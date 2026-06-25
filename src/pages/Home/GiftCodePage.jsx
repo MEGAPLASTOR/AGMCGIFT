@@ -3,6 +3,7 @@ import { GiftCodeEntryPanel } from "../../components/gift-code/forms/GiftCodeEnt
 import { GiftPageDecorations } from "../../components/gift-code/layout/GiftPageDecorations";
 import { GiftTopbar } from "../../components/gift-code/layout/GiftTopbar";
 import { StatusRail } from "../../components/gift-code/layout/StatusRail";
+import { SupportContactRail } from "../../components/gift-code/layout/SupportContactRail";
 import { IncubatingRewardPage } from "../../components/gift-code/rewards/IncubatingRewardPage";
 import { InstantRewardPage } from "../../components/gift-code/rewards/InstantRewardPage";
 import { RewardChoicePage } from "../../components/gift-code/rewards/RewardChoicePage";
@@ -123,6 +124,7 @@ export default function GiftCodePage() {
       </section>
 
       <StatusRail daysToWait={daysToWait} />
+      <SupportContactRail />
     </main>
   );
 }

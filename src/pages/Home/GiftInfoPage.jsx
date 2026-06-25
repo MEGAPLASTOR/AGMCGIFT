@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from "react-router-dom";
 import { GiftPageDecorations } from "../../components/gift-code/layout/GiftPageDecorations";
 import { GiftTopbar } from "../../components/gift-code/layout/GiftTopbar";
+import { SupportContactRail } from "../../components/gift-code/layout/SupportContactRail";
 import {
   DEFAULT_GIFT_INFO_MODULE_ID,
   GIFT_INFO_MODULES,
@@ -72,6 +73,8 @@ export default function GiftInfoPage() {
           <Link to={giftCodeRoute.path}>Quay lại mở trứng</Link>
         </div>
       </section>
+
+      <SupportContactRail />
     </main>
   );
 }

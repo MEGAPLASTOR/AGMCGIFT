@@ -1,15 +1,21 @@
+import { Link } from "react-router-dom";
 import anhGaLogo from "../../../assets/images/anh-ga-logo.png";
+import { giftCodeRoute } from "../../../routes/giftCodeRoute";
 
 export function GiftTopbar() {
   return (
     <header className="gift-topbar">
-      <div className="brand-lockup" aria-label="Anh Gà MC gift">
+      <Link
+        className="brand-lockup"
+        to={giftCodeRoute.path}
+        aria-label="Về trang chủ AGMC Gift"
+      >
         <img className="brand-mark" src={anhGaLogo} alt="Anh Gà MC" />
         <span>
           <strong>AGMC Gift</strong>
           <small>Ổ trứng acc may mắn</small>
         </span>
-      </div>
+      </Link>
       <div className="topbar-pill">Gift code may mắn</div>
     </header>
   );

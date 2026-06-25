@@ -59,6 +59,22 @@
     transform: none;
   }
 
+  .support-contact-rail {
+    right: 12px;
+    bottom: 12px;
+    gap: 6px;
+  }
+
+  .support-contact-rail span {
+    display: none;
+  }
+
+  .support-contact-rail__item {
+    width: 46px;
+    height: 46px;
+    font-size: 21px;
+  }
+
   .floor-lines {
     display: none;
   }
