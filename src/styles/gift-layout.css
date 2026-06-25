@@ -180,6 +180,50 @@
   height: 25px;
 }
 
+.shop-rail__tiktok-shop-icon {
+  position: relative;
+  display: grid;
+  width: 36px;
+  height: 32px;
+  place-items: center;
+  border-radius: 7px 7px 9px 9px;
+  background: #111111;
+}
+
+.shop-rail__tiktok-shop-icon::before {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  width: 16px;
+  height: 12px;
+  border: 4px solid #111111;
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  content: "";
+  transform: translateX(-50%);
+}
+
+.shop-rail__tiktok-shop-icon::after {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  left: 7px;
+  display: flex;
+  justify-content: space-between;
+  content: "";
+}
+
+.shop-rail__tiktok-shop-icon svg {
+  position: relative;
+  z-index: 1;
+  width: 19px;
+  height: 19px;
+  color: #ffffff;
+  filter:
+    drop-shadow(1px 0 0 #25f4ee)
+    drop-shadow(-1px 0 0 #fe2c55);
+}
+
 .shop-rail__item img {
   display: block;
   width: 32px;

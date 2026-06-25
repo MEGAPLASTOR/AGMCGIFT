@@ -14,8 +14,10 @@ export function StatusRail() {
         rel="noreferrer"
         aria-label="Mở TikTok Shop Anh Gà"
       >
-        <FaTiktok aria-hidden="true" />
-        <span>TikTok</span>
+        <i className="shop-rail__tiktok-shop-icon" aria-hidden="true">
+          <FaTiktok />
+        </i>
+        <span>TikTok Shop</span>
       </a>
       <a
         className="status-rail__item shop-rail__item shop-rail__item--shopee"
