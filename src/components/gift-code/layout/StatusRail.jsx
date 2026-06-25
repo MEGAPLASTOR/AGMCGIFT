@@ -6,6 +6,7 @@ import { SHOP_LINKS } from "../../../constants/shopLinks";
 export function StatusRail() {
   return (
     <aside className="status-rail shop-rail" aria-label="Kênh mua hàng">
+      <span className="shop-rail__label">Mua hàng</span>
       <a
         className="status-rail__item shop-rail__item shop-rail__item--tiktok"
         href={SHOP_LINKS.tiktokShop}
