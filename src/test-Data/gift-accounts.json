@@ -1,0 +1,502 @@
+[
+  {
+    "id": "gift-account-001",
+    "username": "toy_acc_normal_001",
+    "password": "Nor@1001",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-001",
+    "created_at": "2026-06-01T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-002",
+    "username": "toy_acc_premium_002",
+    "password": "Pre@1002",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-002",
+    "created_at": "2026-06-02T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-003",
+    "username": "toy_acc_normal_003",
+    "password": "Nor@1003",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-003",
+    "created_at": "2026-06-03T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-004",
+    "username": "toy_acc_premium_004",
+    "password": "Pre@1004",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-004",
+    "created_at": "2026-06-04T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-005",
+    "username": "toy_acc_normal_005",
+    "password": "Nor@1005",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-005",
+    "created_at": "2026-06-05T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-006",
+    "username": "toy_acc_premium_006",
+    "password": "Pre@1006",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-006",
+    "created_at": "2026-06-06T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-007",
+    "username": "toy_acc_normal_007",
+    "password": "Nor@1007",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-007",
+    "created_at": "2026-06-07T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-008",
+    "username": "toy_acc_premium_008",
+    "password": "Pre@1008",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-008",
+    "created_at": "2026-06-08T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-009",
+    "username": "toy_acc_normal_009",
+    "password": "Nor@1009",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-009",
+    "created_at": "2026-06-09T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-010",
+    "username": "toy_acc_premium_010",
+    "password": "Pre@1010",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-010",
+    "created_at": "2026-06-10T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-011",
+    "username": "toy_acc_normal_011",
+    "password": "Nor@1011",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-011",
+    "created_at": "2026-06-11T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-012",
+    "username": "toy_acc_premium_012",
+    "password": "Pre@1012",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-012",
+    "created_at": "2026-06-12T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-013",
+    "username": "toy_acc_normal_013",
+    "password": "Nor@1013",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-013",
+    "created_at": "2026-06-13T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-014",
+    "username": "toy_acc_premium_014",
+    "password": "Pre@1014",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-014",
+    "created_at": "2026-06-14T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-015",
+    "username": "toy_acc_normal_015",
+    "password": "Nor@1015",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-015",
+    "created_at": "2026-06-15T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-016",
+    "username": "toy_acc_premium_016",
+    "password": "Pre@1016",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-016",
+    "created_at": "2026-06-16T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-017",
+    "username": "toy_acc_normal_017",
+    "password": "Nor@1017",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-017",
+    "created_at": "2026-06-17T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-018",
+    "username": "toy_acc_premium_018",
+    "password": "Pre@1018",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-018",
+    "created_at": "2026-06-18T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-019",
+    "username": "toy_acc_normal_019",
+    "password": "Nor@1019",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-019",
+    "created_at": "2026-06-19T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-020",
+    "username": "toy_acc_premium_020",
+    "password": "Pre@1020",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-020",
+    "created_at": "2026-06-20T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-021",
+    "username": "toy_acc_normal_021",
+    "password": "Nor@1021",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-021",
+    "created_at": "2026-06-01T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-022",
+    "username": "toy_acc_premium_022",
+    "password": "Pre@1022",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-022",
+    "created_at": "2026-06-02T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-023",
+    "username": "toy_acc_normal_023",
+    "password": "Nor@1023",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-023",
+    "created_at": "2026-06-03T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-024",
+    "username": "toy_acc_premium_024",
+    "password": "Pre@1024",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-024",
+    "created_at": "2026-06-04T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-025",
+    "username": "toy_acc_normal_025",
+    "password": "Nor@1025",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-025",
+    "created_at": "2026-06-05T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-026",
+    "username": "toy_acc_premium_026",
+    "password": "Pre@1026",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-026",
+    "created_at": "2026-06-06T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-027",
+    "username": "toy_acc_normal_027",
+    "password": "Nor@1027",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-027",
+    "created_at": "2026-06-07T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-028",
+    "username": "toy_acc_premium_028",
+    "password": "Pre@1028",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-028",
+    "created_at": "2026-06-08T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-029",
+    "username": "toy_acc_normal_029",
+    "password": "Nor@1029",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-029",
+    "created_at": "2026-06-09T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-030",
+    "username": "toy_acc_premium_030",
+    "password": "Pre@1030",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-030",
+    "created_at": "2026-06-10T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-031",
+    "username": "toy_acc_normal_031",
+    "password": "Nor@1031",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-031",
+    "created_at": "2026-06-11T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-032",
+    "username": "toy_acc_premium_032",
+    "password": "Pre@1032",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-032",
+    "created_at": "2026-06-12T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-033",
+    "username": "toy_acc_normal_033",
+    "password": "Nor@1033",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-033",
+    "created_at": "2026-06-13T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-034",
+    "username": "toy_acc_premium_034",
+    "password": "Pre@1034",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-034",
+    "created_at": "2026-06-14T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-035",
+    "username": "toy_acc_normal_035",
+    "password": "Nor@1035",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-035",
+    "created_at": "2026-06-15T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-036",
+    "username": "toy_acc_premium_036",
+    "password": "Pre@1036",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-036",
+    "created_at": "2026-06-16T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-037",
+    "username": "toy_acc_normal_037",
+    "password": "Nor@1037",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-037",
+    "created_at": "2026-06-17T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-038",
+    "username": "toy_acc_premium_038",
+    "password": "Pre@1038",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-038",
+    "created_at": "2026-06-18T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-039",
+    "username": "toy_acc_normal_039",
+    "password": "Nor@1039",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-039",
+    "created_at": "2026-06-19T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-040",
+    "username": "toy_acc_premium_040",
+    "password": "Pre@1040",
+    "status": "available",
+    "platform": "blox-fruit",
+    "token": "gift-token-040",
+    "created_at": "2026-06-20T09:00:00.000Z",
+    "assigned_at": null
+  },
+  {
+    "id": "gift-account-041",
+    "username": "toy_acc_normal_041",
+    "password": "Nor@1041",
+    "status": "reserved",
+    "platform": "blox-fruit",
+    "token": "gift-token-041",
+    "created_at": "2026-06-01T09:00:00.000Z",
+    "assigned_at": "2026-06-03T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-042",
+    "username": "toy_acc_premium_042",
+    "password": "Pre@1042",
+    "status": "reserved",
+    "platform": "blox-fruit",
+    "token": "gift-token-042",
+    "created_at": "2026-06-02T09:00:00.000Z",
+    "assigned_at": "2026-06-04T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-043",
+    "username": "toy_acc_normal_043",
+    "password": "Nor@1043",
+    "status": "reserved",
+    "platform": "blox-fruit",
+    "token": "gift-token-043",
+    "created_at": "2026-06-03T09:00:00.000Z",
+    "assigned_at": "2026-06-05T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-044",
+    "username": "toy_acc_premium_044",
+    "password": "Pre@1044",
+    "status": "reserved",
+    "platform": "blox-fruit",
+    "token": "gift-token-044",
+    "created_at": "2026-06-04T09:00:00.000Z",
+    "assigned_at": "2026-06-06T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-045",
+    "username": "toy_acc_normal_045",
+    "password": "Nor@1045",
+    "status": "reserved",
+    "platform": "blox-fruit",
+    "token": "gift-token-045",
+    "created_at": "2026-06-05T09:00:00.000Z",
+    "assigned_at": "2026-06-07T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-046",
+    "username": "toy_acc_premium_046",
+    "password": "Pre@1046",
+    "status": "used",
+    "platform": "blox-fruit",
+    "token": "gift-token-046",
+    "created_at": "2026-06-06T09:00:00.000Z",
+    "assigned_at": "2026-06-08T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-047",
+    "username": "toy_acc_normal_047",
+    "password": "Nor@1047",
+    "status": "used",
+    "platform": "blox-fruit",
+    "token": "gift-token-047",
+    "created_at": "2026-06-07T09:00:00.000Z",
+    "assigned_at": "2026-06-09T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-048",
+    "username": "toy_acc_premium_048",
+    "password": "Pre@1048",
+    "status": "used",
+    "platform": "blox-fruit",
+    "token": "gift-token-048",
+    "created_at": "2026-06-08T09:00:00.000Z",
+    "assigned_at": "2026-06-10T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-049",
+    "username": "toy_acc_normal_049",
+    "password": "Nor@1049",
+    "status": "used",
+    "platform": "blox-fruit",
+    "token": "gift-token-049",
+    "created_at": "2026-06-09T09:00:00.000Z",
+    "assigned_at": "2026-06-11T14:00:00.000Z"
+  },
+  {
+    "id": "gift-account-050",
+    "username": "toy_acc_premium_050",
+    "password": "Pre@1050",
+    "status": "used",
+    "platform": "blox-fruit",
+    "token": "gift-token-050",
+    "created_at": "2026-06-10T09:00:00.000Z",
+    "assigned_at": "2026-06-12T14:00:00.000Z"
+  }
+]

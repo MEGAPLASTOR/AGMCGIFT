@@ -1,0 +1,202 @@
+[
+  {
+    "id": "product-egg-mapping-001",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-001",
+    "egg_tier": "normal",
+    "created_at": "2026-06-01T09:00:00.000Z",
+    "updated_at": "2026-06-02T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-002",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-002",
+    "egg_tier": "premium",
+    "created_at": "2026-06-02T09:00:00.000Z",
+    "updated_at": "2026-06-03T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-003",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-003",
+    "egg_tier": "normal",
+    "created_at": "2026-06-03T09:00:00.000Z",
+    "updated_at": "2026-06-04T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-004",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-004",
+    "egg_tier": "premium",
+    "created_at": "2026-06-04T09:00:00.000Z",
+    "updated_at": "2026-06-05T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-005",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-005",
+    "egg_tier": "normal",
+    "created_at": "2026-06-05T09:00:00.000Z",
+    "updated_at": "2026-06-06T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-006",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-006",
+    "egg_tier": "premium",
+    "created_at": "2026-06-06T09:00:00.000Z",
+    "updated_at": "2026-06-07T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-007",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-007",
+    "egg_tier": "normal",
+    "created_at": "2026-06-07T09:00:00.000Z",
+    "updated_at": "2026-06-08T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-008",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-008",
+    "egg_tier": "premium",
+    "created_at": "2026-06-08T09:00:00.000Z",
+    "updated_at": "2026-06-09T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-009",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-009",
+    "egg_tier": "normal",
+    "created_at": "2026-06-09T09:00:00.000Z",
+    "updated_at": "2026-06-10T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-010",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-010",
+    "egg_tier": "premium",
+    "created_at": "2026-06-10T09:00:00.000Z",
+    "updated_at": "2026-06-11T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-011",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-011",
+    "egg_tier": "normal",
+    "created_at": "2026-06-11T09:00:00.000Z",
+    "updated_at": "2026-06-12T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-012",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-012",
+    "egg_tier": "premium",
+    "created_at": "2026-06-12T09:00:00.000Z",
+    "updated_at": "2026-06-13T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-013",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-013",
+    "egg_tier": "normal",
+    "created_at": "2026-06-13T09:00:00.000Z",
+    "updated_at": "2026-06-14T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-014",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-014",
+    "egg_tier": "premium",
+    "created_at": "2026-06-14T09:00:00.000Z",
+    "updated_at": "2026-06-15T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-015",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-015",
+    "egg_tier": "normal",
+    "created_at": "2026-06-15T09:00:00.000Z",
+    "updated_at": "2026-06-16T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-016",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-016",
+    "egg_tier": "premium",
+    "created_at": "2026-06-16T09:00:00.000Z",
+    "updated_at": "2026-06-17T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-017",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-017",
+    "egg_tier": "normal",
+    "created_at": "2026-06-17T09:00:00.000Z",
+    "updated_at": "2026-06-18T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-018",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-018",
+    "egg_tier": "premium",
+    "created_at": "2026-06-18T09:00:00.000Z",
+    "updated_at": "2026-06-19T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-019",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "egg_type": 1,
+    "gift_pool_id": "gift-pool-019",
+    "egg_tier": "normal",
+    "created_at": "2026-06-19T09:00:00.000Z",
+    "updated_at": "2026-06-20T09:00:00.000Z"
+  },
+  {
+    "id": "product-egg-mapping-020",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "egg_type": 2,
+    "gift_pool_id": "gift-pool-020",
+    "egg_tier": "premium",
+    "created_at": "2026-06-20T09:00:00.000Z",
+    "updated_at": "2026-06-21T09:00:00.000Z"
+  }
+]

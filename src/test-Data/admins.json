@@ -1,0 +1,202 @@
+[
+  {
+    "id": "admin-001",
+    "username": "admin_01",
+    "password_hash": "hash_demo_admin_01",
+    "full_name": "Quan tri vien 01",
+    "role": "owner",
+    "status": "active",
+    "created_at": "2026-06-02T09:00:00.000Z",
+    "updated_at": "2026-06-03T09:00:00.000Z"
+  },
+  {
+    "id": "admin-002",
+    "username": "admin_02",
+    "password_hash": "hash_demo_admin_02",
+    "full_name": "Quan tri vien 02",
+    "role": "manager",
+    "status": "active",
+    "created_at": "2026-06-03T09:00:00.000Z",
+    "updated_at": "2026-06-04T09:00:00.000Z"
+  },
+  {
+    "id": "admin-003",
+    "username": "admin_03",
+    "password_hash": "hash_demo_admin_03",
+    "full_name": "Quan tri vien 03",
+    "role": "manager",
+    "status": "active",
+    "created_at": "2026-06-04T09:00:00.000Z",
+    "updated_at": "2026-06-05T09:00:00.000Z"
+  },
+  {
+    "id": "admin-004",
+    "username": "admin_04",
+    "password_hash": "hash_demo_admin_04",
+    "full_name": "Quan tri vien 04",
+    "role": "manager",
+    "status": "active",
+    "created_at": "2026-06-05T09:00:00.000Z",
+    "updated_at": "2026-06-06T09:00:00.000Z"
+  },
+  {
+    "id": "admin-005",
+    "username": "admin_05",
+    "password_hash": "hash_demo_admin_05",
+    "full_name": "Quan tri vien 05",
+    "role": "manager",
+    "status": "active",
+    "created_at": "2026-06-06T09:00:00.000Z",
+    "updated_at": "2026-06-07T09:00:00.000Z"
+  },
+  {
+    "id": "admin-006",
+    "username": "admin_06",
+    "password_hash": "hash_demo_admin_06",
+    "full_name": "Quan tri vien 06",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-07T09:00:00.000Z",
+    "updated_at": "2026-06-08T09:00:00.000Z"
+  },
+  {
+    "id": "admin-007",
+    "username": "admin_07",
+    "password_hash": "hash_demo_admin_07",
+    "full_name": "Quan tri vien 07",
+    "role": "staff",
+    "status": "inactive",
+    "created_at": "2026-06-08T09:00:00.000Z",
+    "updated_at": "2026-06-09T09:00:00.000Z"
+  },
+  {
+    "id": "admin-008",
+    "username": "admin_08",
+    "password_hash": "hash_demo_admin_08",
+    "full_name": "Quan tri vien 08",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-09T09:00:00.000Z",
+    "updated_at": "2026-06-10T09:00:00.000Z"
+  },
+  {
+    "id": "admin-009",
+    "username": "admin_09",
+    "password_hash": "hash_demo_admin_09",
+    "full_name": "Quan tri vien 09",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-10T09:00:00.000Z",
+    "updated_at": "2026-06-11T09:00:00.000Z"
+  },
+  {
+    "id": "admin-010",
+    "username": "admin_10",
+    "password_hash": "hash_demo_admin_10",
+    "full_name": "Quan tri vien 10",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-11T09:00:00.000Z",
+    "updated_at": "2026-06-12T09:00:00.000Z"
+  },
+  {
+    "id": "admin-011",
+    "username": "admin_11",
+    "password_hash": "hash_demo_admin_11",
+    "full_name": "Quan tri vien 11",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-12T09:00:00.000Z",
+    "updated_at": "2026-06-13T09:00:00.000Z"
+  },
+  {
+    "id": "admin-012",
+    "username": "admin_12",
+    "password_hash": "hash_demo_admin_12",
+    "full_name": "Quan tri vien 12",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-13T09:00:00.000Z",
+    "updated_at": "2026-06-14T09:00:00.000Z"
+  },
+  {
+    "id": "admin-013",
+    "username": "admin_13",
+    "password_hash": "hash_demo_admin_13",
+    "full_name": "Quan tri vien 13",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-14T09:00:00.000Z",
+    "updated_at": "2026-06-15T09:00:00.000Z"
+  },
+  {
+    "id": "admin-014",
+    "username": "admin_14",
+    "password_hash": "hash_demo_admin_14",
+    "full_name": "Quan tri vien 14",
+    "role": "staff",
+    "status": "inactive",
+    "created_at": "2026-06-15T09:00:00.000Z",
+    "updated_at": "2026-06-16T09:00:00.000Z"
+  },
+  {
+    "id": "admin-015",
+    "username": "admin_15",
+    "password_hash": "hash_demo_admin_15",
+    "full_name": "Quan tri vien 15",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-16T09:00:00.000Z",
+    "updated_at": "2026-06-17T09:00:00.000Z"
+  },
+  {
+    "id": "admin-016",
+    "username": "admin_16",
+    "password_hash": "hash_demo_admin_16",
+    "full_name": "Quan tri vien 16",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-17T09:00:00.000Z",
+    "updated_at": "2026-06-18T09:00:00.000Z"
+  },
+  {
+    "id": "admin-017",
+    "username": "admin_17",
+    "password_hash": "hash_demo_admin_17",
+    "full_name": "Quan tri vien 17",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-18T09:00:00.000Z",
+    "updated_at": "2026-06-19T09:00:00.000Z"
+  },
+  {
+    "id": "admin-018",
+    "username": "admin_18",
+    "password_hash": "hash_demo_admin_18",
+    "full_name": "Quan tri vien 18",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-19T09:00:00.000Z",
+    "updated_at": "2026-06-20T09:00:00.000Z"
+  },
+  {
+    "id": "admin-019",
+    "username": "admin_19",
+    "password_hash": "hash_demo_admin_19",
+    "full_name": "Quan tri vien 19",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-20T09:00:00.000Z",
+    "updated_at": "2026-06-21T09:00:00.000Z"
+  },
+  {
+    "id": "admin-020",
+    "username": "admin_20",
+    "password_hash": "hash_demo_admin_20",
+    "full_name": "Quan tri vien 20",
+    "role": "staff",
+    "status": "active",
+    "created_at": "2026-06-01T09:00:00.000Z",
+    "updated_at": "2026-06-02T09:00:00.000Z"
+  }
+]

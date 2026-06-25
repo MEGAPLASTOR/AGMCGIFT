@@ -1,0 +1,102 @@
+[
+  {
+    "id": "pool-account-mapping-001",
+    "pool_id": "gift-pool-001",
+    "account_id": "gift-account-001"
+  },
+  {
+    "id": "pool-account-mapping-002",
+    "pool_id": "gift-pool-002",
+    "account_id": "gift-account-004"
+  },
+  {
+    "id": "pool-account-mapping-003",
+    "pool_id": "gift-pool-003",
+    "account_id": "gift-account-005"
+  },
+  {
+    "id": "pool-account-mapping-004",
+    "pool_id": "gift-pool-004",
+    "account_id": "gift-account-008"
+  },
+  {
+    "id": "pool-account-mapping-005",
+    "pool_id": "gift-pool-005",
+    "account_id": "gift-account-009"
+  },
+  {
+    "id": "pool-account-mapping-006",
+    "pool_id": "gift-pool-006",
+    "account_id": "gift-account-012"
+  },
+  {
+    "id": "pool-account-mapping-007",
+    "pool_id": "gift-pool-007",
+    "account_id": "gift-account-013"
+  },
+  {
+    "id": "pool-account-mapping-008",
+    "pool_id": "gift-pool-008",
+    "account_id": "gift-account-016"
+  },
+  {
+    "id": "pool-account-mapping-009",
+    "pool_id": "gift-pool-009",
+    "account_id": "gift-account-017"
+  },
+  {
+    "id": "pool-account-mapping-010",
+    "pool_id": "gift-pool-010",
+    "account_id": "gift-account-020"
+  },
+  {
+    "id": "pool-account-mapping-011",
+    "pool_id": "gift-pool-011",
+    "account_id": "gift-account-021"
+  },
+  {
+    "id": "pool-account-mapping-012",
+    "pool_id": "gift-pool-012",
+    "account_id": "gift-account-024"
+  },
+  {
+    "id": "pool-account-mapping-013",
+    "pool_id": "gift-pool-013",
+    "account_id": "gift-account-025"
+  },
+  {
+    "id": "pool-account-mapping-014",
+    "pool_id": "gift-pool-014",
+    "account_id": "gift-account-028"
+  },
+  {
+    "id": "pool-account-mapping-015",
+    "pool_id": "gift-pool-015",
+    "account_id": "gift-account-029"
+  },
+  {
+    "id": "pool-account-mapping-016",
+    "pool_id": "gift-pool-016",
+    "account_id": "gift-account-032"
+  },
+  {
+    "id": "pool-account-mapping-017",
+    "pool_id": "gift-pool-017",
+    "account_id": "gift-account-033"
+  },
+  {
+    "id": "pool-account-mapping-018",
+    "pool_id": "gift-pool-018",
+    "account_id": "gift-account-036"
+  },
+  {
+    "id": "pool-account-mapping-019",
+    "pool_id": "gift-pool-019",
+    "account_id": "gift-account-037"
+  },
+  {
+    "id": "pool-account-mapping-020",
+    "pool_id": "gift-pool-020",
+    "account_id": "gift-account-040"
+  }
+]

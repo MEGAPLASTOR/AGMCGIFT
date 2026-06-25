@@ -1,0 +1,198 @@
+import { REWARD_TIERS } from "../constants/rewardTiers.js";
+
+function normalizeCode(value) {
+  return String(value || "")
+    .trim()
+    .toUpperCase();
+}
+
+// SAPO_BACKEND_CHUAN_HOA_TRANG_THAI:
+// Backend nên map trạng thái đơn SAPO về đúng 3 giá trị: Pending, Paid, Cancel.
+function normalizeStatus(value) {
+  return String(value || "")
+    .trim()
+    .toUpperCase();
+}
+
+function getSapoOrders(catalogData) {
+  return catalogData.sapoOrders || catalogData.sapo_orders || [];
+}
+
+function getSapoOrderItems(catalogData) {
+  return catalogData.sapoOrderItems || catalogData.sapo_order_items || [];
+}
+
+function getProductEggMappings(catalogData) {
+  return catalogData.productEggMappings || catalogData.product_egg_mappings || [];
+}
+
+function getGiftPools(catalogData) {
+  return catalogData.giftPools || catalogData.gift_pools || [];
+}
+
+function getGiftAccounts(catalogData) {
+  return catalogData.giftAccounts || catalogData.gift_accounts || [];
+}
+
+function getPoolAccountMappings(catalogData) {
+  return catalogData.poolAccountMappings || catalogData.pool_account_mappings || [];
+}
+
+function getOrderItemByOrderId(catalogData, orderId) {
+  return getSapoOrderItems(catalogData).find((item) => item.order_id === orderId);
+}
+
+function normalizeProductFromOrderItem(orderItem) {
+  if (!orderItem) return null;
+
+  return {
+    id: orderItem.sapo_product_id,
+    tenSanPham: orderItem.product_name,
+    maSanPham: orderItem.sku,
+    moTa: `SAPO variant: ${orderItem.sapo_variant_id}`,
+    sapoVariantId: orderItem.sapo_variant_id,
+  };
+}
+
+function getProducts(catalogData) {
+  if (catalogData.products?.length || catalogData.sanPham?.length) {
+    return catalogData.products || catalogData.sanPham;
+  }
+
+  const products = new Map();
+
+  getSapoOrderItems(catalogData).forEach((item) => {
+    if (!products.has(item.sapo_product_id)) {
+      products.set(item.sapo_product_id, normalizeProductFromOrderItem(item));
+    }
+  });
+
+  return [...products.values()];
+}
+
+function getEggTypeByTier(tier) {
+  return tier === REWARD_TIERS.premium ? 2 : 1;
+}
+
+function normalizeAccount(account, tier, productId, pool) {
+  return {
+    id: account.id,
+    productId,
+    loaiAcc: tier,
+    tenAcc: account.username,
+    taiKhoan: account.username,
+    matKhau: account.password,
+    ghiChu: `${pool?.pool_name || "Gift pool"} - ${account.status}`,
+    platform: account.platform,
+    token: account.token,
+    sourceStatus: account.status,
+    assignedAt: account.assigned_at,
+  };
+}
+
+// SAPO_BACKEND_DANH_SACH_DON:
+// Frontend đang đọc bảng JSON sapo_orders và join sapo_order_items để lấy thông tin sản phẩm.
+// Backend sau này thay bằng API lấy đơn thật từ SAPO/MySQL.
+// Field cần có: sapo_orders.order_code, sapo_orders.status, sapo_order_items.sapo_product_id.
+export function getCustomerOrders(catalogData) {
+  if (catalogData.customerOrders?.length || catalogData.orders?.length) {
+    const orders = catalogData.customerOrders || catalogData.orders;
+
+    return orders.map((order) => ({
+      ...order,
+      code: order.code || order.maDonHang,
+    }));
+  }
+
+  return getSapoOrders(catalogData).map((order) => {
+    const orderItem = getOrderItemByOrderId(catalogData, order.id);
+
+    return {
+      ...order,
+      productId: orderItem?.sapo_product_id,
+      productVariantId: orderItem?.sapo_variant_id,
+      maDonHang: order.order_code,
+      trangThai: order.status,
+      tenKhachHang: order.source_name,
+      code: order.order_code,
+    };
+  });
+}
+
+// SAPO_BACKEND_CHAN_DON_CHUA_HOP_LE:
+// Chỉ đơn Paid mới được đi tiếp vào bước chọn trứng.
+// Pending/Cancel vẫn tìm được đơn nhưng bị chặn trong hook useGiftCode.
+export function isPaidOrder(order) {
+  return normalizeStatus(order?.trangThai || order?.status) === "PAID";
+}
+
+// SAPO_BACKEND_CHECK_MA_DON:
+// Người dùng nhập sapo_orders.order_code.
+// Hàm này join theo luồng: order -> order_item -> product.
+export function findCodeInCatalog(catalogData, inputCode) {
+  const normalizedCode = normalizeCode(inputCode);
+  const products = getProducts(catalogData);
+  const matchedOrder = getCustomerOrders(catalogData).find(
+    (order) => normalizeCode(order.maDonHang || order.code) === normalizedCode
+  );
+
+  if (!matchedOrder) {
+    return null;
+  }
+
+  const product = products.find((item) => item.id === matchedOrder.productId);
+
+  if (!product) {
+    return null;
+  }
+
+  return {
+    product,
+    order: matchedOrder,
+    code: {
+      ...matchedOrder,
+      code: matchedOrder.maDonHang || matchedOrder.code,
+    },
+  };
+}
+
+// BACKEND_LOGIC_KHO_ACC:
+// Frontend đang join dữ liệu giống database:
+// product_egg_mappings -> gift_pools -> pool_account_mappings -> gift_accounts.
+// Backend nên chuyển đoạn này thành query/service thật và khóa acc bằng transaction để tránh trùng.
+export function getAccountsByTier(catalogData, orderItem, tier) {
+  if (catalogData.accounts?.length) {
+    return catalogData.accounts.filter((account) => {
+      const accountTier = account.loaiAcc || account.tier;
+      return account.productId === orderItem.productId && accountTier === tier;
+    });
+  }
+
+  const eggType = getEggTypeByTier(tier);
+  const mapping = getProductEggMappings(catalogData).find(
+    (item) =>
+      item.sapo_product_id === orderItem.productId &&
+      item.sapo_variant_id === orderItem.productVariantId &&
+      (item.egg_tier === tier || Number(item.egg_type) === eggType)
+  );
+
+  if (!mapping) {
+    return [];
+  }
+
+  const pool = getGiftPools(catalogData).find(
+    (item) => item.id === mapping.gift_pool_id
+  );
+  const accountIds = new Set(
+    getPoolAccountMappings(catalogData)
+      .filter((item) => item.pool_id === mapping.gift_pool_id)
+      .map((item) => item.account_id)
+  );
+
+  return getGiftAccounts(catalogData)
+    .filter((account) => accountIds.has(account.id))
+    .filter((account) => account.status === "available")
+    .map((account) => normalizeAccount(account, tier, orderItem.productId, pool));
+}
+
+export const getRewardsByTier = getAccountsByTier;

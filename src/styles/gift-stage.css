@@ -1,0 +1,159 @@
+.incubator-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(360px, 1.1fr);
+  grid-template-rows: minmax(220px, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  min-height: 356px;
+  overflow: hidden;
+  margin: 16px 0;
+  border: 3px solid #17130a;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 58% 44%, rgba(255, 255, 255, 0.96), transparent 24%),
+    radial-gradient(circle at 54% 58%, rgba(255, 233, 101, 0.78), transparent 34%),
+    linear-gradient(180deg, #fffbe4 0%, #fff4a5 100%);
+  padding: 24px;
+}
+
+.incubator-stage::before {
+  position: absolute;
+  inset: 16px 16px auto auto;
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  background:
+    linear-gradient(#17130a, #17130a) 50% 50% / 3px 76px no-repeat,
+    linear-gradient(90deg, #17130a, #17130a) 50% 50% / 76px 3px no-repeat;
+  content: "";
+  opacity: 0.07;
+  transform: rotate(16deg);
+}
+
+.stage-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 340px;
+}
+
+.stage-hanging-eggs {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: end;
+  align-items: end;
+  min-height: 274px;
+  padding: 8px 0 4px;
+}
+
+.stage-hanging-eggs::before {
+  position: absolute;
+  top: 68px;
+  left: 50%;
+  width: min(72%, 520px);
+  height: 96px;
+  border: 3px solid rgba(255, 187, 39, 0.32);
+  border-radius: 999px;
+  content: "";
+  transform: translateX(-50%);
+  animation: hanging-ring 2.2s ease-in-out infinite;
+}
+
+.stage-hanging-eggs__pair {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: clamp(0px, 0.4vw, 8px);
+  width: min(100%, 620px);
+  margin-right: 4px;
+}
+
+.stage-hanging-egg {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: min(25vw, 292px);
+  border: 0;
+  background: transparent;
+  padding: 0;
+  transform-origin: 50% 80%;
+  transition:
+    filter 180ms ease,
+    transform 180ms ease;
+}
+
+.stage-hanging-egg:hover {
+  filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.82));
+}
+
+.stage-hanging-egg:focus-visible {
+  border-radius: 14px;
+}
+
+.stage-hanging-egg--selected::after {
+  position: absolute;
+  right: 12%;
+  bottom: 8%;
+  left: 12%;
+  z-index: 1;
+  height: 18px;
+  border: 3px solid rgba(23, 19, 10, 0.86);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  content: "";
+}
+
+.stage-hanging-egg--gold {
+  animation: stage-egg-shake-gold 2.35s ease-in-out infinite;
+}
+
+.stage-hanging-egg--diamond {
+  margin-left: clamp(-58px, -4vw, -24px);
+  animation: stage-egg-shake-diamond 2.55s ease-in-out infinite;
+}
+
+.stage-hanging-egg img {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  height: 248px;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 18px 12px rgba(23, 19, 10, 0.22));
+  transform: scale(1.2);
+}
+
+.stage-metrics {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stage-metrics div {
+  border: 2px solid #17130a;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  padding: 12px;
+}
+
+.stage-metrics strong {
+  display: block;
+  margin: 0;
+  font-size: clamp(17px, 2vw, 24px);
+  font-weight: 1000;
+  text-align: center;
+}
+
+.stage-metrics--nav div {
+  display: grid;
+  min-height: 68px;
+  place-items: center;
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "id": "gift-pool-001",
+    "pool_name": "TOY-ROBOT-ALPHA-NORMAL-W1",
+    "tier": "normal",
+    "created_at": "2026-06-01T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-002",
+    "pool_name": "TOY-RACING-CAR-PREMIUM-W1",
+    "tier": "premium",
+    "created_at": "2026-06-02T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-003",
+    "pool_name": "TOY-BRICK-CASTLE-NORMAL-W1",
+    "tier": "normal",
+    "created_at": "2026-06-03T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-004",
+    "pool_name": "TOY-SPACE-DOLL-PREMIUM-W1",
+    "tier": "premium",
+    "created_at": "2026-06-04T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-005",
+    "pool_name": "TOY-MINI-DRONE-NORMAL-W1",
+    "tier": "normal",
+    "created_at": "2026-06-05T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-006",
+    "pool_name": "TOY-ROBOT-ALPHA-PREMIUM-W1",
+    "tier": "premium",
+    "created_at": "2026-06-06T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-007",
+    "pool_name": "TOY-RACING-CAR-NORMAL-W1",
+    "tier": "normal",
+    "created_at": "2026-06-07T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-008",
+    "pool_name": "TOY-BRICK-CASTLE-PREMIUM-W1",
+    "tier": "premium",
+    "created_at": "2026-06-08T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-009",
+    "pool_name": "TOY-SPACE-DOLL-NORMAL-W1",
+    "tier": "normal",
+    "created_at": "2026-06-09T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-010",
+    "pool_name": "TOY-MINI-DRONE-PREMIUM-W1",
+    "tier": "premium",
+    "created_at": "2026-06-10T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-011",
+    "pool_name": "TOY-ROBOT-ALPHA-NORMAL-W2",
+    "tier": "normal",
+    "created_at": "2026-06-11T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-012",
+    "pool_name": "TOY-RACING-CAR-PREMIUM-W2",
+    "tier": "premium",
+    "created_at": "2026-06-12T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-013",
+    "pool_name": "TOY-BRICK-CASTLE-NORMAL-W2",
+    "tier": "normal",
+    "created_at": "2026-06-13T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-014",
+    "pool_name": "TOY-SPACE-DOLL-PREMIUM-W2",
+    "tier": "premium",
+    "created_at": "2026-06-14T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-015",
+    "pool_name": "TOY-MINI-DRONE-NORMAL-W2",
+    "tier": "normal",
+    "created_at": "2026-06-15T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-016",
+    "pool_name": "TOY-ROBOT-ALPHA-PREMIUM-W2",
+    "tier": "premium",
+    "created_at": "2026-06-16T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-017",
+    "pool_name": "TOY-RACING-CAR-NORMAL-W2",
+    "tier": "normal",
+    "created_at": "2026-06-17T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-018",
+    "pool_name": "TOY-BRICK-CASTLE-PREMIUM-W2",
+    "tier": "premium",
+    "created_at": "2026-06-18T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-019",
+    "pool_name": "TOY-SPACE-DOLL-NORMAL-W2",
+    "tier": "normal",
+    "created_at": "2026-06-19T09:00:00.000Z"
+  },
+  {
+    "id": "gift-pool-020",
+    "pool_name": "TOY-MINI-DRONE-PREMIUM-W2",
+    "tier": "premium",
+    "created_at": "2026-06-20T09:00:00.000Z"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "id": "egg-opening-log-001",
+    "egg_id": "egg-001",
+    "account_id": "gift-account-001",
+    "action_type": "claim_now",
+    "triggered_by": "admin",
+    "ip_address": "192.168.1.20",
+    "created_at": "2026-06-01T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-002",
+    "egg_id": "egg-002",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.21",
+    "created_at": "2026-06-02T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-003",
+    "egg_id": "egg-003",
+    "account_id": "gift-account-005",
+    "action_type": "claim_now",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.22",
+    "created_at": "2026-06-03T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-004",
+    "egg_id": "egg-004",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.23",
+    "created_at": "2026-06-04T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-005",
+    "egg_id": "egg-005",
+    "account_id": "gift-account-009",
+    "action_type": "claim_now",
+    "triggered_by": "admin",
+    "ip_address": "192.168.1.24",
+    "created_at": "2026-06-05T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-006",
+    "egg_id": "egg-006",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.25",
+    "created_at": "2026-06-06T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-007",
+    "egg_id": "egg-007",
+    "account_id": "gift-account-013",
+    "action_type": "claim_now",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.26",
+    "created_at": "2026-06-07T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-008",
+    "egg_id": "egg-008",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.27",
+    "created_at": "2026-06-08T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-009",
+    "egg_id": "egg-009",
+    "account_id": "gift-account-017",
+    "action_type": "claim_now",
+    "triggered_by": "admin",
+    "ip_address": "192.168.1.28",
+    "created_at": "2026-06-09T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-010",
+    "egg_id": "egg-010",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.29",
+    "created_at": "2026-06-10T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-011",
+    "egg_id": "egg-011",
+    "account_id": "gift-account-001",
+    "action_type": "claim_now",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.30",
+    "created_at": "2026-06-11T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-012",
+    "egg_id": "egg-012",
+    "account_id": "gift-account-004",
+    "action_type": "incubate",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.31",
+    "created_at": "2026-06-12T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-013",
+    "egg_id": "egg-013",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "admin",
+    "ip_address": "192.168.1.32",
+    "created_at": "2026-06-13T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-014",
+    "egg_id": "egg-014",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.33",
+    "created_at": "2026-06-14T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-015",
+    "egg_id": "egg-015",
+    "account_id": "gift-account-009",
+    "action_type": "claim_now",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.34",
+    "created_at": "2026-06-15T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-016",
+    "egg_id": "egg-016",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.35",
+    "created_at": "2026-06-16T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-017",
+    "egg_id": "egg-017",
+    "account_id": "gift-account-013",
+    "action_type": "claim_now",
+    "triggered_by": "admin",
+    "ip_address": "192.168.1.36",
+    "created_at": "2026-06-17T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-018",
+    "egg_id": "egg-018",
+    "account_id": null,
+    "action_type": "blocked",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.37",
+    "created_at": "2026-06-18T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-019",
+    "egg_id": "egg-019",
+    "account_id": "gift-account-017",
+    "action_type": "claim_now",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.38",
+    "created_at": "2026-06-19T15:00:00.000Z"
+  },
+  {
+    "id": "egg-opening-log-020",
+    "egg_id": "egg-020",
+    "account_id": "gift-account-020",
+    "action_type": "incubate",
+    "triggered_by": "customer",
+    "ip_address": "192.168.1.39",
+    "created_at": "2026-06-20T15:00:00.000Z"
+  }
+]

@@ -1,0 +1,182 @@
+[
+  {
+    "id": "sapo-order-item-001",
+    "order_id": "sapo-order-001",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 1
+  },
+  {
+    "id": "sapo-order-item-002",
+    "order_id": "sapo-order-002",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 2
+  },
+  {
+    "id": "sapo-order-item-003",
+    "order_id": "sapo-order-003",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 3
+  },
+  {
+    "id": "sapo-order-item-004",
+    "order_id": "sapo-order-004",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 1
+  },
+  {
+    "id": "sapo-order-item-005",
+    "order_id": "sapo-order-005",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 2
+  },
+  {
+    "id": "sapo-order-item-006",
+    "order_id": "sapo-order-006",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 3
+  },
+  {
+    "id": "sapo-order-item-007",
+    "order_id": "sapo-order-007",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 1
+  },
+  {
+    "id": "sapo-order-item-008",
+    "order_id": "sapo-order-008",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 2
+  },
+  {
+    "id": "sapo-order-item-009",
+    "order_id": "sapo-order-009",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 3
+  },
+  {
+    "id": "sapo-order-item-010",
+    "order_id": "sapo-order-010",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 1
+  },
+  {
+    "id": "sapo-order-item-011",
+    "order_id": "sapo-order-011",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 2
+  },
+  {
+    "id": "sapo-order-item-012",
+    "order_id": "sapo-order-012",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 3
+  },
+  {
+    "id": "sapo-order-item-013",
+    "order_id": "sapo-order-013",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 1
+  },
+  {
+    "id": "sapo-order-item-014",
+    "order_id": "sapo-order-014",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 2
+  },
+  {
+    "id": "sapo-order-item-015",
+    "order_id": "sapo-order-015",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 3
+  },
+  {
+    "id": "sapo-order-item-016",
+    "order_id": "sapo-order-016",
+    "sapo_product_id": "sapo-product-001",
+    "sapo_variant_id": "sapo-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 1
+  },
+  {
+    "id": "sapo-order-item-017",
+    "order_id": "sapo-order-017",
+    "sapo_product_id": "sapo-product-002",
+    "sapo_variant_id": "sapo-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 2
+  },
+  {
+    "id": "sapo-order-item-018",
+    "order_id": "sapo-order-018",
+    "sapo_product_id": "sapo-product-003",
+    "sapo_variant_id": "sapo-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 3
+  },
+  {
+    "id": "sapo-order-item-019",
+    "order_id": "sapo-order-019",
+    "sapo_product_id": "sapo-product-004",
+    "sapo_variant_id": "sapo-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 1
+  },
+  {
+    "id": "sapo-order-item-020",
+    "order_id": "sapo-order-020",
+    "sapo_product_id": "sapo-product-005",
+    "sapo_variant_id": "sapo-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 2
+  }
+]
