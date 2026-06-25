@@ -46,7 +46,7 @@ Mỗi bảng có 20 record, riêng `gift-accounts.json` có 50 record.
 
 ## Admin Dashboard
 
-- Route: `/agmcmyadmin`
+- Route admin khi deploy static host: `/#/agmcmyadmin`
 - `src/pages/Admin/AdminDashboardPage.jsx`
   - Trang dashboard quản trị, độc lập với trang khách.
   - Đọc dữ liệu từ JSON table state.
