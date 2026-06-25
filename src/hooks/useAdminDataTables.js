@@ -136,6 +136,34 @@ export function useAdminDataTables(sourceTables) {
     };
   };
 
+  // BACKEND_ADMIN_DOI_MAT_KHAU:
+  // Frontend đang so mật khẩu hiện tại với admins.password_hash trong state tạm.
+  // Backend cần verify bằng hash thật, cập nhật password_hash và ghi audit log nếu cần.
+  const changeAdminPassword = ({ adminId, currentPassword, newPassword }) => {
+    const matchedAdmin = (tables.admins || []).find((admin) => admin.id === adminId);
+
+    if (!matchedAdmin) {
+      return { ok: false, message: "Không tìm thấy tài khoản admin." };
+    }
+
+    if (matchedAdmin.password_hash !== currentPassword) {
+      return { ok: false, message: "Mật khẩu hiện tại chưa đúng." };
+    }
+
+    const updatedAt = new Date().toISOString();
+
+    setTables((currentTables) => ({
+      ...currentTables,
+      admins: (currentTables.admins || []).map((admin) =>
+        admin.id === adminId
+          ? { ...admin, password_hash: newPassword, updated_at: updatedAt }
+          : admin
+      ),
+    }));
+
+    return { ok: true, message: "Đã cập nhật mật khẩu admin." };
+  };
+
   const resetTables = () => {
     setTables(createAdminTableState(sourceTables));
   };
@@ -146,6 +174,7 @@ export function useAdminDataTables(sourceTables) {
     upsertRecord,
     deleteRecord,
     importGiftAccounts,
+    changeAdminPassword,
     resetTables,
   };
 }

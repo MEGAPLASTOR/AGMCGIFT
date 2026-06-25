@@ -56,6 +56,16 @@ Mỗi bảng có 20 record, riêng `gift-accounts.json` có 50 record.
 - `src/hooks/useAdminAuth.js`
   - `BACKEND_ADMIN_PHIEN_DANG_NHAP`: thay sessionStorage bằng token/session thật.
 
+## Module Đổi Mật Khẩu Admin
+
+- `src/components/admin/AdminPasswordPanel.jsx`
+  - `BACKEND_ADMIN_DOI_MAT_KHAU`
+  - Modal đổi mật khẩu cho admin đang đăng nhập, mở từ nút trên header dashboard.
+- `src/hooks/useAdminDataTables.js`
+  - `BACKEND_ADMIN_DOI_MAT_KHAU`
+  - Frontend hiện đổi `admins.password_hash` trong state tạm.
+  - Backend cần tạo API verify mật khẩu hiện tại, hash mật khẩu mới, cập nhật `admins.password_hash`, `admins.updated_at`.
+
 ## Module Thêm Sửa Xóa Tìm Kiếm
 
 - `src/components/admin/AdminDataCrudPanel.jsx`

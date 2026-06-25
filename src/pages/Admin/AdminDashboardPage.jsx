@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { AdminDataTable } from "../../components/admin/AdminDataTable";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
 import { AdminMetricCard } from "../../components/admin/AdminMetricCard";
+import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
 import { AdminStatusBar } from "../../components/admin/AdminStatusBar";
 import { AdminWorkflow } from "../../components/admin/AdminWorkflow";
 import { giftCatalogData } from "../../config/giftCatalogData";
@@ -48,6 +50,7 @@ const logColumns = [
 export default function AdminDashboardPage() {
   const adminTables = useAdminDataTables(giftCatalogData);
   const { admin, error, login, logout } = useAdminAuth(adminTables.tables);
+  const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
 
   if (!admin) {
@@ -68,10 +71,27 @@ export default function AdminDashboardPage() {
             Đăng nhập: {admin.full_name} / {admin.role}
           </span>
         </div>
-        <button type="button" onClick={logout}>
-          Đăng xuất
-        </button>
+        <div className="admin-header__actions">
+          <button
+            type="button"
+            className="admin-light-button"
+            onClick={() => setPasswordModalOpen(true)}
+          >
+            Đổi mật khẩu
+          </button>
+          <button type="button" onClick={logout}>
+            Đăng xuất
+          </button>
+        </div>
       </header>
+
+      {isPasswordModalOpen ? (
+        <AdminPasswordPanel
+          admin={admin}
+          onChangePassword={adminTables.changeAdminPassword}
+          onClose={() => setPasswordModalOpen(false)}
+        />
+      ) : null}
 
       <section className="admin-metric-grid">
         <AdminMetricCard

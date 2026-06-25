@@ -104,6 +104,52 @@
   font-weight: 800;
 }
 
+.admin-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.admin-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: start center;
+  overflow-y: auto;
+  background: rgba(23, 32, 51, 0.56);
+  padding: 56px 24px 24px;
+}
+
+.admin-modal {
+  width: min(360px, 100%);
+  margin: auto;
+  box-shadow: 0 30px 90px rgba(7, 12, 24, 0.32);
+}
+
+.admin-modal-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.admin-modal-close {
+  min-height: 34px;
+  border: 1px solid #d8dfeb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172033;
+  font-weight: 1000;
+  padding: 7px 10px;
+}
+
+.admin-password-panel .admin-modal-head-actions {
+  align-items: flex-end;
+  flex-direction: column;
+}
+
 .admin-metric-grid,
 .admin-grid-two,
 .admin-panel {
@@ -165,6 +211,12 @@
   padding: 18px;
 }
 
+.admin-panel.admin-modal {
+  width: min(360px, calc(100vw - 32px));
+  max-width: 360px;
+  min-height: 520px;
+}
+
 .admin-panel__head {
   display: flex;
   align-items: center;
@@ -178,6 +230,74 @@
   color: #172033;
   font-size: 20px;
   font-weight: 1000;
+}
+
+.admin-password-panel {
+  border-top: 5px solid #e7af19;
+  display: grid;
+  align-content: start;
+  padding: 18px;
+}
+
+.admin-password-panel .admin-panel__head {
+  align-items: flex-start;
+}
+
+.admin-password-panel .admin-panel__head strong {
+  border-radius: 999px;
+  background: #fff9d2;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 1000;
+  padding: 8px 12px;
+}
+
+.admin-password-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.admin-password-form label {
+  display: grid;
+  gap: 7px;
+  color: #647187;
+  font-size: 12px;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.admin-password-form input {
+  min-height: 42px;
+  width: 100%;
+  border: 2px solid #d8dfeb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #172033;
+  font: inherit;
+  font-weight: 800;
+  padding: 9px 10px;
+}
+
+.admin-password-form button {
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  background: #172033;
+  color: #fff7b8;
+  font-weight: 1000;
+  padding: 9px 12px;
+}
+
+.admin-password-panel p {
+  border: 1px solid #d8dfeb;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #172033;
+  font-size: 13px;
+  font-weight: 900;
+  margin: 12px 0 0;
+  padding: 10px 12px;
 }
 
 .admin-workflow {
@@ -502,6 +622,7 @@
 
   .admin-login-card,
   .admin-grid-two,
+  .admin-password-form,
   .admin-crud-toolbar,
   .admin-crud-grid,
   .admin-form-grid {
@@ -511,6 +632,10 @@
   .admin-header {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .admin-header__actions {
+    justify-content: flex-start;
   }
 
   .admin-account-import {
