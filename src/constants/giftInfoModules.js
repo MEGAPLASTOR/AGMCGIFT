@@ -41,3 +41,9 @@ export const GIFT_INFO_MODULES = [
     ],
   },
 ];
+
+export const DEFAULT_GIFT_INFO_MODULE_ID = GIFT_INFO_MODULES[0].id;
+
+export function getGiftInfoModule(moduleId) {
+  return GIFT_INFO_MODULES.find((module) => module.id === moduleId);
+}
