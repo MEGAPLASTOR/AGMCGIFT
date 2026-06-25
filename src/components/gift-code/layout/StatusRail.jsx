@@ -31,10 +31,10 @@ export function StatusRail() {
         href={SHOP_LINKS.website}
         target="_blank"
         rel="noreferrer"
-        aria-label="Mở web bán hàng Anh Gà MC"
+        aria-label="Mở shop Anh Gà MC"
       >
         <img src={anhGaLogo} alt="" aria-hidden="true" />
-        <span>Web</span>
+        <span>Shop</span>
       </a>
     </aside>
   );

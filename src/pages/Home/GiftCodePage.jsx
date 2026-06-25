@@ -69,15 +69,6 @@ export default function GiftCodePage() {
       <section className="incubator-shell" aria-label="AGMC Gift Hatchery">
         <GiftTopbar />
 
-        <section className="incubator-stage incubator-stage--eggs-only">
-          <StageIntroCopy daysToWait={daysToWait} />
-          <StageEggDisplay
-            selectedEgg={selectedStageEgg}
-            onSelectEgg={handleStageEggSelect}
-          />
-          <StageMetrics />
-        </section>
-
         {(status === GIFT_CODE_STATUS.idle ||
           status === GIFT_CODE_STATUS.invalid) && (
           <div ref={codeEntryRef}>
@@ -90,6 +81,15 @@ export default function GiftCodePage() {
             />
           </div>
         )}
+
+        <section className="incubator-stage incubator-stage--eggs-only">
+          <StageIntroCopy daysToWait={daysToWait} />
+          <StageEggDisplay
+            selectedEgg={selectedStageEgg}
+            onSelectEgg={handleStageEggSelect}
+          />
+          <StageMetrics />
+        </section>
 
         {status === GIFT_CODE_STATUS.choosing && (
           <div ref={actionSectionRef}>
