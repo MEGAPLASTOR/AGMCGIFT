@@ -75,9 +75,6 @@
     font-size: 21px;
   }
 
-  .floor-lines {
-    display: none;
-  }
 }
 
 @media (max-width: 700px) {

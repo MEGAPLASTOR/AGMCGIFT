@@ -245,36 +245,3 @@
 .support-contact-rail__item--zalo {
   background: #0068ff;
 }
-
-.floor-lines {
-  position: absolute;
-  right: 10%;
-  bottom: 16px;
-  left: 6%;
-  z-index: 1;
-  display: grid;
-  gap: 18px;
-  opacity: 0.8;
-  pointer-events: none;
-}
-
-.floor-lines span {
-  display: block;
-  height: 3px;
-  border-radius: 999px;
-  background: #17130a;
-}
-
-.floor-lines span:nth-child(1) {
-  width: 72%;
-}
-
-.floor-lines span:nth-child(2) {
-  width: 24%;
-  margin-left: 16%;
-}
-
-.floor-lines span:nth-child(3) {
-  width: 32%;
-  margin-left: 58%;
-}
