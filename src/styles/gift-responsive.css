@@ -44,6 +44,10 @@
     grid-template-columns: 1fr;
   }
 
+  .stage-info-panel ul {
+    grid-template-columns: 1fr;
+  }
+
   .status-rail {
     position: relative;
     top: auto;
