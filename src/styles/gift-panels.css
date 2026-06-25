@@ -39,6 +39,8 @@
 .gift-panel--code-entry {
   display: grid;
   gap: 14px;
+  width: min(820px, 100%);
+  margin: -4px auto 16px;
   animation: code-panel-reveal 320ms ease-out both;
 }
 

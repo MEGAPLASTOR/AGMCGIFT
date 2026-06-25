@@ -118,14 +118,24 @@
 
 .status-rail__item {
   display: grid;
-  width: 72px;
-  min-height: 78px;
+  width: 76px;
+  min-height: 76px;
   place-items: center;
   border: 3px solid #17130a;
   border-radius: 999px;
   background: #ffffff;
   box-shadow: 5px 5px 0 #17130a;
+  color: #17130a;
   text-align: center;
+  text-decoration: none;
+  transition:
+    box-shadow 180ms ease,
+    transform 180ms ease;
+}
+
+.status-rail__item:hover {
+  box-shadow: 3px 3px 0 #17130a;
+  transform: translate(2px, 2px);
 }
 
 .status-rail__item strong,
@@ -144,7 +154,44 @@
   font-weight: 900;
 }
 
-.status-rail__item--hot {
+.shop-rail {
+  gap: 14px;
+}
+
+.shop-rail__item {
+  align-content: center;
+  gap: 4px;
+}
+
+.shop-rail__item svg {
+  width: 25px;
+  height: 25px;
+}
+
+.shop-rail__item img {
+  display: block;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #17130a;
+  border-radius: 8px;
+  object-fit: cover;
+  object-position: center 38%;
+}
+
+.shop-rail__item--tiktok {
+  background: #ffffff;
+}
+
+.shop-rail__item--shopee {
+  background: #ff6b35;
+  color: #ffffff;
+}
+
+.shop-rail__item--shopee span {
+  color: #ffffff;
+}
+
+.shop-rail__item--website {
   background: #ffd52e;
 }
 

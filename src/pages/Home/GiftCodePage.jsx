@@ -123,7 +123,7 @@ export default function GiftCodePage() {
         )}
       </section>
 
-      <StatusRail daysToWait={daysToWait} />
+      <StatusRail />
       <SupportContactRail />
     </main>
   );
