@@ -143,7 +143,7 @@ Mỗi bảng có 20 record, riêng `gift-accounts.json` có 50 record.
 - `src/api/eggs/syncEggsByOrderCode.js`
   - `BACKEND_API_SYNC_TRUNG`
   - Frontend goi `POST /api/eggs/sync`.
-  - Request body: `{ orderCode: string }`.
+  - Request body: `{ code: string }`.
   - Response 200 dung cac field: `customerName`, `customerStatus`, `deliveryStatus`, `eggs[]`.
   - Moi phan tu `eggs[]` can co: `eggId`, `eggType`, `displayStatus`, `hatchAt`.
   - Response 400 duoc hieu la ma don khong hop le, khach bi BAN, hoac don chua du dieu kien.

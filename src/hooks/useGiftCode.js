@@ -87,7 +87,7 @@ export function useGiftCode(catalogData) {
 
     try {
       // BACKEND_API_NHAP_MA_DON:
-      // Frontend POST orderCode lên /api/eggs/sync.
+      // Frontend POST code lên /api/eggs/sync.
       // Backend kiểm tra đơn KiotViet/SAPO, trạng thái khách, trạng thái giao hàng
       // rồi trả về danh sách trứng hợp lệ để khách chọn.
       const payload = await syncEggsByOrderCode(trimmedCode);
