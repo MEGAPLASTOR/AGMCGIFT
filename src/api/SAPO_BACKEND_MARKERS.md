@@ -46,7 +46,7 @@ Mỗi bảng có 20 record, riêng `gift-accounts.json` có 50 record.
 
 ## Admin Dashboard
 
-- Route admin khi deploy static host: `/#/agmcmyadmin`
+- Route admin khi deploy static host: `/agmcmyadmin`
 - `src/pages/Admin/AdminDashboardPage.jsx`
   - Trang dashboard quản trị, độc lập với trang khách.
   - Đọc dữ liệu từ JSON table state.
@@ -122,5 +122,47 @@ Mỗi bảng có 20 record, riêng `gift-accounts.json` có 50 record.
   ]
 }
 ```
+
+## API Khach Nhap Ma Va Mo Trung
+
+- `src/api/config/apiRuntimeConfig.js`
+  - `BACKEND_API_BASE_URL`
+  - Cau hinh base URL cho backend.
+  - Dev fallback hien tai: `http://10.16.2.116:8080`.
+  - Neu backend chay port/domain khac, set `VITE_API_BASE_URL` khi build hoac `AGMC_API_BASE_URL` trong runtime.
+- `src/api/endpoints/eggEndpoints.js`
+  - Khai bao endpoint rieng cho module eggs.
+- `src/api/http/postJson.js`
+  - HTTP client dung chung cho cac API POST JSON.
+- `src/api/errors/apiErrorMessages.js`
+  - Message loi API dung chung, tach khoi UI.
+- `src/api/eggs/normalizers/*`
+  - Chuan hoa response `/api/eggs/sync` va `/api/eggs/claim` ve shape frontend dang dung.
+- `src/api/eggs/messages/*`
+  - Chuan hoa thong bao loi API eggs, khong de message ky thuat hien len UI.
+- `src/api/eggs/syncEggsByOrderCode.js`
+  - `BACKEND_API_SYNC_TRUNG`
+  - Frontend goi `POST /api/eggs/sync`.
+  - Request body: `{ orderCode: string }`.
+  - Response 200 dung cac field: `customerName`, `customerStatus`, `deliveryStatus`, `eggs[]`.
+  - Moi phan tu `eggs[]` can co: `eggId`, `eggType`, `displayStatus`, `hatchAt`.
+  - Response 400 duoc hieu la ma don khong hop le, khach bi BAN, hoac don chua du dieu kien.
+  - Response 429 duoc hien thi la thao tac qua nhanh.
+- `src/hooks/useGiftCode.js`
+  - `BACKEND_API_NHAP_MA_DON`
+  - Sau khi sync thanh cong, frontend khong random account tu JSON nua.
+  - Frontend chi hien thi danh sach trung backend tra ve va giu `eggId` cho buoc claim.
+- `src/api/eggs/claimEggById.js`
+  - `BACKEND_API_CLAIM_TRUNG`
+  - Frontend goi `POST /api/eggs/claim`.
+  - Request body: `{ eggId: string }`.
+  - Response 200 dung cac field: `username`, `password`, `platform`, `message`.
+  - Response 400 duoc hieu la trung chua san sang, het qua, hoac da mo.
+  - Response 429 duoc hien thi la thao tac qua nhanh.
+- `src/hooks/useGiftCode.js`
+  - `BACKEND_API_MO_TRUNG`
+  - Trung vang goi claim ngay khi khach chon.
+  - Trung kim cuong neu `hatchAt` con o tuong lai thi frontend chi hien countdown.
+  - Khi countdown ve 0, khach bam mo trung thi frontend moi goi `POST /api/eggs/claim`.
 
 `sapoOrders.status` nên được backend map về một trong ba giá trị: `Pending`, `Paid`, `Cancel`.

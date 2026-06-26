@@ -1,4 +1,5 @@
 .gift-panel {
+  min-width: 0;
   border: 3px solid #17130a;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.92);
@@ -46,6 +47,7 @@
 
 .code-entry-header {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
@@ -67,6 +69,7 @@
 
 .code-entry-header strong {
   display: block;
+  overflow-wrap: anywhere;
   margin-top: 4px;
   font-size: clamp(18px, 2vw, 24px);
   font-weight: 1000;
@@ -97,11 +100,13 @@
 
 .code-form {
   display: grid;
+  min-width: 0;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 12px;
 }
 
 input {
+  min-width: 0;
   width: 100%;
   min-height: 52px;
   border: 3px solid #17130a;
@@ -110,6 +115,11 @@ input {
   color: #17130a;
   font-weight: 900;
   padding: 13px 14px;
+}
+
+input:disabled {
+  cursor: wait;
+  opacity: 0.68;
 }
 
 input::placeholder {
@@ -146,6 +156,15 @@ input::placeholder {
   color: #17130a;
 }
 
+.code-form button:disabled,
+.gift-panel > button:disabled,
+.secondary-button:disabled,
+.reward-egg-card:disabled {
+  cursor: wait;
+  opacity: 0.62;
+  transform: none;
+}
+
 .account-reward dt {
   display: block;
   color: #6d5300;
@@ -156,6 +175,7 @@ input::placeholder {
 
 .reward-choice-page {
   display: grid;
+  min-width: 0;
   gap: 16px;
 }
 
@@ -168,6 +188,7 @@ input::placeholder {
 .reward-egg-card {
   position: relative;
   display: grid;
+  min-width: 0;
   grid-template-rows: minmax(170px, 1fr) auto;
   gap: 14px;
   min-height: 330px;
@@ -186,6 +207,11 @@ input::placeholder {
 .reward-egg-card:hover {
   box-shadow: 0 12px 0 #17130a;
   transform: translateY(-4px);
+}
+
+.reward-egg-card:disabled:hover {
+  box-shadow: 0 8px 0 #17130a;
+  transform: none;
 }
 
 .reward-egg-card--instant {
@@ -379,6 +405,7 @@ input::placeholder {
 }
 
 .result-summary span {
+  max-width: 100%;
   border: 2px solid #17130a;
   border-radius: 999px;
   background: #fff36f;
@@ -389,6 +416,7 @@ input::placeholder {
 }
 
 .account-reward {
+  min-width: 0;
   border: 3px solid #17130a;
   border-radius: 8px;
   background: #ffffff;
@@ -399,6 +427,7 @@ input::placeholder {
 
 .account-reward__head {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 12px;
   margin-bottom: 14px;
@@ -428,6 +457,7 @@ input::placeholder {
 
 .account-reward__head strong {
   display: block;
+  overflow-wrap: anywhere;
   margin-top: 4px;
   font-size: 20px;
   font-weight: 1000;

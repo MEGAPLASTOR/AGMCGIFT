@@ -1,5 +1,6 @@
 .admin-page {
   min-height: 100vh;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(255, 213, 46, 0.22), transparent 26%),
     linear-gradient(180deg, #f7f8fb 0%, #edf1f6 100%);
@@ -27,6 +28,7 @@
   grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1fr);
   gap: 28px;
   width: min(860px, 100%);
+  min-width: 0;
   padding: 28px;
 }
 
@@ -90,6 +92,7 @@
 
 .admin-header {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
   gap: 18px;
@@ -208,6 +211,7 @@
 
 .admin-panel {
   margin-bottom: 16px;
+  min-width: 0;
   padding: 18px;
 }
 
@@ -308,6 +312,7 @@
 
 .admin-workflow article {
   display: grid;
+  min-width: 0;
   gap: 7px;
   min-height: 132px;
   border: 1px solid #d8dfeb;
@@ -545,6 +550,7 @@
 
 .admin-record-editor {
   display: grid;
+  min-width: 0;
   gap: 12px;
   border: 1px solid #d8dfeb;
   border-radius: 8px;
@@ -613,6 +619,50 @@
   .admin-workflow {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .admin-crud-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-record-editor {
+    order: -1;
+  }
+}
+
+@media (max-width: 900px) {
+  .admin-page {
+    padding: 20px;
+  }
+
+  .admin-login-card,
+  .admin-grid-two,
+  .admin-crud-toolbar,
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-login-card {
+    gap: 20px;
+  }
+
+  .admin-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-header__actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .admin-header__actions button {
+    flex: 1 1 180px;
+  }
+
+  .admin-account-import {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 760px) {
@@ -629,22 +679,82 @@
     grid-template-columns: 1fr;
   }
 
-  .admin-header {
-    align-items: flex-start;
-    flex-direction: column;
+  .admin-metric-grid,
+  .admin-workflow {
+    grid-template-columns: 1fr;
   }
 
-  .admin-header__actions {
-    justify-content: flex-start;
+  .admin-panel {
+    padding: 14px;
   }
 
-  .admin-account-import {
+  .admin-panel__head,
+  .admin-record-editor__head,
+  .admin-crud-actions {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .admin-metric-grid,
-  .admin-workflow {
+  .admin-crud-actions button,
+  .admin-panel__head button,
+  .admin-record-editor__head button {
+    width: 100%;
+  }
+
+  .admin-status-row {
+    grid-template-columns: 88px minmax(0, 1fr) 34px;
+  }
+
+  .admin-modal-backdrop {
+    align-items: start;
+    padding: 20px 12px;
+  }
+
+  .admin-panel.admin-modal {
+    width: min(360px, calc(100vw - 24px));
+    min-height: auto;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-page {
+    padding: 10px;
+  }
+
+  .admin-header,
+  .admin-login-card,
+  .admin-panel,
+  .admin-metric {
+    border-radius: 8px;
+  }
+
+  .admin-login-card,
+  .admin-header,
+  .admin-panel {
+    padding: 12px;
+  }
+
+  .admin-header h1,
+  .admin-login-card h1 {
+    font-size: 30px;
+  }
+
+  .admin-metric strong {
+    font-size: 28px;
+  }
+
+  .admin-status-row {
     grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .admin-file-button,
+  .admin-light-button,
+  .admin-mini-button,
+  .admin-crud-toolbar button,
+  .admin-crud-actions button {
+    width: 100%;
   }
 }

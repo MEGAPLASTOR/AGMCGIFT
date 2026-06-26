@@ -1,5 +1,10 @@
 export function AccountRewardCard({ reward, account }) {
   const accountInfo = account || reward;
+  const accountName =
+    accountInfo.tenAcc || accountInfo.tenPhanThuong || accountInfo.platform;
+  const username = accountInfo.taiKhoan || accountInfo.username;
+  const password = accountInfo.matKhau || accountInfo.password;
+  const note = accountInfo.ghiChu || accountInfo.message;
 
   return (
     <div className="account-reward">
@@ -9,27 +14,29 @@ export function AccountRewardCard({ reward, account }) {
         </span>
         <div>
           <span>Acc nhận được</span>
-          <strong>
-            {accountInfo.tenAcc ||
-              accountInfo.tenPhanThuong ||
-              "Acc Blox Fruit"}
-          </strong>
+          <strong>{accountName || "Acc Blox Fruit"}</strong>
         </div>
       </div>
 
       <dl className="account-reward__grid">
         <div>
           <dt>Tài khoản</dt>
-          <dd>{accountInfo.taiKhoan}</dd>
+          <dd>{username}</dd>
         </div>
         <div>
           <dt>Mật khẩu</dt>
-          <dd>{accountInfo.matKhau}</dd>
+          <dd>{password}</dd>
         </div>
-        {accountInfo.ghiChu ? (
+        {accountInfo.platform ? (
+          <div>
+            <dt>Nền tảng</dt>
+            <dd>{accountInfo.platform}</dd>
+          </div>
+        ) : null}
+        {note ? (
           <div className="account-reward__note">
             <dt>Ghi chú</dt>
-            <dd>{accountInfo.ghiChu}</dd>
+            <dd>{note}</dd>
           </div>
         ) : null}
       </dl>

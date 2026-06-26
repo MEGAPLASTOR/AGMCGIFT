@@ -4,11 +4,14 @@
 }
 
 .gift-info-shell {
-  width: min(980px, 100%);
+  min-width: 0;
+  width: 100%;
+  max-width: 980px;
 }
 
 .gift-info-hero {
   display: grid;
+  min-width: 0;
   grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
   gap: 22px;
   align-items: start;
@@ -85,11 +88,13 @@
 
 .gift-info-content {
   display: grid;
+  min-width: 0;
   grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
   gap: 14px;
 }
 
 .gift-info-card {
+  min-width: 0;
   border: 2px solid #17130a;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.9);
@@ -115,6 +120,7 @@
 
 .gift-info-card li {
   position: relative;
+  overflow-wrap: anywhere;
   color: #17130a;
   font-size: 15px;
   font-weight: 900;
@@ -172,6 +178,18 @@
 
   .gift-info-hero {
     padding: 18px;
+  }
+
+  .gift-info-page {
+    padding-inline: 12px;
+  }
+
+  .gift-info-shell {
+    box-shadow: 0 10px 0 #17130a, 0 20px 32px rgba(23, 19, 10, 0.18);
+  }
+
+  .gift-info-hero h1 {
+    font-size: clamp(34px, 13vw, 48px);
   }
 
   .gift-info-actions {

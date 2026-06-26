@@ -30,15 +30,19 @@ export default function GiftCodePage() {
     redemptionInfo,
     errorMsg,
     daysToWait,
+    isChecking,
+    isClaiming,
+    availableChoices,
     checkCode,
     claimReward,
+    claimReadyReward,
     reset,
     choices,
   } = useGiftCode(giftCatalogData);
 
-  const handleCheck = (event) => {
+  const handleCheck = async (event) => {
     event?.preventDefault();
-    checkCode(inputValue);
+    await checkCode(inputValue);
   };
 
   const handleReset = () => {
@@ -76,6 +80,7 @@ export default function GiftCodePage() {
               inputValue={inputValue}
               status={status}
               errorMsg={errorMsg}
+              isLoading={isChecking}
               onInputChange={setInputValue}
               onSubmit={handleCheck}
             />
@@ -97,6 +102,9 @@ export default function GiftCodePage() {
               code={currentCode}
               productName={selectedEntry.product.tenSanPham}
               daysToWait={daysToWait}
+              isClaiming={isClaiming}
+              availableChoices={availableChoices}
+              claimError={errorMsg}
               onClaimNow={() => claimReward(choices.now)}
               onClaimLater={() => claimReward(choices.later)}
               onBack={handleReset}
@@ -117,6 +125,9 @@ export default function GiftCodePage() {
           <div ref={actionSectionRef}>
             <IncubatingRewardPage
               redemptionInfo={redemptionInfo}
+              isClaiming={isClaiming}
+              claimError={errorMsg}
+              onClaimReady={claimReadyReward}
               onReset={handleReset}
             />
           </div>

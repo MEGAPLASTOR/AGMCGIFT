@@ -5,10 +5,16 @@ export function RewardChoicePage({
   code,
   productName,
   daysToWait,
+  isClaiming = false,
+  availableChoices,
+  claimError,
   onClaimNow,
   onClaimLater,
   onBack,
 }) {
+  const canClaimNow = availableChoices?.now ?? true;
+  const canClaimLater = availableChoices?.later ?? true;
+
   return (
     <section className="gift-panel reward-choice-page">
       <div className="panel-heading">
@@ -28,6 +34,7 @@ export function RewardChoicePage({
         <button
           type="button"
           className="reward-egg-card reward-egg-card--instant"
+          disabled={isClaiming || !canClaimNow}
           onClick={onClaimNow}
         >
           <span className="reward-egg-card__image">
@@ -38,13 +45,14 @@ export function RewardChoicePage({
               <strong>Trứng vàng</strong>
               <span>Nhận acc ngay sau khi random.</span>
             </span>
-            <em>Nhận ngay</em>
+            <em>{isClaiming ? "Đang mở..." : "Nhận ngay"}</em>
           </span>
         </button>
 
         <button
           type="button"
           className="reward-egg-card reward-egg-card--premium"
+          disabled={isClaiming || !canClaimLater}
           onClick={onClaimLater}
         >
           <span className="reward-egg-card__image">
@@ -59,6 +67,8 @@ export function RewardChoicePage({
           </span>
         </button>
       </div>
+
+      {claimError ? <p className="message message--error">{claimError}</p> : null}
 
       <button type="button" className="secondary-button" onClick={onBack}>
         Quay lại nhập code

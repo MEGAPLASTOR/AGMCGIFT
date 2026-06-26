@@ -3,10 +3,12 @@
     align-content: center;
     justify-items: center;
     overflow: visible;
-    padding: 18px 16px 34px;
+    overflow-x: hidden;
+    padding: 18px 16px calc(34px + env(safe-area-inset-bottom));
   }
 
   .incubator-shell {
+    max-width: calc(100vw - 32px);
     box-shadow: 0 12px 0 #17130a, 0 24px 40px rgba(23, 19, 10, 0.22);
   }
 
@@ -53,10 +55,19 @@
     top: auto;
     right: auto;
     display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
     justify-content: center;
-    width: min(1120px, 100%);
+    width: 100%;
+    max-width: 1120px;
     margin-top: 22px;
     transform: none;
+  }
+
+  .shop-rail__label {
+    flex-basis: 100%;
+    width: fit-content;
+    margin-inline: auto;
   }
 
   .support-contact-rail {
@@ -91,6 +102,7 @@
   }
 
   .incubator-shell {
+    max-width: calc(100vw - 24px);
     padding: 12px;
   }
 
@@ -108,11 +120,11 @@
   }
 
   .stage-hanging-eggs__pair {
-    gap: 2px;
+    gap: 0;
   }
 
   .stage-hanging-egg {
-    width: min(43vw, 206px);
+    width: min(40vw, 188px);
   }
 
   .stage-hanging-egg--diamond {
@@ -120,11 +132,28 @@
   }
 
   .stage-hanging-egg img {
-    height: 174px;
+    height: clamp(142px, 34vw, 174px);
   }
 
   h1 {
     font-size: 34px;
+  }
+
+  .brand-lockup {
+    align-items: center;
+  }
+
+  .brand-lockup strong {
+    font-size: 17px;
+  }
+
+  .brand-lockup small {
+    font-size: 12px;
+  }
+
+  .topbar-pill {
+    width: 100%;
+    text-align: center;
   }
 
   .code-form,
@@ -135,6 +164,15 @@
 
   .reward-egg-card {
     min-height: 280px;
+    padding: 14px;
+  }
+
+  .reward-egg-card__image {
+    min-height: 154px;
+  }
+
+  .reward-egg-card__image img {
+    max-height: 178px;
   }
 
   .reward-egg-card__content {
@@ -168,11 +206,20 @@
 
 @media (max-width: 440px) {
   .gift-page {
-    padding-inline: 10px;
+    padding: 14px 10px calc(28px + env(safe-area-inset-bottom));
+  }
+
+  .incubator-shell {
+    max-width: calc(100vw - 20px);
+    border-width: 3px;
+    padding: 9px;
+    box-shadow: 0 8px 0 #17130a, 0 16px 28px rgba(23, 19, 10, 0.18);
   }
 
   .incubator-stage {
+    border-width: 2px;
     min-height: 292px;
+    padding: 12px;
   }
 
   .stage-hanging-eggs {
@@ -184,20 +231,74 @@
   }
 
   .stage-hanging-egg {
-    width: min(44vw, 172px);
+    width: min(39vw, 148px);
   }
 
   .stage-hanging-egg--diamond {
-    margin-left: -18px;
+    margin-left: -14px;
   }
 
   .stage-hanging-egg img {
-    height: 148px;
+    height: clamp(118px, 32vw, 140px);
+    transform: scale(1.14);
   }
 
   .brand-mark {
-    width: 52px;
-    height: 52px;
+    width: 48px;
+    height: 48px;
+    box-shadow: 3px 3px 0 #17130a;
+  }
+
+  .gift-panel {
+    border-width: 2px;
+    box-shadow: 0 7px 0 #17130a;
+    padding: 12px;
+  }
+
+  .code-entry-header {
+    padding: 12px;
+  }
+
+  .code-entry-header strong {
+    font-size: 18px;
+    line-height: 1.18;
+  }
+
+  .status-rail__item {
+    width: 64px;
+    min-height: 64px;
+    box-shadow: 3px 3px 0 #17130a;
+  }
+
+  .status-rail__item strong {
+    font-size: 14px;
+  }
+
+  .status-rail__item span {
+    font-size: 9px;
+  }
+
+  .shop-rail__tiktok-shop-icon {
+    width: 31px;
+    height: 28px;
+  }
+
+  .shop-rail__item img {
+    width: 28px;
+    height: 28px;
+  }
+
+  .support-contact-rail {
+    right: 8px;
+    bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .support-contact-rail__item {
+    width: 42px;
+    height: 42px;
+    border-width: 2px;
+    box-shadow: 3px 3px 0 #17130a;
+    font-size: 19px;
   }
 
   .countdown {

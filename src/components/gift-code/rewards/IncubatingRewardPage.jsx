@@ -3,9 +3,16 @@ import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 import { AccountRewardCard } from "./AccountRewardCard";
 import { CountdownTimer } from "./CountdownTimer";
 
-export function IncubatingRewardPage({ redemptionInfo, onReset }) {
+export function IncubatingRewardPage({
+  redemptionInfo,
+  isClaiming = false,
+  claimError,
+  onClaimReady,
+  onReset,
+}) {
   const [isCountdownComplete, setIsCountdownComplete] = useState(false);
   const isReady = redemptionInfo.isReady || isCountdownComplete;
+  const hasReward = Boolean(redemptionInfo.reward || redemptionInfo.account);
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
   }, []);
@@ -27,12 +34,23 @@ export function IncubatingRewardPage({ redemptionInfo, onReset }) {
       </div>
 
       {isReady ? (
-        <>
-          <p className="message message--success">
-            Trứng kim cương đã nở. Mở phần thưởng ngay bên dưới.
-          </p>
-          <AccountRewardCard reward={redemptionInfo.reward} />
-        </>
+        hasReward ? (
+          <>
+            <p className="message message--success">
+              Trứng kim cương đã nở. Đây là phần thưởng của bạn.
+            </p>
+            <AccountRewardCard reward={redemptionInfo.reward} />
+          </>
+        ) : (
+          <>
+            <p className="message message--success">
+              Trứng kim cương đã sẵn sàng. Bấm mở để nhận acc.
+            </p>
+            <button type="button" onClick={onClaimReady} disabled={isClaiming}>
+              {isClaiming ? "Đang mở trứng..." : "Mở trứng kim cương"}
+            </button>
+          </>
+        )
       ) : (
         <>
           <CountdownTimer
@@ -44,6 +62,8 @@ export function IncubatingRewardPage({ redemptionInfo, onReset }) {
           </p>
         </>
       )}
+
+      {claimError ? <p className="message message--error">{claimError}</p> : null}
 
       <button type="button" onClick={onReset}>
         Nhập code khác

@@ -4,6 +4,7 @@ export function GiftCodeEntryPanel({
   inputValue,
   status,
   errorMsg,
+  isLoading = false,
   onInputChange,
   onSubmit,
 }) {
@@ -24,12 +25,15 @@ export function GiftCodeEntryPanel({
       <form className="code-form" onSubmit={onSubmit}>
         <input
           type="text"
-          placeholder="Ví dụ: SAPO-TOY-1001"
+          placeholder="Ví dụ: DHSPE_260622PSYR4BHX"
           value={inputValue}
           onChange={(event) => onInputChange(event.target.value)}
           aria-label="Nhập mã đơn hàng"
+          disabled={isLoading}
         />
-        <button type="submit">Kiểm tra mã đơn</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Đang kiểm tra..." : "Kiểm tra mã đơn"}
+        </button>
       </form>
 
       {status === GIFT_CODE_STATUS.invalid && (

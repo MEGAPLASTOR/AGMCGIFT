@@ -6,8 +6,8 @@ export function addDays(dateValue, days) {
   return date;
 }
 
-export function getDelayedRewardInfo(redeemedAt, delayDays) {
-  const rewardDate = addDays(redeemedAt, delayDays);
+export function getRewardInfoFromTargetDate(targetDateValue) {
+  const rewardDate = new Date(targetDateValue);
   const diffMs = rewardDate - new Date();
 
   return {
@@ -29,4 +29,8 @@ export function getDelayedRewardInfo(redeemedAt, delayDays) {
     remainingMs: Math.max(0, diffMs),
     isReady: diffMs <= 0,
   };
+}
+
+export function getDelayedRewardInfo(redeemedAt, delayDays) {
+  return getRewardInfoFromTargetDate(addDays(redeemedAt, delayDays));
 }
