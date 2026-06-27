@@ -1,0 +1,182 @@
+[
+  {
+    "id": "kiotviet-order-item-001",
+    "order_id": "kiotviet-order-001",
+    "kv_product_id": "kiotviet-product-001",
+    "kv_variant_id": "kiotviet-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 1
+  },
+  {
+    "id": "kiotviet-order-item-002",
+    "order_id": "kiotviet-order-002",
+    "kv_product_id": "kiotviet-product-002",
+    "kv_variant_id": "kiotviet-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 2
+  },
+  {
+    "id": "kiotviet-order-item-003",
+    "order_id": "kiotviet-order-003",
+    "kv_product_id": "kiotviet-product-003",
+    "kv_variant_id": "kiotviet-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 3
+  },
+  {
+    "id": "kiotviet-order-item-004",
+    "order_id": "kiotviet-order-004",
+    "kv_product_id": "kiotviet-product-004",
+    "kv_variant_id": "kiotviet-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 1
+  },
+  {
+    "id": "kiotviet-order-item-005",
+    "order_id": "kiotviet-order-005",
+    "kv_product_id": "kiotviet-product-005",
+    "kv_variant_id": "kiotviet-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 2
+  },
+  {
+    "id": "kiotviet-order-item-006",
+    "order_id": "kiotviet-order-006",
+    "kv_product_id": "kiotviet-product-001",
+    "kv_variant_id": "kiotviet-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 3
+  },
+  {
+    "id": "kiotviet-order-item-007",
+    "order_id": "kiotviet-order-007",
+    "kv_product_id": "kiotviet-product-002",
+    "kv_variant_id": "kiotviet-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 1
+  },
+  {
+    "id": "kiotviet-order-item-008",
+    "order_id": "kiotviet-order-008",
+    "kv_product_id": "kiotviet-product-003",
+    "kv_variant_id": "kiotviet-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 2
+  },
+  {
+    "id": "kiotviet-order-item-009",
+    "order_id": "kiotviet-order-009",
+    "kv_product_id": "kiotviet-product-004",
+    "kv_variant_id": "kiotviet-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 3
+  },
+  {
+    "id": "kiotviet-order-item-010",
+    "order_id": "kiotviet-order-010",
+    "kv_product_id": "kiotviet-product-005",
+    "kv_variant_id": "kiotviet-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 1
+  },
+  {
+    "id": "kiotviet-order-item-011",
+    "order_id": "kiotviet-order-011",
+    "kv_product_id": "kiotviet-product-001",
+    "kv_variant_id": "kiotviet-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 2
+  },
+  {
+    "id": "kiotviet-order-item-012",
+    "order_id": "kiotviet-order-012",
+    "kv_product_id": "kiotviet-product-002",
+    "kv_variant_id": "kiotviet-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 3
+  },
+  {
+    "id": "kiotviet-order-item-013",
+    "order_id": "kiotviet-order-013",
+    "kv_product_id": "kiotviet-product-003",
+    "kv_variant_id": "kiotviet-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 1
+  },
+  {
+    "id": "kiotviet-order-item-014",
+    "order_id": "kiotviet-order-014",
+    "kv_product_id": "kiotviet-product-004",
+    "kv_variant_id": "kiotviet-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 2
+  },
+  {
+    "id": "kiotviet-order-item-015",
+    "order_id": "kiotviet-order-015",
+    "kv_product_id": "kiotviet-product-005",
+    "kv_variant_id": "kiotviet-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 3
+  },
+  {
+    "id": "kiotviet-order-item-016",
+    "order_id": "kiotviet-order-016",
+    "kv_product_id": "kiotviet-product-001",
+    "kv_variant_id": "kiotviet-variant-001",
+    "product_name": "Robot Alpha thong minh",
+    "sku": "TOY-ROBOT-ALPHA",
+    "quantity": 1
+  },
+  {
+    "id": "kiotviet-order-item-017",
+    "order_id": "kiotviet-order-017",
+    "kv_product_id": "kiotviet-product-002",
+    "kv_variant_id": "kiotviet-variant-002",
+    "product_name": "Xe dua toc do mini",
+    "sku": "TOY-RACING-CAR",
+    "quantity": 2
+  },
+  {
+    "id": "kiotviet-order-item-018",
+    "order_id": "kiotviet-order-018",
+    "kv_product_id": "kiotviet-product-003",
+    "kv_variant_id": "kiotviet-variant-003",
+    "product_name": "Bo xep hinh lau dai",
+    "sku": "TOY-BRICK-CASTLE",
+    "quantity": 3
+  },
+  {
+    "id": "kiotviet-order-item-019",
+    "order_id": "kiotviet-order-019",
+    "kv_product_id": "kiotviet-product-004",
+    "kv_variant_id": "kiotviet-variant-004",
+    "product_name": "Bup be phi hanh gia",
+    "sku": "TOY-SPACE-DOLL",
+    "quantity": 1
+  },
+  {
+    "id": "kiotviet-order-item-020",
+    "order_id": "kiotviet-order-020",
+    "kv_product_id": "kiotviet-product-005",
+    "kv_variant_id": "kiotviet-variant-005",
+    "product_name": "Drone mini bay thu",
+    "sku": "TOY-MINI-DRONE",
+    "quantity": 2
+  }
+]
