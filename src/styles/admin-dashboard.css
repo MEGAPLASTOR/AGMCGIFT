@@ -624,9 +624,434 @@
   flex: 1 1 150px;
 }
 
+.admin-page {
+  background:
+    linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
+  color: #17202a;
+}
+
+.admin-login-card,
+.admin-header,
+.admin-panel,
+.admin-metric,
+.admin-analytics-band,
+.admin-alert-card {
+  border: 1px solid rgba(23, 32, 42, 0.12);
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(23, 32, 42, 0.08);
+}
+
+.admin-header,
+.admin-panel,
+.admin-login-card {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.admin-login-form button,
+.admin-header button,
+.admin-light-button,
+.admin-mini-button,
+.admin-crud-toolbar button,
+.admin-crud-actions button,
+.admin-file-button,
+.admin-password-form button,
+.admin-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid #17202a;
+  box-shadow: none;
+}
+
+.admin-login-form button:hover,
+.admin-header button:hover,
+.admin-light-button:hover,
+.admin-mini-button:hover,
+.admin-crud-toolbar button:hover,
+.admin-crud-actions button:hover,
+.admin-file-button:hover,
+.admin-password-form button:hover,
+.admin-modal-close:hover {
+  box-shadow: 0 8px 18px rgba(23, 32, 42, 0.16);
+}
+
+.admin-light-button,
+.admin-modal-close {
+  border-color: rgba(23, 32, 42, 0.18);
+  background: #ffffff;
+}
+
+.admin-danger-button {
+  border-color: #9b1c1c !important;
+  background: #fee2e2 !important;
+  box-shadow: none !important;
+}
+
+.admin-page input,
+.admin-page select {
+  min-height: 46px;
+  border: 1px solid rgba(23, 32, 42, 0.2);
+  box-shadow: inset 0 1px 0 rgba(23, 32, 42, 0.04);
+}
+
+.admin-metric-grid {
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.admin-metric {
+  min-height: 108px;
+  border-left: 5px solid #6b7280;
+}
+
+.admin-metric--blue {
+  border-left-color: #2563eb;
+  background: #ffffff;
+}
+
+.admin-metric--green {
+  border-left-color: #16a34a;
+  background: #ffffff;
+}
+
+.admin-metric--red {
+  border-left-color: #dc2626;
+  background: #ffffff;
+}
+
+.admin-metric--gold {
+  border-left-color: #ca8a04;
+  background: #ffffff;
+}
+
+.admin-metric--purple {
+  border-left-color: #7c3aed;
+  background: #ffffff;
+}
+
+.admin-section-heading,
+.admin-analytics,
+.admin-table-tabs {
+  width: min(1440px, 100%);
+  margin-inline: auto;
+}
+
+.admin-analytics {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.admin-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-section-heading > div {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-section-heading h2 {
+  margin: 0;
+  color: #17202a;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 1000;
+}
+
+.admin-section-heading > span {
+  max-width: 620px;
+  color: #526071;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.admin-alert-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-alert-card,
+.admin-analytics-band {
+  background: #ffffff;
+}
+
+.admin-alert-card {
+  display: grid;
+  gap: 8px;
+  min-height: 118px;
+  padding: 14px;
+  border-left: 5px solid #2563eb;
+}
+
+.admin-alert-card span,
+.admin-alert-card small,
+.admin-risk-grid span,
+.admin-risk-grid small,
+.admin-tier-list span,
+.admin-tier-list em,
+.admin-mapping-health span,
+.admin-mapping-health small {
+  color: #526071;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.admin-alert-card strong {
+  color: #17202a;
+  font-size: 30px;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.admin-alert-card--green {
+  border-left-color: #16a34a;
+}
+
+.admin-alert-card--red {
+  border-left-color: #dc2626;
+}
+
+.admin-alert-card--gold {
+  border-left-color: #ca8a04;
+}
+
+.admin-analytics-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 14px;
+  width: min(1440px, 100%);
+  margin-inline: auto;
+}
+
+.admin-analytics-band {
+  min-width: 0;
+  padding: 16px;
+}
+
+.admin-funnel {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-funnel article,
+.admin-risk-grid article,
+.admin-tier-list article {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(23, 32, 42, 0.1);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.admin-funnel article {
+  display: grid;
+  gap: 12px;
+  min-height: 120px;
+  padding: 14px;
+}
+
+.admin-funnel article > div {
+  display: grid;
+  gap: 5px;
+}
+
+.admin-funnel strong,
+.admin-risk-grid strong,
+.admin-mapping-health strong {
+  color: #17202a;
+  font-size: clamp(24px, 2.4vw, 34px);
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.admin-funnel span {
+  color: #526071;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-funnel em {
+  color: #2563eb;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 1000;
+}
+
+.admin-funnel i,
+.admin-mapping-health i,
+.admin-tier-list i {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: #e5e7eb;
+}
+
+.admin-funnel i {
+  display: block;
+}
+
+.admin-funnel i,
+.admin-mapping-health i,
+.admin-tier-list i {
+  width: 100%;
+}
+
+.admin-funnel i::before {
+  content: "";
+  display: block;
+  width: inherit;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, #16a34a);
+}
+
+.admin-risk-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-risk-grid article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: center;
+  padding: 12px;
+}
+
+.admin-risk-grid small {
+  grid-column: 1 / -1;
+}
+
+.admin-tier-list {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-tier-list article {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.8fr) minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+}
+
+.admin-tier-list article > div {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-tier-list strong {
+  color: #17202a;
+  font-size: 15px;
+  font-weight: 1000;
+}
+
+.admin-tier-list i,
+.admin-mapping-health i {
+  display: block;
+}
+
+.admin-tier-list b,
+.admin-mapping-health b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #16a34a, #84cc16);
+}
+
+.admin-mapping-health {
+  display: grid;
+  gap: 10px;
+  min-height: 156px;
+  align-content: center;
+  border: 1px solid rgba(23, 32, 42, 0.1);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 16px;
+}
+
+.admin-analytics-empty {
+  border: 1px dashed rgba(23, 32, 42, 0.22);
+  border-radius: 8px;
+  color: #526071;
+  font-weight: 900;
+  margin: 0;
+  padding: 14px;
+}
+
+.admin-table-tabs {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.admin-table-tabs button {
+  display: grid;
+  min-width: 0;
+  min-height: 58px;
+  border: 1px solid rgba(23, 32, 42, 0.14);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17202a;
+  cursor: pointer;
+  font: inherit;
+  padding: 9px 10px;
+  text-align: left;
+}
+
+.admin-table-tabs button span,
+.admin-table-tabs button strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table-tabs button span {
+  color: #526071;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-table-tabs button strong {
+  color: #17202a;
+  font-size: 18px;
+  font-weight: 1000;
+}
+
+.admin-table-tabs button.is-active {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: inset 0 0 0 1px #2563eb;
+}
+
 @media (max-width: 1120px) {
   .admin-metric-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-alert-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-analytics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-funnel {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .admin-table-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .admin-crud-grid {
@@ -645,9 +1070,19 @@
 
   .admin-login-card,
   .admin-grid-two,
+  .admin-section-heading,
   .admin-crud-toolbar,
   .admin-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-section-heading {
+    display: grid;
+  }
+
+  .admin-section-heading > span {
+    max-width: none;
+    text-align: left;
   }
 
   .admin-login-card {
@@ -690,6 +1125,17 @@
 
   .admin-metric-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-alert-grid,
+  .admin-funnel,
+  .admin-table-tabs,
+  .admin-tier-list article {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-table-tabs button {
+    min-height: 50px;
   }
 
   .admin-panel {

@@ -14,6 +14,11 @@ function sum(items, getValue) {
   return items.reduce((total, item) => total + Number(getValue(item) || 0), 0);
 }
 
+function percent(value, total) {
+  if (!total) return 0;
+  return Math.round((Number(value || 0) / total) * 100);
+}
+
 function formatDateTime(value) {
   if (!value) return "-";
   return new Date(value).toLocaleString("vi-VN");
@@ -66,6 +71,141 @@ function getPoolAvailableCount(poolAccountMappings, availableAccountIds) {
   }, {});
 }
 
+function buildTierInventory(giftPools, giftAccounts, poolAccountMappings) {
+  const accountById = new Map(giftAccounts.map((account) => [account.id, account]));
+  const tierRows = new Map();
+
+  giftPools.forEach((pool) => {
+    const tier = String(pool.tier || "Unknown").toUpperCase();
+
+    if (!tierRows.has(tier)) {
+      tierRows.set(tier, {
+        tier,
+        pools: 0,
+        totalAccounts: 0,
+        availableAccounts: 0,
+        usedAccounts: 0,
+      });
+    }
+
+    tierRows.get(tier).pools += 1;
+  });
+
+  poolAccountMappings.forEach((mapping) => {
+    const account = accountById.get(mapping.account_id);
+
+    if (!account) {
+      return;
+    }
+
+    const tier = String(account.tier || "Unknown").toUpperCase();
+
+    if (!tierRows.has(tier)) {
+      tierRows.set(tier, {
+        tier,
+        pools: 0,
+        totalAccounts: 0,
+        availableAccounts: 0,
+        usedAccounts: 0,
+      });
+    }
+
+    const row = tierRows.get(tier);
+    row.totalAccounts += 1;
+
+    if (normalizeStatus(account.status) === "available") {
+      row.availableAccounts += 1;
+      return;
+    }
+
+    row.usedAccounts += 1;
+  });
+
+  return [...tierRows.values()]
+    .map((row) => ({
+      ...row,
+      availableRate: percent(row.availableAccounts, row.totalAccounts),
+    }))
+    .sort((left, right) => left.tier.localeCompare(right.tier));
+}
+
+function buildMappedProductIds(products) {
+  return new Set(
+    products
+      .filter((product) => (product.mappings || []).length)
+      .map((product) => String(product.kvProductId || product.id || ""))
+  );
+}
+
+function buildOperationalAlerts({
+  blockedOrders,
+  customers,
+  giftPools,
+  poolAvailableCount,
+  products,
+  readyEggs,
+  totalAccounts,
+  availableAccounts,
+}) {
+  const mappedProductIds = buildMappedProductIds(products);
+  const unmappedProducts = products.filter(
+    (product) => !mappedProductIds.has(String(product.kvProductId || product.id || ""))
+  ).length;
+  const emptyPools = giftPools.filter(
+    (pool) => !Number(poolAvailableCount[pool.id] || 0)
+  ).length;
+  const warningCustomers = customers.filter(
+    (customer) =>
+      normalizeStatus(customer.status).includes("warning") ||
+      Number(customer.warningCount || 0) > 0 ||
+      Number(customer.returnStreak || 0) === 1
+  ).length;
+  const bannedCustomers = customers.filter(
+    (customer) =>
+      normalizeStatus(customer.status).includes("banned") ||
+      Number(customer.returnStreak || 0) >= 2
+  ).length;
+  const lowStock = totalAccounts > 0 && percent(availableAccounts, totalAccounts) < 20;
+
+  return [
+    {
+      key: "ready-eggs",
+      label: "Trứng sẵn sàng",
+      value: readyEggs,
+      tone: readyEggs ? "gold" : "green",
+      note: readyEggs ? "Có thể phát quà khi khách quay lại" : "Không có trứng đang chờ mở",
+    },
+    {
+      key: "blocked-orders",
+      label: "Đơn cần chặn",
+      value: blockedOrders.length,
+      tone: blockedOrders.length ? "red" : "green",
+      note: "Pending / Cancel / hoàn trả",
+    },
+    {
+      key: "risk-customers",
+      label: "Khách rủi ro",
+      value: warningCustomers + bannedCustomers,
+      tone: warningCustomers + bannedCustomers ? "red" : "green",
+      note: `${warningCustomers} cảnh báo, ${bannedCustomers} bị khóa`,
+    },
+    {
+      key: "inventory",
+      label: "Kho quà trống",
+      value: emptyPools,
+      tone: emptyPools || lowStock ? "red" : "green",
+      note: lowStock ? "Tồn kho available dưới 20%" : "Theo bể quà",
+    },
+    {
+      key: "mapping",
+      label: "Sản phẩm chưa mapping",
+      value: unmappedProducts,
+      tone: unmappedProducts ? "gold" : "green",
+      note: "Không mapping sẽ không cấp trứng",
+    },
+  ];
+}
+
 // BACKEND_ADMIN_THONG_KE:
 // Frontend đang tự tính analytics từ các bảng JSON.
 // Backend nên tạo API, ví dụ /admin/analytics, trả về cùng shape dữ liệu để thay thế hàm này.
@@ -89,6 +229,32 @@ export function buildAdminDashboard(tables) {
     availableAccountIds
   );
   const now = Date.now();
+  const readyEggs = eggs.filter(
+    (egg) => egg.hatch_at && new Date(egg.hatch_at).getTime() <= now
+  );
+  const claimedEggs = eggs.filter((egg) =>
+    ["hatched", "claimed", "opened"].includes(normalizeStatus(egg.status))
+  );
+  const blockedCustomers = customers.filter(
+    (customer) =>
+      normalizeStatus(customer.status).includes("banned") ||
+      Number(customer.returnStreak || 0) >= 2
+  );
+  const warningCustomers = customers.filter(
+    (customer) =>
+      normalizeStatus(customer.status).includes("warning") ||
+      Number(customer.warningCount || 0) > 0 ||
+      Number(customer.returnStreak || 0) === 1
+  );
+  const inventoryByTier = buildTierInventory(
+    giftPools,
+    giftAccounts,
+    poolAccountMappings
+  );
+  const availableAccounts = giftAccounts.filter(
+    (account) => normalizeStatus(account.status) === "available"
+  );
+  const productMappings = products.flatMap((product) => product.mappings || []);
 
   return {
     summary: {
@@ -110,13 +276,66 @@ export function buildAdminDashboard(tables) {
       hatchingEggs: eggs.filter(
         (egg) => normalizeStatus(egg.status) === "incubating"
       ).length,
-      readyEggs: eggs.filter(
-        (egg) => egg.hatch_at && new Date(egg.hatch_at).getTime() <= now
-      ).length,
+      readyEggs: readyEggs.length,
       totalAccounts: giftAccounts.length,
-      availableAccounts: giftAccounts.filter(
-        (account) => normalizeStatus(account.status) === "available"
-      ).length,
+      availableAccounts: availableAccounts.length,
+    },
+    analytics: {
+      alerts: buildOperationalAlerts({
+        blockedOrders,
+        customers,
+        giftPools,
+        poolAvailableCount,
+        products,
+        readyEggs: readyEggs.length,
+        totalAccounts: giftAccounts.length,
+        availableAccounts: availableAccounts.length,
+      }),
+      funnel: [
+        {
+          label: "Đơn đồng bộ",
+          value: orders.length,
+          percent: 100,
+        },
+        {
+          label: "Đơn hợp lệ",
+          value: paidOrders.length,
+          percent: percent(paidOrders.length, orders.length),
+        },
+        {
+          label: "Trứng đã cấp",
+          value: eggs.length,
+          percent: percent(eggs.length, Math.max(paidOrders.length, 1) * 2),
+        },
+        {
+          label: "Đang ấp",
+          value: eggs.filter((egg) => normalizeStatus(egg.status) === "incubating")
+            .length,
+          percent: percent(
+            eggs.filter((egg) => normalizeStatus(egg.status) === "incubating").length,
+            eggs.length
+          ),
+        },
+        {
+          label: "Đã nhận quà",
+          value: claimedEggs.length,
+          percent: percent(claimedEggs.length, eggs.length),
+        },
+      ],
+      risk: {
+        warningCustomers: warningCustomers.length,
+        bannedCustomers: blockedCustomers.length,
+        warningRate: percent(warningCustomers.length, customers.length),
+        bannedRate: percent(blockedCustomers.length, customers.length),
+        blockedOrderRate: percent(blockedOrders.length, orders.length),
+      },
+      inventoryByTier,
+      mapping: {
+        mappedProducts: buildMappedProductIds(products).size,
+        totalProducts: products.length,
+        mappingRules: productMappings.length,
+        mappedRate: percent(buildMappedProductIds(products).size, products.length),
+      },
     },
     counts: {
       customerStatus: countBy(customers, (customer) => customer.status),

@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  FaBoxesStacked,
+  FaKey,
+  FaRightFromBracket,
+  FaRotateRight,
+} from "react-icons/fa6";
+import { AdminAnalyticsPanel } from "../../components/admin/AdminAnalyticsPanel";
 import { AdminDataTable } from "../../components/admin/AdminDataTable";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
 import { AdminEmptyState } from "../../components/admin/AdminEmptyState";
@@ -435,6 +442,7 @@ export default function AdminDashboardPage() {
             disabled={adminTables.isLoadingRawData}
             onClick={handleReloadRawData}
           >
+            <FaRotateRight aria-hidden="true" />
             {adminTables.isLoadingRawData ? "Đang tải dữ liệu" : "Tải lại dữ liệu"}
           </button>
           <button
@@ -443,6 +451,7 @@ export default function AdminDashboardPage() {
             disabled={isSyncingProducts || adminTables.isLoadingRawData}
             onClick={handleSyncProducts}
           >
+            <FaBoxesStacked aria-hidden="true" />
             {isSyncingProducts ? "Dang dong bo san pham" : "Dong bo san pham"}
           </button>
           <button
@@ -450,9 +459,11 @@ export default function AdminDashboardPage() {
             className="admin-light-button"
             onClick={() => setPasswordModalOpen(true)}
           >
+            <FaKey aria-hidden="true" />
             Đổi mật khẩu
           </button>
           <button type="button" onClick={logout}>
+            <FaRightFromBracket aria-hidden="true" />
             Đăng xuất
           </button>
         </div>
@@ -494,6 +505,8 @@ export default function AdminDashboardPage() {
           ))}
         </section>
       ) : null}
+
+      <AdminAnalyticsPanel analytics={dashboard.analytics} />
 
       {shouldShowCustomerTable ? (
         <AdminDataTable

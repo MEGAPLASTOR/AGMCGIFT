@@ -1,4 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
+import {
+  FaFloppyDisk,
+  FaPen,
+  FaPlus,
+  FaRotateLeft,
+  FaTrashCan,
+} from "react-icons/fa6";
 import { AdminAccountImportPanel } from "./AdminAccountImportPanel";
 import {
   ADMIN_TABLES,
@@ -29,6 +36,16 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   productEggMappings: ["kv_product_id", "egg_type", "gift_pool_id", "egg_tier"],
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
 };
+const QUICK_TABLES = [
+  { key: "giftAccounts", label: "Kho account" },
+  { key: "giftPools", label: "Bể quà" },
+  { key: "productEggMappings", label: "Mapping trứng" },
+  { key: "poolAccountMappings", label: "Gán account" },
+  { key: "customers", label: "Khách hàng" },
+  { key: "eggs", label: "Trứng" },
+  { key: "products", label: "Sản phẩm" },
+  { key: "kiotvietOrders", label: "Đơn hàng" },
+];
 
 function getPriorityColumns(tableKey, rows, fields) {
   const preferredColumns = PRIORITY_COLUMNS_BY_TABLE[tableKey] || [];
@@ -194,6 +211,15 @@ export function AdminDataCrudPanel({
         : isProductMappingsTable
           ? "Lien ket san pham"
           : "Thêm bản ghi";
+  const quickTables = useMemo(
+    () =>
+      QUICK_TABLES.filter(
+        (quickTable) =>
+          visibleTables.some((table) => table.key === quickTable.key) ||
+          ALWAYS_VISIBLE_TABLE_KEYS.has(quickTable.key)
+      ),
+    [visibleTables]
+  );
 
   useEffect(() => {
     if (visibleTables.some((table) => table.key === tableKey)) {
@@ -375,12 +401,16 @@ export function AdminDataCrudPanel({
     }
   };
 
-  const handleTableChange = (event) => {
-    setTableKey(event.target.value);
+  const changeTable = (nextTableKey) => {
+    setTableKey(nextTableKey);
     setKeyword("");
     setSelectedRecordId("");
     setFormValues({});
     setMessage("");
+  };
+
+  const handleTableChange = (event) => {
+    changeTable(event.target.value);
   };
 
   return (
@@ -391,8 +421,25 @@ export function AdminDataCrudPanel({
           <span>Tạo account, upload Excel và kiểm tra dữ liệu raw từ API</span>
         </div>
         <button type="button" className="admin-light-button" onClick={onResetTables}>
+          <FaRotateLeft aria-hidden="true" />
           Khôi phục dữ liệu
         </button>
+      </div>
+
+      <div className="admin-table-tabs" role="tablist" aria-label="Bảng quản trị">
+        {quickTables.map((table) => (
+          <button
+            type="button"
+            role="tab"
+            aria-selected={table.key === tableKey}
+            className={table.key === tableKey ? "is-active" : ""}
+            key={table.key}
+            onClick={() => changeTable(table.key)}
+          >
+            <span>{table.label}</span>
+            <strong>{tableCounts[table.key] || 0}</strong>
+          </button>
+        ))}
       </div>
 
       <div className="admin-crud-toolbar">
@@ -416,6 +463,7 @@ export function AdminDataCrudPanel({
           />
         </label>
         <button type="button" onClick={startAdd}>
+          <FaPlus aria-hidden="true" />
           {addButtonLabel}
         </button>
       </div>
@@ -456,6 +504,7 @@ export function AdminDataCrudPanel({
                           className="admin-mini-button"
                           onClick={() => startEdit(row)}
                         >
+                          <FaPen aria-hidden="true" />
                           Sửa
                         </button>
                       </td>
@@ -485,6 +534,7 @@ export function AdminDataCrudPanel({
               <span>{recordTitle}</span>
             </div>
             <button type="button" className="admin-light-button" onClick={startAdd}>
+              <FaPlus aria-hidden="true" />
               Tạo mới
             </button>
           </div>
@@ -514,6 +564,7 @@ export function AdminDataCrudPanel({
               onClick={saveForm}
               disabled={!hasActiveForm || isSaving}
             >
+              <FaFloppyDisk aria-hidden="true" />
               {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
             </button>
             <button
@@ -522,6 +573,7 @@ export function AdminDataCrudPanel({
               onClick={deleteSelected}
               disabled={!selectedRecordId || isSaving}
             >
+              <FaTrashCan aria-hidden="true" />
               {isGiftAccountsTable
                 ? "Xóa tài khoản"
                 : isGiftPoolsTable
