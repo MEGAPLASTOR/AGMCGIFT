@@ -13,6 +13,20 @@ const ADMIN_RAW_ENDPOINTS = [
   ADMIN_ENDPOINTS.products,
 ];
 
+const ADMIN_GIFT_POOL_ENDPOINTS = [
+  ADMIN_ENDPOINTS.giftPools,
+  ADMIN_ENDPOINTS.giftPoolsAddAccount,
+  ADMIN_ENDPOINTS.giftPoolsAddAccounts,
+  ADMIN_ENDPOINTS.giftPoolsRemoveAccounts,
+];
+
+function isAdminGiftPoolEndpoint(endpoint) {
+  return (
+    ADMIN_GIFT_POOL_ENDPOINTS.includes(endpoint) ||
+    String(endpoint || "").startsWith(`${ADMIN_ENDPOINTS.giftPools}/`)
+  );
+}
+
 export function getDefaultApiErrorMessage(status, endpoint) {
   if (status === 429) return "Thao tác quá nhanh.";
 
