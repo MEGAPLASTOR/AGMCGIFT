@@ -32,14 +32,6 @@ export async function requestJson(endpoint, options = {}) {
   const payload = await readResponsePayload(response);
 
   if (!response.ok) {
-    console.error("[AGMC API] JSON request failed", {
-      endpoint,
-      method,
-      status: response.status,
-      statusText: response.statusText,
-      payload,
-    });
-
     throw new ApiRequestError(
       payload?.message || getDefaultApiErrorMessage(response.status, endpoint),
       {

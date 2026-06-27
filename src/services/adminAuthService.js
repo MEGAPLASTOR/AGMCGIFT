@@ -1,6 +1,7 @@
 import { ADMIN_ENDPOINTS } from "../api/endpoints/adminEndpoints";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { postJson } from "../api/http/postJson";
+import { requestJson } from "../api/http/requestJson";
 
 function normalizeTokenType(value) {
   return String(value || "Bearer").trim() || "Bearer";
@@ -32,6 +33,31 @@ export async function loginAdmin({ username, password }) {
   });
 
   return normalizeLoginPayload(payload, username);
+}
+
+export async function updateAdminCredentials(
+  { oldPassword, newUsername = "", newPassword = "" },
+  authHeader
+) {
+  if (!authHeader) {
+    throw new ApiRequestError("Vui long dang nhap admin truoc khi doi mat khau.", {
+      status: 401,
+      payload: null,
+      endpoint: ADMIN_ENDPOINTS.authCredentials,
+    });
+  }
+
+  return requestJson(ADMIN_ENDPOINTS.authCredentials, {
+    method: "PUT",
+    body: {
+      oldPassword,
+      newUsername: String(newUsername || "").trim(),
+      newPassword,
+    },
+    headers: {
+      Authorization: authHeader,
+    },
+  });
 }
 
 export function getAdminAuthorizationHeader(session) {

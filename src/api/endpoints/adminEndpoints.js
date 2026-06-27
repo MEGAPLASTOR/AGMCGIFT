@@ -1,7 +1,9 @@
 export const ADMIN_ENDPOINTS = {
+  authCredentials: "/api/admin/auth/credentials",
   customers: "/api/admin/customers",
   eggs: "/api/admin/eggs",
   giftAccounts: "/api/admin/gift-accounts",
+  giftAccountsBatchDelete: "/api/admin/gift-accounts/batch-delete",
   giftAccountsSingle: "/api/admin/gift-accounts/single",
   giftAccountsUpload: "/api/admin/gift-accounts/upload",
   giftPools: "/api/admin/gift-pools",
@@ -10,9 +12,24 @@ export const ADMIN_ENDPOINTS = {
   giftPoolsRemoveAccounts: "/api/admin/gift-pools/remove-accounts",
   login: "/api/admin/auth/login",
   orders: "/api/admin/orders",
+  productEggMappings: "/api/admin/product-egg-mappings",
+  productEggMappingsBatchDelete: "/api/admin/product-egg-mappings/batch-delete",
   products: "/api/admin/products",
+  productsSyncAll: "/api/admin/products/sync/all",
 };
 
 export function getAdminGiftPoolEndpoint(id) {
   return `${ADMIN_ENDPOINTS.giftPools}/${encodeURIComponent(id)}`;
+}
+
+export function getAdminGiftAccountEndpoint(id) {
+  return `${ADMIN_ENDPOINTS.giftAccounts}/${encodeURIComponent(id)}`;
+}
+
+export function getAdminCustomerStatusEndpoint(customerCode) {
+  return `${ADMIN_ENDPOINTS.customers}/${encodeURIComponent(customerCode)}/status`;
+}
+
+export function getAdminProductEggMappingEndpoint(id) {
+  return `${ADMIN_ENDPOINTS.productEggMappings}/${encodeURIComponent(id)}`;
 }

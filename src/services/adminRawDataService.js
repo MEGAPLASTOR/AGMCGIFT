@@ -91,15 +91,7 @@ async function fetchAdminRawEndpoint(key, endpoint, authHeader) {
     );
   }
 
-  const rows = getArrayPayload(payload, key);
-
-  console.info("[AGMC API] Raw admin data loaded", {
-    endpoint,
-    key,
-    rows: rows.length,
-  });
-
-  return rows;
+  return getArrayPayload(payload, key);
 }
 
 function normalizeDate(value) {
@@ -328,14 +320,6 @@ export async function fetchAdminRawTables(authHeader) {
       return;
     }
 
-    console.warn("[AGMC API] Raw admin data failed", {
-      endpoint,
-      key,
-      status: result.reason?.status,
-      message: result.reason?.message,
-      payload: result.reason?.payload,
-    });
-
     errors.push({
       key,
       endpoint,
@@ -364,14 +348,6 @@ export async function fetchAdminRawTables(authHeader) {
     raw.giftPools = detailResult.pools;
 
     if (detailResult.errors.length) {
-      console.warn("[AGMC API] Gift pool detail data partially failed", {
-        errors: detailResult.errors.map((error) => ({
-          endpoint: error?.endpoint,
-          status: error?.status,
-          message: error?.message,
-        })),
-      });
-
       errors.push(
         ...detailResult.errors.map((error) => ({
           key: "giftPools",

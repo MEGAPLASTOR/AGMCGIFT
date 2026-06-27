@@ -1,9 +1,14 @@
 import { getApiBaseUrl } from "../api/config/apiRuntimeConfig";
-import { ADMIN_ENDPOINTS } from "../api/endpoints/adminEndpoints";
+import {
+  ADMIN_ENDPOINTS,
+  getAdminGiftAccountEndpoint,
+} from "../api/endpoints/adminEndpoints";
 import { getDefaultApiErrorMessage } from "../api/errors/apiErrorMessages";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { postJson } from "../api/http/postJson";
 import { readResponsePayload } from "../api/http/readResponsePayload";
+import { requestJson } from "../api/http/requestJson";
+import { normalizeAdminGiftAccount } from "./adminGiftPoolService";
 
 function requireAuthHeader(authHeader) {
   if (!authHeader) {
@@ -36,6 +41,20 @@ function buildGiftAccountPayload(record) {
   };
 }
 
+function buildGiftAccountUpdatePayload(record) {
+  return {
+    username: normalizeText(record.username),
+    password: String(record.password || ""),
+    platform: normalizeText(record.platform || "blox-fruit"),
+    status: normalizeText(record.status || "AVAILABLE").toUpperCase(),
+    token: normalizeText(record.token),
+  };
+}
+
+function getResponseRecord(payload) {
+  return payload?.data || payload?.account || payload?.giftAccount || payload;
+}
+
 export async function createAdminGiftAccount(record, authHeader) {
   const payload = buildGiftAccountPayload(record);
 
@@ -52,6 +71,47 @@ export async function createAdminGiftAccount(record, authHeader) {
       Authorization: requireAuthHeader(authHeader),
     },
   });
+}
+
+export async function updateAdminGiftAccount(id, record, authHeader) {
+  const endpoint = getAdminGiftAccountEndpoint(id);
+  const payload = buildGiftAccountUpdatePayload(record);
+
+  if (!payload.username || !payload.password || !payload.platform || !payload.status) {
+    throw new Error("Vui long nhap username, password, platform va status.");
+  }
+
+  const responsePayload = await requestJson(endpoint, {
+    method: "PUT",
+    body: payload,
+    headers: {
+      Authorization: requireAuthHeader(authHeader),
+    },
+  });
+
+  return normalizeAdminGiftAccount(getResponseRecord(responsePayload));
+}
+
+export async function deleteAdminGiftAccounts(accountIds, authHeader) {
+  const normalizedIds = (Array.isArray(accountIds) ? accountIds : [accountIds])
+    .map(normalizeText)
+    .filter(Boolean);
+
+  if (!normalizedIds.length) {
+    throw new Error("Vui long chon tai khoan can xoa.");
+  }
+
+  return requestJson(ADMIN_ENDPOINTS.giftAccountsBatchDelete, {
+    method: "POST",
+    body: { accountIds: normalizedIds },
+    headers: {
+      Authorization: requireAuthHeader(authHeader),
+    },
+  });
+}
+
+export function deleteAdminGiftAccount(id, authHeader) {
+  return deleteAdminGiftAccounts([id], authHeader);
 }
 
 export async function uploadAdminGiftAccounts(file, authHeader) {
@@ -85,13 +145,6 @@ export async function uploadAdminGiftAccounts(file, authHeader) {
   const payload = await readResponsePayload(response);
 
   if (!response.ok) {
-    console.error("[AGMC API] Upload gift accounts failed", {
-      endpoint,
-      status: response.status,
-      statusText: response.statusText,
-      payload,
-    });
-
     throw new ApiRequestError(
       payload?.message || getDefaultApiErrorMessage(response.status, endpoint),
       {

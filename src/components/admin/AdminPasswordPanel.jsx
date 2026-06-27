@@ -8,6 +8,7 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const resetForm = () => {
     setCurrentPassword("");
@@ -15,8 +16,12 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
     setConfirmPassword("");
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (isSaving) {
+      return;
+    }
 
     if (newPassword.length < 6) {
       setMessage("Mật khẩu mới cần ít nhất 6 ký tự.");
@@ -28,16 +33,24 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
       return;
     }
 
-    const result = onChangePassword({
-      adminId: admin.id,
-      currentPassword,
-      newPassword,
-    });
+    setIsSaving(true);
 
-    setMessage(result.message);
+    try {
+      const result = await onChangePassword({
+        adminId: admin.id,
+        currentPassword,
+        newPassword,
+      });
 
-    if (result.ok) {
-      resetForm();
+      setMessage(result.message || "Da cap nhat thong tin dang nhap.");
+
+      if (result.ok !== false) {
+        resetForm();
+      }
+    } catch (error) {
+      setMessage(error.message || "Khong cap nhat duoc thong tin dang nhap.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -100,7 +113,9 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
               autoComplete="new-password"
             />
           </label>
-          <button type="submit">Cập nhật mật khẩu</button>
+          <button type="submit" disabled={isSaving}>
+            {isSaving ? "Dang cap nhat..." : "Cập nhật mật khẩu"}
+          </button>
         </form>
 
         {message ? <p>{message}</p> : null}
