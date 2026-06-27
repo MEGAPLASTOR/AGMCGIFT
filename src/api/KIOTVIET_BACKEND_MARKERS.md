@@ -7,7 +7,7 @@ Frontend hiện lấy dữ liệu từ API backend KiotViet, không đọc dữ 
 Tất cả API admin yêu cầu JWT token trong header:
 
 ```http
-Authorization: Bearer <accessToken>
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc4MjU1ODY3NywiZXhwIjoxNzgyNjQ1MDc3fQ.42JTdCbnR7_83zsPac_h3b030kgOoZL2kbztQYy3ubM
 ```
 
 - `POST /api/admin/auth/login`
