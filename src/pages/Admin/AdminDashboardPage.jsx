@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaBoxesStacked,
   FaKey,
@@ -6,13 +7,10 @@ import {
   FaRotateRight,
 } from "react-icons/fa6";
 import { AdminAnalyticsPanel } from "../../components/admin/AdminAnalyticsPanel";
-import { AdminDataTable } from "../../components/admin/AdminDataTable";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
-import { AdminEmptyState } from "../../components/admin/AdminEmptyState";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
 import { AdminMetricCard } from "../../components/admin/AdminMetricCard";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
-import { AdminStatusBar } from "../../components/admin/AdminStatusBar";
 import { giftCatalogData } from "../../config/giftCatalogData";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { useAdminDataTables } from "../../hooks/useAdminDataTables";
@@ -41,63 +39,103 @@ import {
 } from "../../services/adminProductEggMappingService";
 import { syncAllAdminProducts } from "../../services/adminProductService";
 
-const orderColumns = [
-  { key: "code", label: "Mã đơn" },
-  { key: "product", label: "Sản phẩm" },
-  { key: "status", label: "Trạng thái" },
-  { key: "fulfillment", label: "Giao hàng" },
-  { key: "total", label: "Tổng tiền" },
-  { key: "updatedAt", label: "Cập nhật" },
+const ADMIN_BASE_PATH = "/agmcmyadmin";
+
+const MANAGEMENT_PAGES = [
+  {
+    slug: "accounts",
+    tableKey: "giftAccounts",
+    label: "Kho account",
+    title: "Quản lý kho account",
+    description: "Tạo account, upload Excel, sửa trạng thái và quản lý tồn kho quà.",
+  },
+  {
+    slug: "pools",
+    tableKey: "giftPools",
+    label: "Bể quà",
+    title: "Quản lý bể quà",
+    description: "Tạo bể quà, chỉnh tier và chuẩn bị nguồn account theo hạng.",
+  },
+  {
+    slug: "egg-mappings",
+    tableKey: "productEggMappings",
+    label: "Mapping trứng",
+    title: "Quản lý mapping trứng",
+    description: "Liên kết sản phẩm KiotViet với loại trứng và bể quà phát thưởng.",
+  },
+  {
+    slug: "pool-accounts",
+    tableKey: "poolAccountMappings",
+    label: "Gán account",
+    title: "Quản lý gán account",
+    description: "Gắn hoặc gỡ account vào từng bể quà để backend có nguồn phát thưởng.",
+  },
+  {
+    slug: "customers",
+    tableKey: "customers",
+    label: "Khách hàng",
+    title: "Quản lý khách hàng",
+    description: "Theo dõi trạng thái, đơn thành công, cảnh báo và return streak.",
+  },
+  {
+    slug: "eggs",
+    tableKey: "eggs",
+    label: "Trứng",
+    title: "Quản lý trứng",
+    description: "Kiểm tra loại trứng, trạng thái ấp, thời gian mở và tài khoản được cấp.",
+  },
+  {
+    slug: "products",
+    tableKey: "products",
+    label: "Sản phẩm",
+    title: "Quản lý sản phẩm",
+    description: "Xem sản phẩm đã đồng bộ từ KiotViet và đối chiếu mapping phát trứng.",
+  },
+  {
+    slug: "orders",
+    tableKey: "kiotvietOrders",
+    label: "Đơn hàng",
+    title: "Quản lý đơn hàng",
+    description: "Kiểm tra đơn KiotViet, trạng thái thanh toán, giao hàng và điều kiện nhận quà.",
+  },
 ];
 
-const poolColumns = [
-  { key: "pool", label: "Pool" },
-  { key: "tier", label: "Tier" },
-  { key: "accounts", label: "Acc map" },
-  { key: "available", label: "Có sẵn" },
-  { key: "createdAt", label: "Ngày tạo" },
-];
+const MANAGEMENT_PAGE_BY_TABLE = new Map(
+  MANAGEMENT_PAGES.map((page) => [page.tableKey, page])
+);
 
-const customerColumns = [
-  { key: "code", label: "Mã khách" },
-  { key: "name", label: "Tên khách" },
-  { key: "status", label: "Trạng thái" },
-  { key: "success", label: "Đơn thành công" },
-  { key: "returnStreak", label: "Hoàn liên tiếp" },
-  { key: "warning", label: "Cảnh báo" },
-  { key: "updatedAt", label: "Cập nhật" },
-];
-
-const accountColumns = [
-  { key: "username", label: "Username" },
-  { key: "platform", label: "Platform" },
-  { key: "tier", label: "Tier" },
-  { key: "status", label: "Status" },
-  { key: "token", label: "Token" },
-  { key: "assignedAt", label: "Assigned" },
-];
-
-const productColumns = [
-  { key: "id", label: "ID KV" },
-  { key: "name", label: "Sản phẩm" },
-  { key: "price", label: "Giá" },
-  { key: "syncedAt", label: "Đồng bộ" },
-];
-
-const logColumns = [
-  { key: "action", label: "Action" },
-  { key: "eggId", label: "Egg" },
-  { key: "accountId", label: "Account" },
-  { key: "triggeredBy", label: "By" },
-  { key: "createdAt", label: "Created" },
-];
-
-function hasRows(rows) {
-  return Array.isArray(rows) && rows.length > 0;
+function getAdminPath(slug = "") {
+  return slug ? `${ADMIN_BASE_PATH}/${slug}` : ADMIN_BASE_PATH;
 }
 
-function hasCounts(counts) {
-  return Object.values(counts || {}).some((value) => Number(value) > 0);
+function getActiveSlug(pathname) {
+  return pathname
+    .replace(ADMIN_BASE_PATH, "")
+    .replace(/^\/+/, "")
+    .split("/")[0];
+}
+
+function AdminManagementNav({ activeSlug, tableCounts }) {
+  const overviewActive = !activeSlug;
+
+  return (
+    <nav className="admin-management-nav" aria-label="Điều hướng quản trị">
+      <Link className={overviewActive ? "is-active" : ""} to={getAdminPath()}>
+        <span>Tổng quan</span>
+        <strong>Analytics</strong>
+      </Link>
+      {MANAGEMENT_PAGES.map((page) => (
+        <Link
+          className={activeSlug === page.slug ? "is-active" : ""}
+          key={page.slug}
+          to={getAdminPath(page.slug)}
+        >
+          <span>{page.label}</span>
+          <strong>{tableCounts[page.tableKey] || 0}</strong>
+        </Link>
+      ))}
+    </nav>
+  );
 }
 
 function hasMetricValue(value) {

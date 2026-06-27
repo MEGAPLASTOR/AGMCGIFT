@@ -24,6 +24,10 @@ const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
   "giftPools",
   "poolAccountMappings",
   "productEggMappings",
+  "customers",
+  "eggs",
+  "products",
+  "kiotvietOrders",
 ]);
 const DEFAULT_TABLE_KEY = "giftAccounts";
 const PRIORITY_COLUMNS_BY_TABLE = {
@@ -36,17 +40,6 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   productEggMappings: ["kv_product_id", "egg_type", "gift_pool_id", "egg_tier"],
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
 };
-const QUICK_TABLES = [
-  { key: "giftAccounts", label: "Kho account" },
-  { key: "giftPools", label: "Bể quà" },
-  { key: "productEggMappings", label: "Mapping trứng" },
-  { key: "poolAccountMappings", label: "Gán account" },
-  { key: "customers", label: "Khách hàng" },
-  { key: "eggs", label: "Trứng" },
-  { key: "products", label: "Sản phẩm" },
-  { key: "kiotvietOrders", label: "Đơn hàng" },
-];
-
 function getPriorityColumns(tableKey, rows, fields) {
   const preferredColumns = PRIORITY_COLUMNS_BY_TABLE[tableKey] || [];
 
@@ -139,8 +132,12 @@ function AdminFormField({ field, value, onChange }) {
 // Giao diện quản trị dữ liệu hiện thao tác trên state frontend.
 // Backend thay các handler thêm/sửa/xóa bằng endpoint CRUD thật khi nối KiotViet/database.
 export function AdminDataCrudPanel({
+  activeTableKey = DEFAULT_TABLE_KEY,
+  panelTitle = "Quản lý kho account",
+  panelDescription = "Tạo account, upload Excel và kiểm tra dữ liệu raw từ API",
   tables,
   tableCounts,
+  onTableChange,
   onSaveRecord,
   onDeleteRecord,
   onCreateGiftAccount,
@@ -158,7 +155,7 @@ export function AdminDataCrudPanel({
   onUploadGiftAccounts,
   onResetTables,
 }) {
-  const [tableKey, setTableKey] = useState(DEFAULT_TABLE_KEY);
+  const [tableKey, setTableKey] = useState(activeTableKey);
   const [keyword, setKeyword] = useState("");
   const [selectedRecordId, setSelectedRecordId] = useState("");
   const [formValues, setFormValues] = useState({});
@@ -211,15 +208,21 @@ export function AdminDataCrudPanel({
         : isProductMappingsTable
           ? "Liên kết sản phẩm"
           : "Thêm bản ghi";
-  const quickTables = useMemo(
-    () =>
-      QUICK_TABLES.filter(
-        (quickTable) =>
-          visibleTables.some((table) => table.key === quickTable.key) ||
-          ALWAYS_VISIBLE_TABLE_KEYS.has(quickTable.key)
-      ),
-    [visibleTables]
-  );
+  const resetTableState = (nextTableKey) => {
+    setTableKey(nextTableKey);
+    setKeyword("");
+    setSelectedRecordId("");
+    setFormValues({});
+    setMessage("");
+  };
+
+  useEffect(() => {
+    if (!activeTableKey || activeTableKey === tableKey) {
+      return;
+    }
+
+    resetTableState(activeTableKey);
+  }, [activeTableKey, tableKey]);
 
   useEffect(() => {
     if (visibleTables.some((table) => table.key === tableKey)) {
@@ -227,12 +230,14 @@ export function AdminDataCrudPanel({
     }
 
     const nextTableKey = visibleTables[0]?.key || "giftAccounts";
-    setTableKey(nextTableKey);
-    setKeyword("");
-    setSelectedRecordId("");
-    setFormValues({});
-    setMessage("");
-  }, [tableKey, visibleTables]);
+
+    if (onTableChange) {
+      onTableChange(nextTableKey);
+      return;
+    }
+
+    resetTableState(nextTableKey);
+  }, [onTableChange, tableKey, visibleTables]);
 
   const updateField = (fieldKey, value) => {
     setFormValues((currentValues) => ({
@@ -402,11 +407,16 @@ export function AdminDataCrudPanel({
   };
 
   const changeTable = (nextTableKey) => {
-    setTableKey(nextTableKey);
-    setKeyword("");
-    setSelectedRecordId("");
-    setFormValues({});
-    setMessage("");
+    if (nextTableKey === tableKey) {
+      return;
+    }
+
+    if (onTableChange) {
+      onTableChange(nextTableKey);
+      return;
+    }
+
+    resetTableState(nextTableKey);
   };
 
   const handleTableChange = (event) => {
@@ -417,8 +427,8 @@ export function AdminDataCrudPanel({
     <section className="admin-panel admin-crud-panel">
       <div className="admin-panel__head">
         <div>
-          <h2>Quản lý kho account</h2>
-          <span>Tạo account, upload Excel và kiểm tra dữ liệu raw từ API</span>
+          <h2>{panelTitle}</h2>
+          <span>{panelDescription}</span>
         </div>
         <button type="button" className="admin-light-button" onClick={onResetTables}>
           <FaRotateLeft aria-hidden="true" />
@@ -426,25 +436,9 @@ export function AdminDataCrudPanel({
         </button>
       </div>
 
-      <div className="admin-table-tabs" role="tablist" aria-label="Bảng quản trị">
-        {quickTables.map((table) => (
-          <button
-            type="button"
-            role="tab"
-            aria-selected={table.key === tableKey}
-            className={table.key === tableKey ? "is-active" : ""}
-            key={table.key}
-            onClick={() => changeTable(table.key)}
-          >
-            <span>{table.label}</span>
-            <strong>{tableCounts[table.key] || 0}</strong>
-          </button>
-        ))}
-      </div>
-
       <div className="admin-crud-toolbar">
         <label>
-          Bảng dữ liệu
+          Chuyển trang quản lý
           <select value={tableKey} onChange={handleTableChange}>
             {visibleTables.map((table) => (
               <option key={table.key} value={table.key}>
