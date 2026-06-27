@@ -25,20 +25,35 @@ function requireAuthHeader(authHeader, endpoint) {
   return authHeader;
 }
 
-function getArrayPayload(payload) {
-  const source =
-    payload?.data?.items ||
-    payload?.data?.content ||
-    payload?.data ||
-    payload?.items ||
-    payload?.content ||
-    payload?.records ||
-    payload;
+function getArrayPayload(payload, key) {
+  const keyedData = payload?.data?.[key] || payload?.[key];
+  const candidates = [
+    payload,
+    payload?.data,
+    keyedData,
+    keyedData?.items,
+    keyedData?.content,
+    keyedData?.records,
+    payload?.data?.[key],
+    payload?.data?.items,
+    payload?.data?.content,
+    payload?.data?.records,
+    payload?.items,
+    payload?.content,
+    payload?.records,
+    payload?.[key],
+  ];
 
-  return Array.isArray(source) ? source : [];
+  const source = candidates.find((candidate) => Array.isArray(candidate));
+
+  if (source) {
+    return source;
+  }
+
+  return [];
 }
 
-async function fetchAdminRawEndpoint(endpoint, authHeader) {
+async function fetchAdminRawEndpoint(key, endpoint, authHeader) {
   let response;
 
   try {
@@ -70,7 +85,15 @@ async function fetchAdminRawEndpoint(endpoint, authHeader) {
     );
   }
 
-  return getArrayPayload(payload);
+  const rows = getArrayPayload(payload, key);
+
+  console.info("[AGMC API] Raw admin data loaded", {
+    endpoint,
+    key,
+    rows: rows.length,
+  });
+
+  return rows;
 }
 
 function normalizeDate(value) {
@@ -303,20 +326,36 @@ export async function fetchAdminRawTables(authHeader) {
   const results = await Promise.allSettled(
     RAW_ENDPOINTS.map(async ([key, endpoint]) => [
       key,
-      await fetchAdminRawEndpoint(endpoint, authHeader),
+      await fetchAdminRawEndpoint(key, endpoint, authHeader),
     ])
   );
   const raw = {};
   const errors = [];
 
-  results.forEach((result) => {
+  results.forEach((result, index) => {
+    const [key, endpoint] = RAW_ENDPOINTS[index];
+
     if (result.status === "fulfilled") {
-      const [key, rows] = result.value;
+      const [, rows] = result.value;
       raw[key] = rows;
       return;
     }
 
-    errors.push(result.reason);
+    console.warn("[AGMC API] Raw admin data failed", {
+      endpoint,
+      key,
+      status: result.reason?.status,
+      message: result.reason?.message,
+      payload: result.reason?.payload,
+    });
+
+    errors.push({
+      key,
+      endpoint,
+      status: result.reason?.status || 0,
+      payload: result.reason?.payload || null,
+      message: result.reason?.message || "Không tải được API raw.",
+    });
   });
 
   if (!Object.keys(raw).length) {
@@ -332,5 +371,8 @@ export async function fetchAdminRawTables(authHeader) {
     );
   }
 
-  return mergeAdminRawRows(raw);
+  return {
+    ...mergeAdminRawRows(raw),
+    __rawErrors: errors,
+  };
 }

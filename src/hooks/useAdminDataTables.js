@@ -178,7 +178,18 @@ export function useAdminDataTables(sourceTables) {
 
       try {
         const rawTables = await fetchAdminRawTables(authHeader);
-        setTables(createAdminTableState({ ...sourceTables, ...rawTables }));
+        const { __rawErrors: rawErrors = [], ...loadedTables } = rawTables;
+
+        setTables(createAdminTableState({ ...sourceTables, ...loadedTables }));
+
+        if (rawErrors.length) {
+          setRawDataError(
+            `Một số API raw chưa tải được: ${rawErrors
+              .map((error) => `${error.endpoint}${error.status ? ` (${error.status})` : ""}`)
+              .join(", ")}`
+          );
+        }
+
         return rawTables;
       } catch (error) {
         const statusText = error.status ? ` (${error.status})` : "";

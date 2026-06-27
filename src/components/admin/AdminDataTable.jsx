@@ -1,4 +1,9 @@
-export function AdminDataTable({ title, columns, rows }) {
+export function AdminDataTable({
+  title,
+  columns,
+  rows,
+  emptyMessage = "Chưa có dữ liệu để hiển thị.",
+}) {
   return (
     <section className="admin-panel admin-table-panel">
       <div className="admin-panel__head">
@@ -15,13 +20,19 @@ export function AdminDataTable({ title, columns, rows }) {
             </tr>
           </thead>
           <tbody>
-            {rows.map((row, index) => (
-              <tr key={`${title}-${index}`}>
-                {columns.map((column) => (
-                  <td key={column.key}>{row[column.key]}</td>
-                ))}
+            {rows.length ? (
+              rows.map((row, index) => (
+                <tr key={`${title}-${index}`}>
+                  {columns.map((column) => (
+                    <td key={column.key}>{row[column.key]}</td>
+                  ))}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={columns.length}>{emptyMessage}</td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

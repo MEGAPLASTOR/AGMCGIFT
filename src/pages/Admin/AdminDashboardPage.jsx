@@ -249,13 +249,16 @@ export default function AdminDashboardPage() {
         </section>
       ) : null}
 
-      {hasRows(dashboard.customerRows) ? (
-        <AdminDataTable
-          title="Danh sách khách hàng"
-          columns={customerColumns}
-          rows={dashboard.customerRows}
-        />
-      ) : null}
+      <AdminDataTable
+        title="Danh sách khách hàng"
+        columns={customerColumns}
+        rows={dashboard.customerRows}
+        emptyMessage={
+          adminTables.isLoadingRawData
+            ? "Đang tải danh sách khách hàng từ API..."
+            : "Chưa có khách hàng từ /api/admin/customers. Bấm Tải lại dữ liệu sau khi đăng nhập JWT."
+        }
+      />
 
       <AdminDataCrudPanel
         tables={adminTables.tables}
