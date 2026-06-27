@@ -218,6 +218,7 @@ export function AdminDataCrudPanel({
 
     try {
       let record = buildRecordFromForm(formValues, tableKey);
+      let shouldDeleteSelectedBeforeSave = false;
 
       if (isGiftAccountsTable && isCreating && onCreateGiftAccount) {
         const payload = await onCreateGiftAccount(record);
@@ -242,9 +243,14 @@ export function AdminDataCrudPanel({
 
         if (currentRecord && !isSameMapping && onRemovePoolAccount) {
           await onRemovePoolAccount(currentRecord);
+          shouldDeleteSelectedBeforeSave = true;
         }
 
         record = isSameMapping ? currentRecord : await onAddPoolAccount(record);
+      }
+
+      if (shouldDeleteSelectedBeforeSave) {
+        onDeleteRecord(tableKey, selectedRecordId);
       }
 
       onSaveRecord(tableKey, record);

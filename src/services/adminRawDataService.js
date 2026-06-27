@@ -371,6 +371,16 @@ export async function fetchAdminRawTables(authHeader) {
           message: error?.message,
         })),
       });
+
+      errors.push(
+        ...detailResult.errors.map((error) => ({
+          key: "giftPools",
+          endpoint: error?.endpoint || ADMIN_ENDPOINTS.giftPools,
+          status: error?.status || 0,
+          payload: error?.payload || null,
+          message: error?.message || "Khong tai duoc chi tiet be qua.",
+        }))
+      );
     }
   }
 

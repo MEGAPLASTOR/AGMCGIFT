@@ -16,6 +16,13 @@ import {
   createAdminGiftAccount,
   uploadAdminGiftAccounts,
 } from "../../services/adminGiftAccountService";
+import {
+  addAdminGiftPoolAccount,
+  createAdminGiftPool,
+  deleteAdminGiftPool,
+  removeAdminGiftPoolAccounts,
+  updateAdminGiftPool,
+} from "../../services/adminGiftPoolService";
 
 const orderColumns = [
   { key: "code", label: "Mã đơn" },
@@ -185,6 +192,56 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleCreateGiftPool = async (record) => {
+    try {
+      return await createAdminGiftPool(record, admin.authHeader);
+    } catch (createError) {
+      handleAuthError(createError);
+      throw createError;
+    }
+  };
+
+  const handleUpdateGiftPool = async (record, id) => {
+    try {
+      return await updateAdminGiftPool(id, record, admin.authHeader);
+    } catch (updateError) {
+      handleAuthError(updateError);
+      throw updateError;
+    }
+  };
+
+  const handleDeleteGiftPool = async (id) => {
+    try {
+      return await deleteAdminGiftPool(id, admin.authHeader);
+    } catch (deleteError) {
+      handleAuthError(deleteError);
+      throw deleteError;
+    }
+  };
+
+  const handleAddPoolAccount = async (record) => {
+    try {
+      return await addAdminGiftPoolAccount(record, admin.authHeader);
+    } catch (addError) {
+      handleAuthError(addError);
+      throw addError;
+    }
+  };
+
+  const handleRemovePoolAccount = async (record) => {
+    try {
+      const removedMappings = await removeAdminGiftPoolAccounts(
+        record,
+        admin.authHeader
+      );
+
+      return removedMappings[0] || record;
+    } catch (removeError) {
+      handleAuthError(removeError);
+      throw removeError;
+    }
+  };
+
   if (!admin) {
     return (
       <main className="admin-page admin-page--login">
@@ -285,6 +342,11 @@ export default function AdminDashboardPage() {
         onSaveRecord={adminTables.upsertRecord}
         onDeleteRecord={adminTables.deleteRecord}
         onCreateGiftAccount={handleCreateGiftAccount}
+        onCreateGiftPool={handleCreateGiftPool}
+        onUpdateGiftPool={handleUpdateGiftPool}
+        onDeleteGiftPool={handleDeleteGiftPool}
+        onAddPoolAccount={handleAddPoolAccount}
+        onRemovePoolAccount={handleRemovePoolAccount}
         onImportGiftAccounts={adminTables.importGiftAccounts}
         onUploadGiftAccounts={handleUploadGiftAccounts}
         onResetTables={adminTables.resetTables}
