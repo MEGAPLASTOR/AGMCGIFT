@@ -6,20 +6,25 @@ function normalizeCode(value) {
     .toUpperCase();
 }
 
-// SAPO_BACKEND_CHUAN_HOA_TRANG_THAI:
-// Backend nên map trạng thái đơn SAPO về đúng 3 giá trị: Pending, Paid, Cancel.
+// KIOTVIET_BACKEND_CHUAN_HOA_TRANG_THAI:
+// Backend nên map trạng thái đơn KiotViet về đúng 3 giá trị: Pending, Paid, Cancel.
 function normalizeStatus(value) {
   return String(value || "")
     .trim()
     .toUpperCase();
 }
 
-function getSapoOrders(catalogData) {
-  return catalogData.sapoOrders || catalogData.sapo_orders || [];
+function getKiotvietOrders(catalogData) {
+  return catalogData.kiotvietOrders || catalogData.sapoOrders || catalogData.sapo_orders || [];
 }
 
-function getSapoOrderItems(catalogData) {
-  return catalogData.sapoOrderItems || catalogData.sapo_order_items || [];
+function getKiotvietOrderItems(catalogData) {
+  return (
+    catalogData.kiotvietOrderItems ||
+    catalogData.sapoOrderItems ||
+    catalogData.sapo_order_items ||
+    []
+  );
 }
 
 function getProductEggMappings(catalogData) {
@@ -39,18 +44,18 @@ function getPoolAccountMappings(catalogData) {
 }
 
 function getOrderItemByOrderId(catalogData, orderId) {
-  return getSapoOrderItems(catalogData).find((item) => item.order_id === orderId);
+  return getKiotvietOrderItems(catalogData).find((item) => item.order_id === orderId);
 }
 
 function normalizeProductFromOrderItem(orderItem) {
   if (!orderItem) return null;
 
   return {
-    id: orderItem.sapo_product_id,
+    id: orderItem.kv_product_id || orderItem.sapo_product_id,
     tenSanPham: orderItem.product_name,
     maSanPham: orderItem.sku,
-    moTa: `SAPO variant: ${orderItem.sapo_variant_id}`,
-    sapoVariantId: orderItem.sapo_variant_id,
+    moTa: `KiotViet variant: ${orderItem.kv_variant_id || orderItem.sapo_variant_id || "-"}`,
+    kiotvietVariantId: orderItem.kv_variant_id || orderItem.sapo_variant_id,
   };
 }
 
@@ -61,9 +66,11 @@ function getProducts(catalogData) {
 
   const products = new Map();
 
-  getSapoOrderItems(catalogData).forEach((item) => {
-    if (!products.has(item.sapo_product_id)) {
-      products.set(item.sapo_product_id, normalizeProductFromOrderItem(item));
+  getKiotvietOrderItems(catalogData).forEach((item) => {
+    const productId = item.kv_product_id || item.sapo_product_id;
+
+    if (!products.has(productId)) {
+      products.set(productId, normalizeProductFromOrderItem(item));
     }
   });
 
@@ -90,10 +97,9 @@ function normalizeAccount(account, tier, productId, pool) {
   };
 }
 
-// SAPO_BACKEND_DANH_SACH_DON:
-// Frontend đang đọc bảng JSON sapo_orders và join sapo_order_items để lấy thông tin sản phẩm.
-// Backend sau này thay bằng API lấy đơn thật từ SAPO/MySQL.
-// Field cần có: sapo_orders.order_code, sapo_orders.status, sapo_order_items.sapo_product_id.
+// KIOTVIET_BACKEND_DANH_SACH_DON:
+// Frontend đọc dữ liệu đơn KiotViet qua API backend.
+// Field cần có: order_code, status, kv_product_id.
 export function getCustomerOrders(catalogData) {
   if (catalogData.customerOrders?.length || catalogData.orders?.length) {
     const orders = catalogData.customerOrders || catalogData.orders;
@@ -104,13 +110,13 @@ export function getCustomerOrders(catalogData) {
     }));
   }
 
-  return getSapoOrders(catalogData).map((order) => {
+  return getKiotvietOrders(catalogData).map((order) => {
     const orderItem = getOrderItemByOrderId(catalogData, order.id);
 
     return {
       ...order,
-      productId: orderItem?.sapo_product_id,
-      productVariantId: orderItem?.sapo_variant_id,
+      productId: orderItem?.kv_product_id || orderItem?.sapo_product_id,
+      productVariantId: orderItem?.kv_variant_id || orderItem?.sapo_variant_id,
       maDonHang: order.order_code,
       trangThai: order.status,
       tenKhachHang: order.source_name,
@@ -119,15 +125,15 @@ export function getCustomerOrders(catalogData) {
   });
 }
 
-// SAPO_BACKEND_CHAN_DON_CHUA_HOP_LE:
+// KIOTVIET_BACKEND_CHAN_DON_CHUA_HOP_LE:
 // Chỉ đơn Paid mới được đi tiếp vào bước chọn trứng.
 // Pending/Cancel vẫn tìm được đơn nhưng bị chặn trong hook useGiftCode.
 export function isPaidOrder(order) {
   return normalizeStatus(order?.trangThai || order?.status) === "PAID";
 }
 
-// SAPO_BACKEND_CHECK_MA_DON:
-// Người dùng nhập sapo_orders.order_code.
+// KIOTVIET_BACKEND_CHECK_MA_DON:
+// Người dùng nhập mã đơn KiotViet.
 // Hàm này join theo luồng: order -> order_item -> product.
 export function findCodeInCatalog(catalogData, inputCode) {
   const normalizedCode = normalizeCode(inputCode);
@@ -171,8 +177,9 @@ export function getAccountsByTier(catalogData, orderItem, tier) {
   const eggType = getEggTypeByTier(tier);
   const mapping = getProductEggMappings(catalogData).find(
     (item) =>
-      item.sapo_product_id === orderItem.productId &&
-      item.sapo_variant_id === orderItem.productVariantId &&
+      (item.kv_product_id || item.sapo_product_id) === orderItem.productId &&
+      (item.kv_variant_id || item.sapo_variant_id || "") ===
+        (orderItem.productVariantId || "") &&
       (item.egg_tier === tier || Number(item.egg_type) === eggType)
   );
 

@@ -182,8 +182,8 @@ function normalizeOrderItems(orders) {
     (order.orderItems || []).map((item) => ({
       id: item.id,
       order_id: order.id,
-      sapo_product_id: item.kvProductId || item.sapo_product_id || "",
-      sapo_variant_id: "",
+      kv_product_id: item.kvProductId || item.kv_product_id || "",
+      kv_variant_id: "",
       product_name: item.productName || "",
       sku: item.sku || "",
       quantity: Number(item.quantity || 0),
@@ -195,8 +195,8 @@ function normalizeProductEggMappings(products) {
   return products.flatMap((product) =>
     (product.mappings || []).map((mapping) => ({
       id: mapping.id,
-      sapo_product_id: String(product.kvProductId || ""),
-      sapo_variant_id: "",
+      kv_product_id: String(product.kvProductId || ""),
+      kv_variant_id: "",
       egg_type: Number(mapping.eggType || 0),
       gift_pool_id: mapping.giftPool?.id || "",
       egg_tier: mapping.eggTier || mapping.giftPool?.tier || "",
@@ -279,8 +279,8 @@ function mergeAdminRawRows(raw) {
   return {
     customers,
     products,
-    sapoOrders: uniqueById([...orders, ...deriveOrdersFromEggs(raw.eggs || [])]),
-    sapoOrderItems: normalizeOrderItems(raw.orders || []),
+    kiotvietOrders: uniqueById([...orders, ...deriveOrdersFromEggs(raw.eggs || [])]),
+    kiotvietOrderItems: normalizeOrderItems(raw.orders || []),
     eggs,
     productEggMappings: normalizeProductEggMappings(raw.products || []),
     giftPools: uniqueById([

@@ -95,7 +95,7 @@ export default function AdminDashboardPage() {
       tone: "blue",
     },
     {
-      label: "Tổng đơn SAPO",
+      label: "Tổng đơn KiotViet",
       value: dashboard.summary.totalOrders,
       note: "orders raw",
       tone: "blue",
@@ -316,7 +316,7 @@ export default function AdminDashboardPage() {
 
       {hasRows(dashboard.latestOrders) ? (
         <AdminDataTable
-          title="Đơn SAPO mới"
+          title="Đơn KiotViet mới"
           columns={orderColumns}
           rows={dashboard.latestOrders}
         />

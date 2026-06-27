@@ -71,8 +71,8 @@ function getPoolAvailableCount(poolAccountMappings, availableAccountIds) {
 // Backend nên tạo API, ví dụ /admin/analytics, trả về cùng shape dữ liệu để thay thế hàm này.
 export function buildAdminDashboard(tables) {
   const customers = tables.customers || [];
-  const orders = tables.sapoOrders || [];
-  const orderItems = tables.sapoOrderItems || [];
+  const orders = tables.kiotvietOrders || tables.sapoOrders || [];
+  const orderItems = tables.kiotvietOrderItems || tables.sapoOrderItems || [];
   const products = tables.products || [];
   const eggs = tables.eggs || [];
   const giftPools = tables.giftPools || [];
@@ -131,7 +131,7 @@ export function buildAdminDashboard(tables) {
     },
     workflow: [
       {
-        title: "Webhook SAPO",
+        title: "Đồng bộ KiotViet",
         value: orders.length,
         note: "orders raw",
       },

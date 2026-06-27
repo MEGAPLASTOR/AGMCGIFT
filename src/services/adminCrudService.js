@@ -111,8 +111,8 @@ export const ADMIN_TABLES = [
     ],
   },
   {
-    key: "sapoOrders",
-    label: "sapo_orders",
+    key: "kiotvietOrders",
+    label: "kiotviet_orders",
     idField: "id",
     fields: [
       text("id", "ID", { required: true, wide: true }),
@@ -127,14 +127,14 @@ export const ADMIN_TABLES = [
     ],
   },
   {
-    key: "sapoOrderItems",
-    label: "sapo_order_items",
+    key: "kiotvietOrderItems",
+    label: "kiotviet_order_items",
     idField: "id",
     fields: [
       text("id", "ID", { required: true, wide: true }),
       text("order_id", "ID đơn hàng", { required: true }),
-      text("sapo_product_id", "ID sản phẩm SAPO"),
-      text("sapo_variant_id", "ID biến thể SAPO"),
+      text("kv_product_id", "ID sản phẩm KiotViet"),
+      text("kv_variant_id", "ID biến thể KiotViet"),
       text("product_name", "Tên sản phẩm", { wide: true }),
       text("sku", "SKU"),
       number("quantity", "Số lượng"),
@@ -178,8 +178,8 @@ export const ADMIN_TABLES = [
     idField: "id",
     fields: [
       text("id", "ID", { required: true, wide: true }),
-      text("sapo_product_id", "ID sản phẩm SAPO", { required: true }),
-      text("sapo_variant_id", "ID biến thể SAPO"),
+      text("kv_product_id", "ID sản phẩm KiotViet", { required: true }),
+      text("kv_variant_id", "ID biến thể KiotViet"),
       select("egg_type", "Loại trứng", eggTypeOptions, {
         valueType: "number",
       }),

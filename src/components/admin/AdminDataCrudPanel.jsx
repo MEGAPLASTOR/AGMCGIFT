@@ -56,7 +56,7 @@ function AdminFormField({ field, value, onChange }) {
 
 // BACKEND_ADMIN_CRUD_GIAO_DIEN:
 // Giao diện quản trị dữ liệu hiện thao tác trên state frontend.
-// Backend thay các handler thêm/sửa/xóa bằng endpoint CRUD thật khi nối MySQL/SAPO.
+// Backend thay các handler thêm/sửa/xóa bằng endpoint CRUD thật khi nối KiotViet/database.
 export function AdminDataCrudPanel({
   tables,
   tableCounts,
