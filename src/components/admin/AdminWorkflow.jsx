@@ -3,7 +3,7 @@ export function AdminWorkflow({ steps }) {
     <section className="admin-panel">
       <div className="admin-panel__head">
         <h2>Luồng xử lý</h2>
-        <span>theo sơ đồ SAPO</span>
+        <span>theo luồng KiotViet</span>
       </div>
       <div className="admin-workflow">
         {steps.map((step, index) => (

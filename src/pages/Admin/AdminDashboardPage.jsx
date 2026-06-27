@@ -181,8 +181,8 @@ export default function AdminDashboardPage() {
     <main className="admin-page">
       <header className="admin-header">
         <div>
-          <p className="admin-eyebrow">AGMC MT Admin</p>
-          <h1>Dashboard vận hành quà trứng</h1>
+          <p className="admin-eyebrow">AGMC KiotViet Admin</p>
+          <h1>Dashboard vận hành KiotViet</h1>
           <span>
             Đăng nhập: {admin.full_name} / {admin.role}
           </span>
