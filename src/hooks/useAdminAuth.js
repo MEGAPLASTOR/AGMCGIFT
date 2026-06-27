@@ -1,10 +1,16 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   getAdminAuthorizationHeader,
   loginAdmin,
 } from "../services/adminAuthService";
 
 const STORAGE_KEY = "agmc_admin_session";
+const JWT_EXPIRY_SKEW_MS = 30 * 1000;
+const MAX_SESSION_TIMER_MS = 2_147_483_647;
+const SESSION_EXPIRED_MESSAGE =
+  "Phiên đăng nhập JWT đã hết hạn. Vui lòng đăng nhập lại.";
+const SESSION_RELOGIN_MESSAGE =
+  "Phiên đăng nhập JWT hết hạn hoặc không đủ quyền. Vui lòng đăng nhập lại.";
 
 function normalizeStoredSession(value) {
   if (!value?.accessToken || !value?.username) {
@@ -55,6 +61,73 @@ function clearStoredAdminSession() {
   }
 }
 
+function decodeJwtPayload(accessToken) {
+  const payloadSegment = String(accessToken || "").split(".")[1];
+
+  if (
+    !payloadSegment ||
+    typeof window === "undefined" ||
+    typeof window.atob !== "function"
+  ) {
+    return null;
+  }
+
+  try {
+    const base64 = payloadSegment.replace(/-/g, "+").replace(/_/g, "/");
+    const paddedBase64 = base64.padEnd(
+      base64.length + ((4 - (base64.length % 4)) % 4),
+      "="
+    );
+
+    return JSON.parse(window.atob(paddedBase64));
+  } catch {
+    return null;
+  }
+}
+
+function getJwtExpiresAt(session) {
+  const exp = Number(decodeJwtPayload(session?.accessToken)?.exp);
+
+  if (!Number.isFinite(exp)) {
+    return null;
+  }
+
+  return exp * 1000;
+}
+
+function isSessionExpired(session) {
+  const expiresAt = getJwtExpiresAt(session);
+
+  return Boolean(expiresAt && expiresAt - JWT_EXPIRY_SKEW_MS <= Date.now());
+}
+
+function isAuthorizationError(error) {
+  return error?.status === 401 || error?.status === 403;
+}
+
+function hasAuthorizationError(result) {
+  if (isAuthorizationError(result)) {
+    return true;
+  }
+
+  return (result?.__rawErrors || []).some(isAuthorizationError);
+}
+
+function readStoredAdminSessionResult() {
+  const session = readStoredAdminSession();
+
+  if (!session) {
+    return { error: "", session: null };
+  }
+
+  if (isSessionExpired(session)) {
+    clearStoredAdminSession();
+    return { error: SESSION_EXPIRED_MESSAGE, session: null };
+  }
+
+  return { error: "", session };
+}
+
 function findLocalAdmin(tables, username) {
   const normalizedUsername = String(username || "").trim().toLowerCase();
 
@@ -86,14 +159,52 @@ function createAdminSessionView(session, tables) {
 }
 
 export function useAdminAuth(tables) {
-  const [session, setSession] = useState(readStoredAdminSession);
-  const [error, setError] = useState("");
+  const [initialSession] = useState(readStoredAdminSessionResult);
+  const [session, setSession] = useState(initialSession.session);
+  const [error, setError] = useState(initialSession.error);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const admin = useMemo(
     () => createAdminSessionView(session, tables),
     [session, tables]
   );
+
+  const requireRelogin = useCallback((message = SESSION_RELOGIN_MESSAGE) => {
+    clearStoredAdminSession();
+    setSession(null);
+    setError(message);
+  }, []);
+
+  useEffect(() => {
+    const expiresAt = getJwtExpiresAt(session);
+
+    if (!expiresAt || typeof window === "undefined") {
+      return undefined;
+    }
+
+    let timeoutId;
+    const checkExpiry = () => {
+      if (isSessionExpired(session)) {
+        requireRelogin(SESSION_EXPIRED_MESSAGE);
+        return;
+      }
+
+      timeoutId = window.setTimeout(
+        checkExpiry,
+        Math.min(expiresAt - Date.now(), MAX_SESSION_TIMER_MS)
+      );
+    };
+
+    timeoutId = window.setTimeout(
+      checkExpiry,
+      Math.min(
+        Math.max(expiresAt - Date.now() - JWT_EXPIRY_SKEW_MS, 0),
+        MAX_SESSION_TIMER_MS
+      )
+    );
+
+    return () => window.clearTimeout(timeoutId);
+  }, [requireRelogin, session]);
 
   const login = async ({ username, password }) => {
     const trimmedUsername = String(username || "").trim();
@@ -112,6 +223,10 @@ export function useAdminAuth(tables) {
         password,
       });
 
+      if (isSessionExpired(nextSession)) {
+        throw new Error(SESSION_EXPIRED_MESSAGE);
+      }
+
       writeStoredAdminSession(nextSession);
       setSession(nextSession);
       return true;
@@ -129,12 +244,26 @@ export function useAdminAuth(tables) {
     setError("");
   };
 
+  const handleAuthError = useCallback(
+    (errorOrResult) => {
+      if (!hasAuthorizationError(errorOrResult)) {
+        return false;
+      }
+
+      requireRelogin(SESSION_RELOGIN_MESSAGE);
+      return true;
+    },
+    [requireRelogin]
+  );
+
   return {
     admin,
     authHeader: admin?.authHeader || "",
     error,
+    handleAuthError,
     isLoggingIn,
     login,
     logout,
+    requireRelogin,
   };
 }

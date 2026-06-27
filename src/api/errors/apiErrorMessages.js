@@ -61,6 +61,22 @@ export function getDefaultApiErrorMessage(status, endpoint) {
     return "Dữ liệu tài khoản không hợp lệ.";
   }
 
+  if (isAdminGiftPoolEndpoint(endpoint) && (status === 401 || status === 403)) {
+    return "PhiÃªn Ä‘Äƒng nháº­p admin háº¿t háº¡n hoáº·c khÃ´ng Ä‘á»§ quyá»n quáº£n lÃ½ bá»ƒ quÃ .";
+  }
+
+  if (isAdminGiftPoolEndpoint(endpoint) && status === 400) {
+    return "Dá»¯ liá»‡u bá»ƒ quÃ  khÃ´ng há»£p lá»‡ hoáº·c bá»ƒ quÃ  Ä‘ang chá»©a trá»©ng liÃªn káº¿t.";
+  }
+
+  if (isAdminGiftPoolEndpoint(endpoint) && status === 404) {
+    return "KhÃ´ng tÃ¬m tháº¥y bá»ƒ quÃ  hoáº·c tÃ i khoáº£n.";
+  }
+
+  if (isAdminGiftPoolEndpoint(endpoint) && status >= 500) {
+    return "API bá»ƒ quÃ  Ä‘ang lá»—i phÃ­a backend.";
+  }
+
   if (endpoint === EGG_ENDPOINTS.sync && status === 400) {
     return "Mã đơn không hợp lệ hoặc khách hàng bị BAN.";
   }

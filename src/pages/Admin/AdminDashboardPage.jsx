@@ -83,9 +83,8 @@ function hasMetricValue(value) {
 export default function AdminDashboardPage() {
   const adminTables = useAdminDataTables(giftCatalogData);
   const { loadRawTables } = adminTables;
-  const { admin, error, isLoggingIn, login, logout } = useAdminAuth(
-    adminTables.tables
-  );
+  const { admin, error, handleAuthError, isLoggingIn, login, logout } =
+    useAdminAuth(adminTables.tables);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
   const visibleMetrics = [
@@ -151,19 +150,39 @@ export default function AdminDashboardPage() {
       return;
     }
 
-    loadRawTables(admin.authHeader).catch(() => {
+    loadRawTables(admin.authHeader).then(handleAuthError).catch((loadError) => {
+      handleAuthError(loadError);
       // The hook stores a user-facing error message.
     });
-  }, [admin?.authHeader, loadRawTables]);
+  }, [admin?.authHeader, handleAuthError, loadRawTables]);
 
   const handleReloadRawData = () => {
     if (!admin?.authHeader || adminTables.isLoadingRawData) {
       return;
     }
 
-    loadRawTables(admin.authHeader).catch(() => {
+    loadRawTables(admin.authHeader).then(handleAuthError).catch((loadError) => {
+      handleAuthError(loadError);
       // The hook stores a user-facing error message.
     });
+  };
+
+  const handleCreateGiftAccount = async (record) => {
+    try {
+      return await createAdminGiftAccount(record, admin.authHeader);
+    } catch (createError) {
+      handleAuthError(createError);
+      throw createError;
+    }
+  };
+
+  const handleUploadGiftAccounts = async (file) => {
+    try {
+      return await uploadAdminGiftAccounts(file, admin.authHeader);
+    } catch (uploadError) {
+      handleAuthError(uploadError);
+      throw uploadError;
+    }
   };
 
   if (!admin) {
@@ -265,13 +284,9 @@ export default function AdminDashboardPage() {
         tableCounts={adminTables.tableCounts}
         onSaveRecord={adminTables.upsertRecord}
         onDeleteRecord={adminTables.deleteRecord}
-        onCreateGiftAccount={(record) =>
-          createAdminGiftAccount(record, admin.authHeader)
-        }
+        onCreateGiftAccount={handleCreateGiftAccount}
         onImportGiftAccounts={adminTables.importGiftAccounts}
-        onUploadGiftAccounts={(file) =>
-          uploadAdminGiftAccounts(file, admin.authHeader)
-        }
+        onUploadGiftAccounts={handleUploadGiftAccounts}
         onResetTables={adminTables.resetTables}
       />
 

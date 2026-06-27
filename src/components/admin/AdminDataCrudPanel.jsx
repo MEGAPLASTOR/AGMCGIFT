@@ -12,7 +12,11 @@ import {
 } from "../../services/adminCrudService";
 
 const EMPTY_ROWS = [];
-const ALWAYS_VISIBLE_TABLE_KEYS = new Set(["giftAccounts"]);
+const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
+  "giftAccounts",
+  "giftPools",
+  "poolAccountMappings",
+]);
 const DEFAULT_TABLE_KEY = "giftAccounts";
 const PRIORITY_COLUMNS_BY_TABLE = {
   giftAccounts: ["username", "password", "tier", "platform", "status"],
@@ -20,6 +24,7 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   eggs: ["egg_type", "status", "hatch_at", "order_id", "account_id"],
   giftPools: ["pool_name", "tier", "created_at"],
   kiotvietOrders: ["order_code", "status", "financial_status", "fulfillment_status", "total_price"],
+  poolAccountMappings: ["pool_id", "account_id"],
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
 };
 
@@ -50,6 +55,16 @@ function getColumnLabel(fields, column) {
 function getRecordTitle(tableKey, formValues, selectedRecordId) {
   if (tableKey === "giftAccounts") {
     return formValues.username || "Tài khoản mới";
+  }
+
+  if (tableKey === "giftPools") {
+    return formValues.pool_name || "Bể quà mới";
+  }
+
+  if (tableKey === "poolAccountMappings") {
+    return formValues.pool_id && formValues.account_id
+      ? `${formValues.pool_id} -> ${formValues.account_id}`
+      : "Liên kết mới";
   }
 
   return selectedRecordId || "Bản ghi mới";

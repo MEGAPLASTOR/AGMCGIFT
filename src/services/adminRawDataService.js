@@ -3,6 +3,12 @@ import { ADMIN_ENDPOINTS } from "../api/endpoints/adminEndpoints";
 import { getDefaultApiErrorMessage } from "../api/errors/apiErrorMessages";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { readResponsePayload } from "../api/http/readResponsePayload";
+import {
+  fetchAdminGiftPoolDetails,
+  getPoolAccountMappingsFromPools,
+  normalizeAdminGiftAccount,
+  normalizeAdminGiftPool,
+} from "./adminGiftPoolService";
 
 const RAW_ENDPOINTS = [
   ["customers", ADMIN_ENDPOINTS.customers],
@@ -100,10 +106,6 @@ function normalizeDate(value) {
   return value || null;
 }
 
-function normalizeAccountStatus(value) {
-  return String(value || "available").trim().toLowerCase();
-}
-
 function normalizeEggStatus(rawEgg) {
   const status = String(rawEgg.status || "").trim().toUpperCase();
 
@@ -165,26 +167,11 @@ function normalizeCustomers(customers) {
 }
 
 function normalizeGiftAccounts(accounts) {
-  return accounts.map((account) => ({
-    id: account.id,
-    username: account.username,
-    password: account.password || "",
-    status: normalizeAccountStatus(account.status),
-    tier: account.tier || "",
-    platform: account.platform || "",
-    token: account.token || "",
-    created_at: normalizeDate(account.createdAt || account.created_at),
-    assigned_at: normalizeDate(account.assignedAt || account.assigned_at),
-  }));
+  return accounts.map(normalizeAdminGiftAccount);
 }
 
 function normalizeGiftPools(pools) {
-  return pools.map((pool) => ({
-    id: pool.id,
-    pool_name: pool.poolName || pool.pool_name,
-    tier: pool.tier || "",
-    created_at: normalizeDate(pool.createdAt || pool.created_at),
-  }));
+  return pools.map(normalizeAdminGiftPool);
 }
 
 function normalizeOrders(orders) {
@@ -317,7 +304,7 @@ function mergeAdminRawRows(raw) {
       ...giftAccounts,
       ...deriveAccountsFromEggs(raw.eggs || []),
     ]),
-    poolAccountMappings: [],
+    poolAccountMappings: uniqueById(getPoolAccountMappingsFromPools(giftPools)),
     eggOpeningLogs: [],
   };
 }
@@ -369,6 +356,22 @@ export async function fetchAdminRawTables(authHeader) {
         endpoint: firstError?.endpoint || ADMIN_ENDPOINTS.eggs,
       }
     );
+  }
+
+  if (raw.giftPools?.length) {
+    const detailResult = await fetchAdminGiftPoolDetails(raw.giftPools, authHeader);
+
+    raw.giftPools = detailResult.pools;
+
+    if (detailResult.errors.length) {
+      console.warn("[AGMC API] Gift pool detail data partially failed", {
+        errors: detailResult.errors.map((error) => ({
+          endpoint: error?.endpoint,
+          status: error?.status,
+          message: error?.message,
+        })),
+      });
+    }
   }
 
   return {
