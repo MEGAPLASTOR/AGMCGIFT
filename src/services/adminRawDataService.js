@@ -128,14 +128,16 @@ function uniqueById(rows) {
 function normalizeCustomers(customers) {
   return customers.map((customer) => ({
     id: customer.id,
-    customerCode: customer.customerCode,
-    customerName: customer.customerName,
-    status: customer.status,
-    successCount: customer.successCount || 0,
-    returnStreak: customer.returnStreak || 0,
-    warningCount: customer.warningCount || 0,
-    createdAt: normalizeDate(customer.createdAt),
-    updatedAt: normalizeDate(customer.updatedAt),
+    customerCode:
+      customer.customerCode || customer.customer_code || customer.code || "",
+    customerName:
+      customer.customerName || customer.customer_name || customer.name || "",
+    status: customer.status || "",
+    successCount: Number(customer.successCount || customer.success_count || 0),
+    returnStreak: Number(customer.returnStreak || customer.return_streak || 0),
+    warningCount: Number(customer.warningCount || customer.warning_count || 0),
+    createdAt: normalizeDate(customer.createdAt || customer.created_at),
+    updatedAt: normalizeDate(customer.updatedAt || customer.updated_at),
   }));
 }
 

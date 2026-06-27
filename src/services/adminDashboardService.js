@@ -161,12 +161,15 @@ export function buildAdminDashboard(tables) {
         note: "egg_opening_logs",
       },
     ],
-    customerRows: customers.slice(0, 12).map((customer) => ({
+    customerRows: customers.map((customer) => ({
+      id: customer.id || "-",
       code: customer.customerCode,
       name: customer.customerName,
       status: customer.status,
       success: customer.successCount,
+      returnStreak: customer.returnStreak,
       warning: customer.warningCount,
+      createdAt: formatDateTime(customer.createdAt),
       updatedAt: formatDateTime(customer.updatedAt),
     })),
     latestOrders: orders.slice(0, 10).map((order) => {

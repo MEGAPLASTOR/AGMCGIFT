@@ -38,7 +38,8 @@ const customerColumns = [
   { key: "code", label: "Mã khách" },
   { key: "name", label: "Tên khách" },
   { key: "status", label: "Trạng thái" },
-  { key: "success", label: "Thành công" },
+  { key: "success", label: "Đơn thành công" },
+  { key: "returnStreak", label: "Hoàn liên tiếp" },
   { key: "warning", label: "Cảnh báo" },
   { key: "updatedAt", label: "Cập nhật" },
 ];
@@ -248,6 +249,14 @@ export default function AdminDashboardPage() {
         </section>
       ) : null}
 
+      {hasRows(dashboard.customerRows) ? (
+        <AdminDataTable
+          title="Danh sách khách hàng"
+          columns={customerColumns}
+          rows={dashboard.customerRows}
+        />
+      ) : null}
+
       <AdminDataCrudPanel
         tables={adminTables.tables}
         tableCounts={adminTables.tableCounts}
@@ -304,14 +313,6 @@ export default function AdminDashboardPage() {
             />
           ) : null}
         </section>
-      ) : null}
-
-      {hasRows(dashboard.customerRows) ? (
-        <AdminDataTable
-          title="Khách hàng"
-          columns={customerColumns}
-          rows={dashboard.customerRows}
-        />
       ) : null}
 
       {hasRows(dashboard.latestOrders) ? (
