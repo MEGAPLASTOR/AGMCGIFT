@@ -242,7 +242,14 @@ export function AdminDataCrudPanel({
 
       if (isGiftAccountsTable && isCreating && onCreateGiftAccount) {
         const payload = await onCreateGiftAccount(record);
-        record = { ...record, ...(payload?.data || payload?.account || {}) };
+        const responseRecord =
+          payload?.data || payload?.account || payload?.giftAccount || payload;
+        record = {
+          ...record,
+          ...(responseRecord && typeof responseRecord === "object"
+            ? responseRecord
+            : {}),
+        };
       }
 
       if (isGiftAccountsTable && !isCreating && onUpdateGiftAccount) {
@@ -285,8 +292,13 @@ export function AdminDataCrudPanel({
         onDeleteRecord(tableKey, selectedRecordId);
       }
 
-      onSaveRecord(tableKey, record);
-      setSelectedRecordId(getRecordId(record, tableKey));
+      const savedRecords = Array.isArray(record) ? record : [record];
+      const primaryRecord = savedRecords[0];
+
+      savedRecords.forEach((savedRecord) => {
+        onSaveRecord(tableKey, savedRecord);
+      });
+      setSelectedRecordId(getRecordId(primaryRecord, tableKey));
       setMessage(
         isGiftAccountsTable && isCreating && onCreateGiftAccount
           ? "Đã thêm tài khoản lên backend."

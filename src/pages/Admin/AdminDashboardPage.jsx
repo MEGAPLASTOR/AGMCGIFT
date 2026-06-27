@@ -22,7 +22,7 @@ import {
   uploadAdminGiftAccounts,
 } from "../../services/adminGiftAccountService";
 import {
-  addAdminGiftPoolAccount,
+  addAdminGiftPoolAccounts,
   createAdminGiftPool,
   deleteAdminGiftPool,
   removeAdminGiftPoolAccounts,
@@ -95,6 +95,40 @@ function hasCounts(counts) {
 
 function hasMetricValue(value) {
   return Number(value) > 0;
+}
+
+function normalizeComparable(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function findGiftAccountRow(tables, record) {
+  const username = normalizeComparable(record.username);
+  const platform = normalizeComparable(record.platform || "blox-fruit");
+  const tier = normalizeComparable(record.tier);
+
+  return (tables.giftAccounts || []).find(
+    (account) =>
+      normalizeComparable(account.username) === username &&
+      normalizeComparable(account.platform || "blox-fruit") === platform &&
+      (!tier || normalizeComparable(account.tier) === tier)
+  );
+}
+
+function findProductEggMappingRow(tables, record) {
+  const productId = normalizeComparable(
+    record.kv_product_id || record.kvProductId || record.productId
+  );
+  const poolId = normalizeComparable(
+    record.gift_pool_id || record.pool_id || record.poolId
+  );
+  const eggType = Number(record.egg_type || record.eggType);
+
+  return (tables.productEggMappings || []).find(
+    (mapping) =>
+      normalizeComparable(mapping.kv_product_id) === productId &&
+      normalizeComparable(mapping.gift_pool_id) === poolId &&
+      Number(mapping.egg_type) === eggType
+  );
 }
 
 export default function AdminDashboardPage() {
@@ -210,11 +244,16 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleChangeAdminCredentials = async ({ currentPassword, newPassword }) => {
+  const handleChangeAdminCredentials = async ({
+    currentPassword,
+    newUsername,
+    newPassword,
+  }) => {
     try {
       await updateAdminCredentials(
         {
           oldPassword: currentPassword,
+          newUsername,
           newPassword,
         },
         admin.authHeader
@@ -229,7 +268,17 @@ export default function AdminDashboardPage() {
 
   const handleCreateGiftAccount = async (record) => {
     try {
-      return await createAdminGiftAccount(record, admin.authHeader);
+      const payload = await createAdminGiftAccount(record, admin.authHeader);
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+
+      return (
+        findGiftAccountRow(rawTables, record) ||
+        payload?.data ||
+        payload?.account ||
+        payload?.giftAccount ||
+        payload
+      );
     } catch (createError) {
       handleAuthError(createError);
       throw createError;
@@ -256,7 +305,11 @@ export default function AdminDashboardPage() {
 
   const handleUploadGiftAccounts = async (file) => {
     try {
-      return await uploadAdminGiftAccounts(file, admin.authHeader);
+      const payload = await uploadAdminGiftAccounts(file, admin.authHeader);
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+
+      return payload;
     } catch (uploadError) {
       handleAuthError(uploadError);
       throw uploadError;
@@ -292,7 +345,9 @@ export default function AdminDashboardPage() {
 
   const handleAddPoolAccount = async (record) => {
     try {
-      return await addAdminGiftPoolAccount(record, admin.authHeader);
+      const mappings = await addAdminGiftPoolAccounts(record, admin.authHeader);
+
+      return mappings.length === 1 ? mappings[0] : mappings;
     } catch (addError) {
       handleAuthError(addError);
       throw addError;
@@ -328,7 +383,14 @@ export default function AdminDashboardPage() {
 
   const handleSaveProductEggMapping = async (record) => {
     try {
-      return await linkAdminProductEggMapping(record, admin.authHeader);
+      const fallbackMapping = await linkAdminProductEggMapping(
+        record,
+        admin.authHeader
+      );
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+
+      return findProductEggMappingRow(rawTables, fallbackMapping) || fallbackMapping;
     } catch (mappingError) {
       handleAuthError(mappingError);
       throw mappingError;

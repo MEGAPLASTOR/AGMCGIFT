@@ -5,6 +5,7 @@ import { useState } from "react";
 // Backend cần thay bằng API verify mật khẩu cũ, hash mật khẩu mới và cập nhật admins.updated_at.
 export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
   const [currentPassword, setCurrentPassword] = useState("");
+  const [newUsername, setNewUsername] = useState(admin.username || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -12,6 +13,7 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
 
   const resetForm = () => {
     setCurrentPassword("");
+    setNewUsername(admin.username || "");
     setNewPassword("");
     setConfirmPassword("");
   };
@@ -23,12 +25,28 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
       return;
     }
 
-    if (newPassword.length < 6) {
+    const trimmedUsername = newUsername.trim();
+    const isChangingUsername = Boolean(
+      trimmedUsername && trimmedUsername !== admin.username
+    );
+    const isChangingPassword = Boolean(newPassword || confirmPassword);
+
+    if (!currentPassword) {
+      setMessage("Vui long nhap mat khau hien tai.");
+      return;
+    }
+
+    if (!isChangingUsername && !isChangingPassword) {
+      setMessage("Nhap username moi hoac mat khau moi de cap nhat.");
+      return;
+    }
+
+    if (isChangingPassword && newPassword.length < 6) {
       setMessage("Mật khẩu mới cần ít nhất 6 ký tự.");
       return;
     }
 
-    if (newPassword !== confirmPassword) {
+    if (isChangingPassword && newPassword !== confirmPassword) {
       setMessage("Mật khẩu xác nhận chưa khớp.");
       return;
     }
@@ -39,7 +57,8 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
       const result = await onChangePassword({
         adminId: admin.id,
         currentPassword,
-        newPassword,
+        newUsername: isChangingUsername ? trimmedUsername : "",
+        newPassword: isChangingPassword ? newPassword : "",
       });
 
       setMessage(result.message || "Da cap nhat thong tin dang nhap.");
@@ -93,6 +112,15 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
               value={currentPassword}
               onChange={(event) => setCurrentPassword(event.target.value)}
               autoComplete="current-password"
+            />
+          </label>
+          <label>
+            Tên đăng nhập mới
+            <input
+              type="text"
+              value={newUsername}
+              onChange={(event) => setNewUsername(event.target.value)}
+              autoComplete="username"
             />
           </label>
           <label>
