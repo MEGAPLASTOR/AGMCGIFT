@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AdminAccountImportPanel } from "./AdminAccountImportPanel";
 import {
   ADMIN_TABLES,
@@ -12,6 +12,7 @@ import {
 } from "../../services/adminCrudService";
 
 const EMPTY_ROWS = [];
+const ALWAYS_VISIBLE_TABLE_KEYS = new Set(["giftAccounts"]);
 
 function AdminFormField({ field, value, onChange }) {
   const fieldId = `admin-field-${field.key}`;
@@ -74,6 +75,15 @@ export function AdminDataCrudPanel({
   const [isSaving, setIsSaving] = useState(false);
 
   const rows = tables[tableKey] || EMPTY_ROWS;
+  const visibleTables = useMemo(
+    () =>
+      ADMIN_TABLES.filter(
+        (table) =>
+          ALWAYS_VISIBLE_TABLE_KEYS.has(table.key) ||
+          (tables[table.key] || []).length > 0
+      ),
+    [tables]
+  );
   const fields = useMemo(() => getTableFields(tableKey), [tableKey]);
   const filteredRows = useMemo(
     () => searchTableRows(rows, keyword),
@@ -85,6 +95,19 @@ export function AdminDataCrudPanel({
   );
   const hasActiveForm = Object.keys(formValues).length > 0;
   const isGiftAccountsTable = tableKey === "giftAccounts";
+
+  useEffect(() => {
+    if (visibleTables.some((table) => table.key === tableKey)) {
+      return;
+    }
+
+    const nextTableKey = visibleTables[0]?.key || "giftAccounts";
+    setTableKey(nextTableKey);
+    setKeyword("");
+    setSelectedRecordId("");
+    setFormValues({});
+    setMessage("");
+  }, [tableKey, visibleTables]);
 
   const updateField = (fieldKey, value) => {
     setFormValues((currentValues) => ({
@@ -170,7 +193,7 @@ export function AdminDataCrudPanel({
         <label>
           Bảng dữ liệu
           <select value={tableKey} onChange={handleTableChange}>
-            {ADMIN_TABLES.map((table) => (
+            {visibleTables.map((table) => (
               <option key={table.key} value={table.key}>
                 {table.label} ({tableCounts[table.key] || 0})
               </option>

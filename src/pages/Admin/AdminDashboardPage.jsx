@@ -5,7 +5,6 @@ import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
 import { AdminMetricCard } from "../../components/admin/AdminMetricCard";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
 import { AdminStatusBar } from "../../components/admin/AdminStatusBar";
-import { AdminWorkflow } from "../../components/admin/AdminWorkflow";
 import { giftCatalogData } from "../../config/giftCatalogData";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { useAdminDataTables } from "../../hooks/useAdminDataTables";
@@ -68,6 +67,18 @@ const logColumns = [
   { key: "createdAt", label: "Created" },
 ];
 
+function hasRows(rows) {
+  return Array.isArray(rows) && rows.length > 0;
+}
+
+function hasCounts(counts) {
+  return Object.values(counts || {}).some((value) => Number(value) > 0);
+}
+
+function hasMetricValue(value) {
+  return Number(value) > 0;
+}
+
 export default function AdminDashboardPage() {
   const adminTables = useAdminDataTables(giftCatalogData);
   const { loadRawTables } = adminTables;
@@ -76,6 +87,63 @@ export default function AdminDashboardPage() {
   );
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
+  const visibleMetrics = [
+    {
+      label: "Khách hàng",
+      value: dashboard.summary.totalCustomers,
+      note: `${dashboard.summary.warningCustomers} cảnh báo`,
+      tone: "blue",
+    },
+    {
+      label: "Tổng đơn SAPO",
+      value: dashboard.summary.totalOrders,
+      note: "orders raw",
+      tone: "blue",
+    },
+    {
+      label: "Đơn Paid",
+      value: dashboard.summary.paidOrders,
+      note: "được nhập mã",
+      tone: "green",
+    },
+    {
+      label: "Đơn bị chặn",
+      value: dashboard.summary.blockedOrders,
+      note: "Pending / Cancel",
+      tone: "red",
+    },
+    {
+      label: "Doanh thu Paid",
+      value: formatCurrency(dashboard.summary.totalRevenue),
+      rawValue: dashboard.summary.totalRevenue,
+      note: "financial_status paid",
+      tone: "gold",
+    },
+    {
+      label: "Sản phẩm",
+      value: dashboard.summary.totalProducts,
+      note: "products raw",
+      tone: "blue",
+    },
+    {
+      label: "Tổng trứng",
+      value: dashboard.summary.totalEggs,
+      note: `${dashboard.summary.readyEggs} sẵn sàng`,
+      tone: "purple",
+    },
+    {
+      label: "Trứng đang ấp",
+      value: dashboard.summary.hatchingEggs,
+      note: "status incubating",
+      tone: "purple",
+    },
+    {
+      label: "Acc available",
+      value: dashboard.summary.availableAccounts,
+      note: `${dashboard.summary.totalAccounts} total`,
+      tone: "green",
+    },
+  ].filter((metric) => hasMetricValue(metric.rawValue ?? metric.value));
 
   useEffect(() => {
     if (!admin?.authHeader) {
@@ -166,58 +234,19 @@ export default function AdminDashboardPage() {
         </section>
       ) : null}
 
-      <section className="admin-metric-grid">
-        <AdminMetricCard
-          label="Khách hàng"
-          value={dashboard.summary.totalCustomers}
-          note={`${dashboard.summary.warningCustomers} cảnh báo`}
-          tone="blue"
-        />
-        <AdminMetricCard
-          label="Tổng đơn SAPO"
-          value={dashboard.summary.totalOrders}
-          note="sapo_orders"
-          tone="blue"
-        />
-        <AdminMetricCard
-          label="Đơn Paid"
-          value={dashboard.summary.paidOrders}
-          note="được nhập mã"
-          tone="green"
-        />
-        <AdminMetricCard
-          label="Đơn bị chặn"
-          value={dashboard.summary.blockedOrders}
-          note="Pending / Cancel"
-          tone="red"
-        />
-        <AdminMetricCard
-          label="Doanh thu Paid"
-          value={formatCurrency(dashboard.summary.totalRevenue)}
-          note="financial_status paid"
-          tone="gold"
-        />
-        <AdminMetricCard
-          label="Tổng trứng"
-          value={dashboard.summary.totalEggs}
-          note={`${dashboard.summary.readyEggs} sẵn sàng`}
-          tone="purple"
-        />
-        <AdminMetricCard
-          label="Trứng đang ấp"
-          value={dashboard.summary.hatchingEggs}
-          note="status incubating"
-          tone="purple"
-        />
-        <AdminMetricCard
-          label="Acc available"
-          value={dashboard.summary.availableAccounts}
-          note={`${dashboard.summary.totalAccounts} total`}
-          tone="green"
-        />
-      </section>
-
-      <AdminWorkflow steps={dashboard.workflow} />
+      {visibleMetrics.length ? (
+        <section className="admin-metric-grid">
+          {visibleMetrics.map((metric) => (
+            <AdminMetricCard
+              key={metric.label}
+              label={metric.label}
+              value={metric.value}
+              note={metric.note}
+              tone={metric.tone}
+            />
+          ))}
+        </section>
+      ) : null}
 
       <AdminDataCrudPanel
         tables={adminTables.tables}
@@ -234,52 +263,99 @@ export default function AdminDashboardPage() {
         onResetTables={adminTables.resetTables}
       />
 
-      <section className="admin-grid-two">
-        <AdminStatusBar title="Trạng thái đơn" counts={dashboard.counts.orderStatus} />
-        <AdminStatusBar title="Trạng thái acc" counts={dashboard.counts.accountStatus} />
-      </section>
-
-      <section className="admin-grid-two">
-        <AdminStatusBar title="Trạng thái trứng" counts={dashboard.counts.eggStatus} />
-        <AdminStatusBar title="Log hành động" counts={dashboard.counts.logAction} />
-      </section>
-
-      <AdminDataTable
-        title="Khách hàng"
-        columns={customerColumns}
-        rows={dashboard.customerRows}
-      />
-
-      <AdminDataTable
-        title="Đơn SAPO mới"
-        columns={orderColumns}
-        rows={dashboard.latestOrders}
-      />
-
-      <section className="admin-grid-two">
-        <AdminDataTable
-          title="Gift pools"
-          columns={poolColumns}
-          rows={dashboard.poolRows}
+      {hasCounts(dashboard.counts.customerStatus) ? (
+        <AdminStatusBar
+          title="Trạng thái khách"
+          counts={dashboard.counts.customerStatus}
         />
+      ) : null}
+
+      {hasCounts(dashboard.counts.orderStatus) ||
+      hasCounts(dashboard.counts.accountStatus) ? (
+        <section className="admin-grid-two">
+          {hasCounts(dashboard.counts.orderStatus) ? (
+            <AdminStatusBar
+              title="Trạng thái đơn"
+              counts={dashboard.counts.orderStatus}
+            />
+          ) : null}
+          {hasCounts(dashboard.counts.accountStatus) ? (
+            <AdminStatusBar
+              title="Trạng thái acc"
+              counts={dashboard.counts.accountStatus}
+            />
+          ) : null}
+        </section>
+      ) : null}
+
+      {hasCounts(dashboard.counts.eggStatus) ||
+      hasCounts(dashboard.counts.logAction) ? (
+        <section className="admin-grid-two">
+          {hasCounts(dashboard.counts.eggStatus) ? (
+            <AdminStatusBar
+              title="Trạng thái trứng"
+              counts={dashboard.counts.eggStatus}
+            />
+          ) : null}
+          {hasCounts(dashboard.counts.logAction) ? (
+            <AdminStatusBar
+              title="Log hành động"
+              counts={dashboard.counts.logAction}
+            />
+          ) : null}
+        </section>
+      ) : null}
+
+      {hasRows(dashboard.customerRows) ? (
         <AdminDataTable
-          title="Gift accounts"
-          columns={accountColumns}
-          rows={dashboard.accountRows}
+          title="Khách hàng"
+          columns={customerColumns}
+          rows={dashboard.customerRows}
         />
-      </section>
+      ) : null}
 
-      <AdminDataTable
-        title="Sản phẩm KiotViet"
-        columns={productColumns}
-        rows={dashboard.productRows}
-      />
+      {hasRows(dashboard.latestOrders) ? (
+        <AdminDataTable
+          title="Đơn SAPO mới"
+          columns={orderColumns}
+          rows={dashboard.latestOrders}
+        />
+      ) : null}
 
-      <AdminDataTable
-        title="Egg opening logs"
-        columns={logColumns}
-        rows={dashboard.logRows}
-      />
+      {hasRows(dashboard.poolRows) || hasRows(dashboard.accountRows) ? (
+        <section className="admin-grid-two">
+          {hasRows(dashboard.poolRows) ? (
+            <AdminDataTable
+              title="Gift pools"
+              columns={poolColumns}
+              rows={dashboard.poolRows}
+            />
+          ) : null}
+          {hasRows(dashboard.accountRows) ? (
+            <AdminDataTable
+              title="Gift accounts"
+              columns={accountColumns}
+              rows={dashboard.accountRows}
+            />
+          ) : null}
+        </section>
+      ) : null}
+
+      {hasRows(dashboard.productRows) ? (
+        <AdminDataTable
+          title="Sản phẩm KiotViet"
+          columns={productColumns}
+          rows={dashboard.productRows}
+        />
+      ) : null}
+
+      {hasRows(dashboard.logRows) ? (
+        <AdminDataTable
+          title="Egg opening logs"
+          columns={logColumns}
+          rows={dashboard.logRows}
+        />
+      ) : null}
     </main>
   );
 }
