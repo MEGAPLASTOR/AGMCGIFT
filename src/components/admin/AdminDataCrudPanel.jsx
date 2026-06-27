@@ -119,6 +119,11 @@ export function AdminDataCrudPanel({
   onSaveRecord,
   onDeleteRecord,
   onCreateGiftAccount,
+  onCreateGiftPool,
+  onUpdateGiftPool,
+  onDeleteGiftPool,
+  onAddPoolAccount,
+  onRemovePoolAccount,
   onImportGiftAccounts,
   onUploadGiftAccounts,
   onResetTables,
@@ -142,10 +147,14 @@ export function AdminDataCrudPanel({
   );
   const fields = useMemo(() => getTableFields(tableKey), [tableKey]);
   const isGiftAccountsTable = tableKey === "giftAccounts";
+  const isGiftPoolsTable = tableKey === "giftPools";
+  const isPoolMappingsTable = tableKey === "poolAccountMappings";
+  const isBackendManagedIdTable =
+    isGiftAccountsTable || isGiftPoolsTable || isPoolMappingsTable;
   const visibleFields = useMemo(
     () =>
-      fields.filter((field) => !(isGiftAccountsTable && field.key === "id")),
-    [fields, isGiftAccountsTable]
+      fields.filter((field) => !(isBackendManagedIdTable && field.key === "id")),
+    [fields, isBackendManagedIdTable]
   );
   const filteredRows = useMemo(
     () => searchTableRows(rows, keyword),
@@ -158,7 +167,13 @@ export function AdminDataCrudPanel({
   );
   const hasActiveForm = Object.keys(formValues).length > 0;
   const recordTitle = getRecordTitle(tableKey, formValues, selectedRecordId);
-  const addButtonLabel = isGiftAccountsTable ? "Thêm tài khoản" : "Thêm bản ghi";
+  const addButtonLabel = isGiftAccountsTable
+    ? "Thêm tài khoản"
+    : isGiftPoolsTable
+      ? "Thêm bể quà"
+      : isPoolMappingsTable
+        ? "Gắn tài khoản"
+        : "Thêm bản ghi";
 
   useEffect(() => {
     if (visibleTables.some((table) => table.key === tableKey)) {
@@ -198,21 +213,50 @@ export function AdminDataCrudPanel({
       return;
     }
 
+    const isCreating = !selectedRecordId;
+    setIsSaving(true);
+
     try {
       let record = buildRecordFromForm(formValues, tableKey);
 
-      if (isGiftAccountsTable && !selectedRecordId && onCreateGiftAccount) {
-        setIsSaving(true);
+      if (isGiftAccountsTable && isCreating && onCreateGiftAccount) {
         const payload = await onCreateGiftAccount(record);
         record = { ...record, ...(payload?.data || payload?.account || {}) };
+      }
+
+      if (isGiftPoolsTable) {
+        if (isCreating && onCreateGiftPool) {
+          record = await onCreateGiftPool(record);
+        } else if (!isCreating && onUpdateGiftPool) {
+          record = await onUpdateGiftPool(record, selectedRecordId);
+        }
+      }
+
+      if (isPoolMappingsTable && onAddPoolAccount) {
+        const currentRecord = rows.find(
+          (row) => getRecordId(row, tableKey) === selectedRecordId
+        );
+        const isSameMapping =
+          currentRecord?.pool_id === record.pool_id &&
+          currentRecord?.account_id === record.account_id;
+
+        if (currentRecord && !isSameMapping && onRemovePoolAccount) {
+          await onRemovePoolAccount(currentRecord);
+        }
+
+        record = isSameMapping ? currentRecord : await onAddPoolAccount(record);
       }
 
       onSaveRecord(tableKey, record);
       setSelectedRecordId(getRecordId(record, tableKey));
       setMessage(
-        isGiftAccountsTable && !selectedRecordId && onCreateGiftAccount
+        isGiftAccountsTable && isCreating && onCreateGiftAccount
           ? "Đã thêm tài khoản lên backend."
-          : "Đã lưu thay đổi."
+          : isGiftPoolsTable
+            ? "Đã đồng bộ bể quà lên backend."
+            : isPoolMappingsTable
+              ? "Đã đồng bộ liên kết tài khoản."
+              : "Đã lưu thay đổi."
       );
     } catch (error) {
       setMessage(error.message || "Dữ liệu bản ghi không hợp lệ.");
@@ -221,16 +265,46 @@ export function AdminDataCrudPanel({
     }
   };
 
-  const deleteSelected = () => {
+  const deleteSelected = async () => {
+    if (isSaving) {
+      return;
+    }
+
     if (!selectedRecordId) {
       setMessage("Chọn một bản ghi trước khi xóa.");
       return;
     }
 
-    onDeleteRecord(tableKey, selectedRecordId);
-    setSelectedRecordId("");
-    setFormValues({});
-    setMessage("Đã xóa bản ghi.");
+    setIsSaving(true);
+
+    try {
+      const selectedRecord = rows.find(
+        (row) => getRecordId(row, tableKey) === selectedRecordId
+      );
+
+      if (isGiftPoolsTable && onDeleteGiftPool) {
+        await onDeleteGiftPool(selectedRecordId);
+      }
+
+      if (isPoolMappingsTable && onRemovePoolAccount) {
+        await onRemovePoolAccount(selectedRecord || formValues);
+      }
+
+      onDeleteRecord(tableKey, selectedRecordId);
+      setSelectedRecordId("");
+      setFormValues({});
+      setMessage(
+        isGiftPoolsTable
+          ? "Đã xóa bể quà."
+          : isPoolMappingsTable
+            ? "Đã gỡ liên kết tài khoản."
+            : "Đã xóa bản ghi."
+      );
+    } catch (error) {
+      setMessage(error.message || "Không thể xóa bản ghi.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleTableChange = (event) => {
@@ -378,9 +452,15 @@ export function AdminDataCrudPanel({
               type="button"
               className="admin-danger-button"
               onClick={deleteSelected}
-              disabled={!selectedRecordId}
+              disabled={!selectedRecordId || isSaving}
             >
-              {isGiftAccountsTable ? "Xóa tài khoản" : "Xóa bản ghi"}
+              {isGiftAccountsTable
+                ? "Xóa tài khoản"
+                : isGiftPoolsTable
+                  ? "Xóa bể quà"
+                  : isPoolMappingsTable
+                    ? "Gỡ liên kết"
+                    : "Xóa bản ghi"}
             </button>
           </div>
         </div>
