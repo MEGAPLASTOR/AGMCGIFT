@@ -93,8 +93,6 @@ export function useGiftCode(catalogData) {
       setStatus(GIFT_CODE_STATUS.invalid);
       return;
     }
-    // console.log(inputCode, trimmedCode);
-
     setIsChecking(true);
     setErrorMsg("");
     setSelectedEntry(null);
@@ -107,9 +105,6 @@ export function useGiftCode(catalogData) {
       // rồi trả về danh sách trứng hợp lệ để khách chọn.
       const payload = await syncEggsByOrderCode(trimmedCode);
       const matchedEntry = normalizeSyncEggResponse(payload, trimmedCode);
-      
-      // console.log(payload);
-
       if (!matchedEntry.eggs.length) {
         setErrorMsg("Mã đơn hợp lệ nhưng chưa có trứng khả dụng.");
         setStatus(GIFT_CODE_STATUS.invalid);
@@ -119,7 +114,6 @@ export function useGiftCode(catalogData) {
       setSelectedEntry(matchedEntry);
       setStatus(GIFT_CODE_STATUS.choosing);
     } catch (error) {
-      console.log(error);
       setErrorMsg(getEggSyncErrorMessage(error));
       setStatus(GIFT_CODE_STATUS.invalid);
     } finally {

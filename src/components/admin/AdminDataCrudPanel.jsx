@@ -16,6 +16,7 @@ const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
   "giftAccounts",
   "giftPools",
   "poolAccountMappings",
+  "productEggMappings",
 ]);
 const DEFAULT_TABLE_KEY = "giftAccounts";
 const PRIORITY_COLUMNS_BY_TABLE = {
@@ -25,6 +26,7 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   giftPools: ["pool_name", "tier", "created_at"],
   kiotvietOrders: ["order_code", "status", "financial_status", "fulfillment_status", "total_price"],
   poolAccountMappings: ["pool_id", "account_id"],
+  productEggMappings: ["kv_product_id", "egg_type", "gift_pool_id", "egg_tier"],
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
 };
 
@@ -65,6 +67,12 @@ function getRecordTitle(tableKey, formValues, selectedRecordId) {
     return formValues.pool_id && formValues.account_id
       ? `${formValues.pool_id} -> ${formValues.account_id}`
       : "Liên kết mới";
+  }
+
+  if (tableKey === "productEggMappings") {
+    return formValues.kv_product_id && formValues.gift_pool_id
+      ? `${formValues.kv_product_id} -> ${formValues.gift_pool_id}`
+      : "Mapping san pham moi";
   }
 
   return selectedRecordId || "Bản ghi mới";
@@ -119,11 +127,16 @@ export function AdminDataCrudPanel({
   onSaveRecord,
   onDeleteRecord,
   onCreateGiftAccount,
+  onUpdateGiftAccount,
+  onDeleteGiftAccount,
   onCreateGiftPool,
   onUpdateGiftPool,
   onDeleteGiftPool,
   onAddPoolAccount,
   onRemovePoolAccount,
+  onUpdateCustomerStatus,
+  onSaveProductEggMapping,
+  onDeleteProductEggMapping,
   onImportGiftAccounts,
   onUploadGiftAccounts,
   onResetTables,
@@ -146,11 +159,16 @@ export function AdminDataCrudPanel({
     [tables]
   );
   const fields = useMemo(() => getTableFields(tableKey), [tableKey]);
+  const isCustomersTable = tableKey === "customers";
   const isGiftAccountsTable = tableKey === "giftAccounts";
   const isGiftPoolsTable = tableKey === "giftPools";
   const isPoolMappingsTable = tableKey === "poolAccountMappings";
+  const isProductMappingsTable = tableKey === "productEggMappings";
   const isBackendManagedIdTable =
-    isGiftAccountsTable || isGiftPoolsTable || isPoolMappingsTable;
+    isGiftAccountsTable ||
+    isGiftPoolsTable ||
+    isPoolMappingsTable ||
+    isProductMappingsTable;
   const visibleFields = useMemo(
     () =>
       fields.filter((field) => !(isBackendManagedIdTable && field.key === "id")),
@@ -173,7 +191,9 @@ export function AdminDataCrudPanel({
       ? "Thêm bể quà"
       : isPoolMappingsTable
         ? "Gắn tài khoản"
-        : "Thêm bản ghi";
+        : isProductMappingsTable
+          ? "Lien ket san pham"
+          : "Thêm bản ghi";
 
   useEffect(() => {
     if (visibleTables.some((table) => table.key === tableKey)) {
@@ -225,6 +245,10 @@ export function AdminDataCrudPanel({
         record = { ...record, ...(payload?.data || payload?.account || {}) };
       }
 
+      if (isGiftAccountsTable && !isCreating && onUpdateGiftAccount) {
+        record = await onUpdateGiftAccount(record, selectedRecordId);
+      }
+
       if (isGiftPoolsTable) {
         if (isCreating && onCreateGiftPool) {
           record = await onCreateGiftPool(record);
@@ -249,6 +273,14 @@ export function AdminDataCrudPanel({
         record = isSameMapping ? currentRecord : await onAddPoolAccount(record);
       }
 
+      if (isCustomersTable && !isCreating && onUpdateCustomerStatus) {
+        record = await onUpdateCustomerStatus(record, selectedRecordId);
+      }
+
+      if (isProductMappingsTable && onSaveProductEggMapping) {
+        record = await onSaveProductEggMapping(record, selectedRecordId);
+      }
+
       if (shouldDeleteSelectedBeforeSave) {
         onDeleteRecord(tableKey, selectedRecordId);
       }
@@ -258,11 +290,17 @@ export function AdminDataCrudPanel({
       setMessage(
         isGiftAccountsTable && isCreating && onCreateGiftAccount
           ? "Đã thêm tài khoản lên backend."
+          : isGiftAccountsTable && !isCreating && onUpdateGiftAccount
+            ? "Da cap nhat tai khoan tren backend."
           : isGiftPoolsTable
             ? "Đã đồng bộ bể quà lên backend."
             : isPoolMappingsTable
               ? "Đã đồng bộ liên kết tài khoản."
-              : "Đã lưu thay đổi."
+              : isCustomersTable && !isCreating && onUpdateCustomerStatus
+                ? "Da cap nhat trang thai khach hang."
+                : isProductMappingsTable && onSaveProductEggMapping
+                  ? "Da dong bo mapping san pham - trung."
+                  : "Đã lưu thay đổi."
       );
     } catch (error) {
       setMessage(error.message || "Dữ liệu bản ghi không hợp lệ.");
@@ -292,8 +330,16 @@ export function AdminDataCrudPanel({
         await onDeleteGiftPool(selectedRecordId);
       }
 
+      if (isGiftAccountsTable && onDeleteGiftAccount) {
+        await onDeleteGiftAccount(selectedRecordId);
+      }
+
       if (isPoolMappingsTable && onRemovePoolAccount) {
         await onRemovePoolAccount(selectedRecord || formValues);
+      }
+
+      if (isProductMappingsTable && onDeleteProductEggMapping) {
+        await onDeleteProductEggMapping(selectedRecordId);
       }
 
       onDeleteRecord(tableKey, selectedRecordId);
@@ -302,9 +348,13 @@ export function AdminDataCrudPanel({
       setMessage(
         isGiftPoolsTable
           ? "Đã xóa bể quà."
+          : isGiftAccountsTable && onDeleteGiftAccount
+            ? "Da xoa tai khoan tren backend."
           : isPoolMappingsTable
             ? "Đã gỡ liên kết tài khoản."
-            : "Đã xóa bản ghi."
+            : isProductMappingsTable && onDeleteProductEggMapping
+              ? "Da xoa mapping san pham - trung."
+              : "Đã xóa bản ghi."
       );
     } catch (error) {
       setMessage(error.message || "Không thể xóa bản ghi.");
@@ -466,7 +516,9 @@ export function AdminDataCrudPanel({
                   ? "Xóa bể quà"
                   : isPoolMappingsTable
                     ? "Gỡ liên kết"
-                    : "Xóa bản ghi"}
+                    : isProductMappingsTable
+                      ? "Xoa mapping"
+                      : "Xóa bản ghi"}
             </button>
           </div>
         </div>

@@ -13,8 +13,12 @@ import {
   buildAdminDashboard,
   formatCurrency,
 } from "../../services/adminDashboardService";
+import { updateAdminCredentials } from "../../services/adminAuthService";
+import { updateAdminCustomerStatus } from "../../services/adminCustomerService";
 import {
   createAdminGiftAccount,
+  deleteAdminGiftAccount,
+  updateAdminGiftAccount,
   uploadAdminGiftAccounts,
 } from "../../services/adminGiftAccountService";
 import {
@@ -24,6 +28,11 @@ import {
   removeAdminGiftPoolAccounts,
   updateAdminGiftPool,
 } from "../../services/adminGiftPoolService";
+import {
+  deleteAdminProductEggMapping,
+  linkAdminProductEggMapping,
+} from "../../services/adminProductEggMappingService";
+import { syncAllAdminProducts } from "../../services/adminProductService";
 
 const orderColumns = [
   { key: "code", label: "Mã đơn" },
@@ -94,6 +103,7 @@ export default function AdminDashboardPage() {
   const { admin, error, handleAuthError, isLoggingIn, login, logout } =
     useAdminAuth(adminTables.tables);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
+  const [isSyncingProducts, setIsSyncingProducts] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
   const hasCustomerRows = hasRows(dashboard.customerRows);
   const shouldShowCustomerTable =
@@ -182,12 +192,65 @@ export default function AdminDashboardPage() {
     });
   };
 
+  const handleSyncProducts = async () => {
+    if (!admin?.authHeader || isSyncingProducts) {
+      return;
+    }
+
+    setIsSyncingProducts(true);
+
+    try {
+      await syncAllAdminProducts(admin.authHeader);
+      const result = await loadRawTables(admin.authHeader);
+      handleAuthError(result);
+    } catch (syncError) {
+      handleAuthError(syncError);
+    } finally {
+      setIsSyncingProducts(false);
+    }
+  };
+
+  const handleChangeAdminCredentials = async ({ currentPassword, newPassword }) => {
+    try {
+      await updateAdminCredentials(
+        {
+          oldPassword: currentPassword,
+          newPassword,
+        },
+        admin.authHeader
+      );
+
+      return { ok: true, message: "Da cap nhat thong tin dang nhap admin." };
+    } catch (changeError) {
+      handleAuthError(changeError);
+      throw changeError;
+    }
+  };
+
   const handleCreateGiftAccount = async (record) => {
     try {
       return await createAdminGiftAccount(record, admin.authHeader);
     } catch (createError) {
       handleAuthError(createError);
       throw createError;
+    }
+  };
+
+  const handleUpdateGiftAccount = async (record, id) => {
+    try {
+      return await updateAdminGiftAccount(id, record, admin.authHeader);
+    } catch (updateError) {
+      handleAuthError(updateError);
+      throw updateError;
+    }
+  };
+
+  const handleDeleteGiftAccount = async (id) => {
+    try {
+      return await deleteAdminGiftAccount(id, admin.authHeader);
+    } catch (deleteError) {
+      handleAuthError(deleteError);
+      throw deleteError;
     }
   };
 
@@ -250,6 +313,37 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleUpdateCustomerStatus = async (record) => {
+    try {
+      return await updateAdminCustomerStatus(
+        record.customerCode,
+        record,
+        admin.authHeader
+      );
+    } catch (updateError) {
+      handleAuthError(updateError);
+      throw updateError;
+    }
+  };
+
+  const handleSaveProductEggMapping = async (record) => {
+    try {
+      return await linkAdminProductEggMapping(record, admin.authHeader);
+    } catch (mappingError) {
+      handleAuthError(mappingError);
+      throw mappingError;
+    }
+  };
+
+  const handleDeleteProductEggMapping = async (id) => {
+    try {
+      return await deleteAdminProductEggMapping(id, admin.authHeader);
+    } catch (deleteError) {
+      handleAuthError(deleteError);
+      throw deleteError;
+    }
+  };
+
   if (!admin) {
     return (
       <main className="admin-page admin-page--login">
@@ -281,25 +375,31 @@ export default function AdminDashboardPage() {
           >
             {adminTables.isLoadingRawData ? "Đang tải dữ liệu" : "Tải lại dữ liệu"}
           </button>
-          {admin.id ? (
-            <button
-              type="button"
-              className="admin-light-button"
-              onClick={() => setPasswordModalOpen(true)}
-            >
-              Đổi mật khẩu
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className="admin-light-button"
+            disabled={isSyncingProducts || adminTables.isLoadingRawData}
+            onClick={handleSyncProducts}
+          >
+            {isSyncingProducts ? "Dang dong bo san pham" : "Dong bo san pham"}
+          </button>
+          <button
+            type="button"
+            className="admin-light-button"
+            onClick={() => setPasswordModalOpen(true)}
+          >
+            Đổi mật khẩu
+          </button>
           <button type="button" onClick={logout}>
             Đăng xuất
           </button>
         </div>
       </header>
 
-      {isPasswordModalOpen && admin.id ? (
+      {isPasswordModalOpen ? (
         <AdminPasswordPanel
           admin={admin}
-          onChangePassword={adminTables.changeAdminPassword}
+          onChangePassword={handleChangeAdminCredentials}
           onClose={() => setPasswordModalOpen(false)}
         />
       ) : null}
@@ -358,11 +458,16 @@ export default function AdminDashboardPage() {
         onSaveRecord={adminTables.upsertRecord}
         onDeleteRecord={adminTables.deleteRecord}
         onCreateGiftAccount={handleCreateGiftAccount}
+        onUpdateGiftAccount={handleUpdateGiftAccount}
+        onDeleteGiftAccount={handleDeleteGiftAccount}
         onCreateGiftPool={handleCreateGiftPool}
         onUpdateGiftPool={handleUpdateGiftPool}
         onDeleteGiftPool={handleDeleteGiftPool}
         onAddPoolAccount={handleAddPoolAccount}
         onRemovePoolAccount={handleRemovePoolAccount}
+        onUpdateCustomerStatus={handleUpdateCustomerStatus}
+        onSaveProductEggMapping={handleSaveProductEggMapping}
+        onDeleteProductEggMapping={handleDeleteProductEggMapping}
         onImportGiftAccounts={adminTables.importGiftAccounts}
         onUploadGiftAccounts={handleUploadGiftAccounts}
         onResetTables={adminTables.resetTables}
