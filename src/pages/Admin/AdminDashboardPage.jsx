@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AdminDataTable } from "../../components/admin/AdminDataTable";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
+import { AdminEmptyState } from "../../components/admin/AdminEmptyState";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
 import { AdminMetricCard } from "../../components/admin/AdminMetricCard";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
@@ -94,8 +95,13 @@ export default function AdminDashboardPage() {
     useAdminAuth(adminTables.tables);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
+  const hasCustomerRows = hasRows(dashboard.customerRows);
   const shouldShowCustomerTable =
-    adminTables.isLoadingRawData || hasRows(dashboard.customerRows);
+    adminTables.isLoadingRawData || hasCustomerRows;
+  const customerEmptyDetails = [
+    "/api/admin/customers: 0 dòng",
+    `${adminTables.tableCounts.giftAccounts || 0} account quà trong kho`,
+  ];
   const visibleMetrics = [
     {
       label: "Khách hàng",
@@ -334,7 +340,17 @@ export default function AdminDashboardPage() {
           rows={dashboard.customerRows}
           emptyMessage="Đang tải danh sách khách hàng từ API..."
         />
-      ) : null}
+      ) : (
+        <AdminEmptyState
+          eyebrow="Raw database"
+          title="Chưa có khách hàng đồng bộ"
+          description="Backend đang trả dữ liệu rỗng cho danh sách khách hàng. Các bảng có dữ liệu vẫn hiển thị và thao tác bình thường bên dưới."
+          details={customerEmptyDetails}
+          actionLabel="Tải lại dữ liệu"
+          isActionLoading={adminTables.isLoadingRawData}
+          onAction={handleReloadRawData}
+        />
+      )}
 
       <AdminDataCrudPanel
         tables={adminTables.tables}
