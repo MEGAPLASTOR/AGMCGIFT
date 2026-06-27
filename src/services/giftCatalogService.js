@@ -15,16 +15,11 @@ function normalizeStatus(value) {
 }
 
 function getKiotvietOrders(catalogData) {
-  return catalogData.kiotvietOrders || catalogData.sapoOrders || catalogData.sapo_orders || [];
+  return catalogData.kiotvietOrders || [];
 }
 
 function getKiotvietOrderItems(catalogData) {
-  return (
-    catalogData.kiotvietOrderItems ||
-    catalogData.sapoOrderItems ||
-    catalogData.sapo_order_items ||
-    []
-  );
+  return catalogData.kiotvietOrderItems || [];
 }
 
 function getProductEggMappings(catalogData) {
@@ -51,11 +46,11 @@ function normalizeProductFromOrderItem(orderItem) {
   if (!orderItem) return null;
 
   return {
-    id: orderItem.kv_product_id || orderItem.sapo_product_id,
+    id: orderItem.kv_product_id,
     tenSanPham: orderItem.product_name,
     maSanPham: orderItem.sku,
-    moTa: `KiotViet variant: ${orderItem.kv_variant_id || orderItem.sapo_variant_id || "-"}`,
-    kiotvietVariantId: orderItem.kv_variant_id || orderItem.sapo_variant_id,
+    moTa: `KiotViet variant: ${orderItem.kv_variant_id || "-"}`,
+    kiotvietVariantId: orderItem.kv_variant_id,
   };
 }
 
@@ -67,7 +62,7 @@ function getProducts(catalogData) {
   const products = new Map();
 
   getKiotvietOrderItems(catalogData).forEach((item) => {
-    const productId = item.kv_product_id || item.sapo_product_id;
+    const productId = item.kv_product_id;
 
     if (!products.has(productId)) {
       products.set(productId, normalizeProductFromOrderItem(item));
@@ -115,8 +110,8 @@ export function getCustomerOrders(catalogData) {
 
     return {
       ...order,
-      productId: orderItem?.kv_product_id || orderItem?.sapo_product_id,
-      productVariantId: orderItem?.kv_variant_id || orderItem?.sapo_variant_id,
+      productId: orderItem?.kv_product_id,
+      productVariantId: orderItem?.kv_variant_id,
       maDonHang: order.order_code,
       trangThai: order.status,
       tenKhachHang: order.source_name,
@@ -177,9 +172,8 @@ export function getAccountsByTier(catalogData, orderItem, tier) {
   const eggType = getEggTypeByTier(tier);
   const mapping = getProductEggMappings(catalogData).find(
     (item) =>
-      (item.kv_product_id || item.sapo_product_id) === orderItem.productId &&
-      (item.kv_variant_id || item.sapo_variant_id || "") ===
-        (orderItem.productVariantId || "") &&
+      item.kv_product_id === orderItem.productId &&
+      (item.kv_variant_id || "") === (orderItem.productVariantId || "") &&
       (item.egg_tier === tier || Number(item.egg_type) === eggType)
   );
 
