@@ -32,12 +32,12 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
     const isChangingPassword = Boolean(newPassword || confirmPassword);
 
     if (!currentPassword) {
-      setMessage("Vui long nhap mat khau hien tai.");
+      setMessage("Vui lòng nhập mật khẩu hiện tại.");
       return;
     }
 
     if (!isChangingUsername && !isChangingPassword) {
-      setMessage("Nhap username moi hoac mat khau moi de cap nhat.");
+      setMessage("Nhập username mới hoặc mật khẩu mới để cập nhật.");
       return;
     }
 
@@ -61,13 +61,13 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
         newPassword: isChangingPassword ? newPassword : "",
       });
 
-      setMessage(result.message || "Da cap nhat thong tin dang nhap.");
+      setMessage(result.message || "Đã cập nhật thông tin đăng nhập.");
 
       if (result.ok !== false) {
         resetForm();
       }
     } catch (error) {
-      setMessage(error.message || "Khong cap nhat duoc thong tin dang nhap.");
+      setMessage(error.message || "Không cập nhật được thông tin đăng nhập.");
     } finally {
       setIsSaving(false);
     }
@@ -94,7 +94,7 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
         <div className="admin-panel__head">
           <div>
             <h2 id="admin-password-title">Bảo mật tài khoản</h2>
-            <span>Đổi mật khẩu đăng nhập admin</span>
+            <span>Đổi username hoặc mật khẩu đăng nhập admin</span>
           </div>
           <div className="admin-modal-head-actions">
             <strong>{admin.username}</strong>
@@ -142,7 +142,7 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
             />
           </label>
           <button type="submit" disabled={isSaving}>
-            {isSaving ? "Dang cap nhat..." : "Cập nhật mật khẩu"}
+            {isSaving ? "Đang cập nhật..." : "Cập nhật thông tin"}
           </button>
         </form>
 

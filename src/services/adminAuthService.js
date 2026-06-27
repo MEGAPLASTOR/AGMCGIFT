@@ -40,7 +40,7 @@ export async function updateAdminCredentials(
   authHeader
 ) {
   if (!authHeader) {
-    throw new ApiRequestError("Vui long dang nhap admin truoc khi doi mat khau.", {
+    throw new ApiRequestError("Vui lòng đăng nhập admin trước khi đổi thông tin đăng nhập.", {
       status: 401,
       payload: null,
       endpoint: ADMIN_ENDPOINTS.authCredentials,

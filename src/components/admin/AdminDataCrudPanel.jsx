@@ -89,7 +89,7 @@ function getRecordTitle(tableKey, formValues, selectedRecordId) {
   if (tableKey === "productEggMappings") {
     return formValues.kv_product_id && formValues.gift_pool_id
       ? `${formValues.kv_product_id} -> ${formValues.gift_pool_id}`
-      : "Mapping san pham moi";
+      : "Mapping sản phẩm mới";
   }
 
   return selectedRecordId || "Bản ghi mới";
@@ -209,7 +209,7 @@ export function AdminDataCrudPanel({
       : isPoolMappingsTable
         ? "Gắn tài khoản"
         : isProductMappingsTable
-          ? "Lien ket san pham"
+          ? "Liên kết sản phẩm"
           : "Thêm bản ghi";
   const quickTables = useMemo(
     () =>
@@ -329,15 +329,15 @@ export function AdminDataCrudPanel({
         isGiftAccountsTable && isCreating && onCreateGiftAccount
           ? "Đã thêm tài khoản lên backend."
           : isGiftAccountsTable && !isCreating && onUpdateGiftAccount
-            ? "Da cap nhat tai khoan tren backend."
+            ? "Đã cập nhật tài khoản trên backend."
           : isGiftPoolsTable
             ? "Đã đồng bộ bể quà lên backend."
             : isPoolMappingsTable
               ? "Đã đồng bộ liên kết tài khoản."
               : isCustomersTable && !isCreating && onUpdateCustomerStatus
-                ? "Da cap nhat trang thai khach hang."
+                ? "Đã cập nhật trạng thái khách hàng."
                 : isProductMappingsTable && onSaveProductEggMapping
-                  ? "Da dong bo mapping san pham - trung."
+                  ? "Đã đồng bộ mapping sản phẩm - trứng."
                   : "Đã lưu thay đổi."
       );
     } catch (error) {
@@ -387,11 +387,11 @@ export function AdminDataCrudPanel({
         isGiftPoolsTable
           ? "Đã xóa bể quà."
           : isGiftAccountsTable && onDeleteGiftAccount
-            ? "Da xoa tai khoan tren backend."
+            ? "Đã xóa tài khoản trên backend."
           : isPoolMappingsTable
             ? "Đã gỡ liên kết tài khoản."
             : isProductMappingsTable && onDeleteProductEggMapping
-              ? "Da xoa mapping san pham - trung."
+              ? "Đã xóa mapping sản phẩm - trứng."
               : "Đã xóa bản ghi."
       );
     } catch (error) {
@@ -581,7 +581,7 @@ export function AdminDataCrudPanel({
                   : isPoolMappingsTable
                     ? "Gỡ liên kết"
                     : isProductMappingsTable
-                      ? "Xoa mapping"
+                      ? "Xóa mapping"
                       : "Xóa bản ghi"}
             </button>
           </div>

@@ -7,7 +7,7 @@ import { requestJson } from "../api/http/requestJson";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
-    throw new ApiRequestError("Vui long dang nhap admin truoc khi quan ly be qua.", {
+    throw new ApiRequestError("Vui lòng đăng nhập admin trước khi quản lý bể quà.", {
       status: 401,
       payload: null,
       endpoint,
@@ -124,11 +124,11 @@ function buildGiftPoolPayload(record) {
   const tier = normalizeTier(record.tier);
 
   if (!poolName) {
-    throw new Error("Vui long nhap ten be qua.");
+    throw new Error("Vui lòng nhập tên bể quà.");
   }
 
   if (!tier) {
-    throw new Error("Tier be qua chi duoc dung A, B, C hoac D.");
+    throw new Error("Tier bể quà chỉ được dùng A, B, C hoặc D.");
   }
 
   return { poolName, tier };
@@ -139,7 +139,7 @@ function buildPoolAccountPayload(record) {
   const accountId = normalizeText(record.accountId || record.account_id);
 
   if (!poolId || !accountId) {
-    throw new Error("Vui long nhap pool_id va account_id.");
+    throw new Error("Vui lòng nhập pool_id và account_id.");
   }
 
   return { poolId, accountId };
@@ -152,7 +152,7 @@ function buildPoolAccountsPayload(record) {
   );
 
   if (!poolId || !accountIds.length) {
-    throw new Error("Vui long nhap pool_id va danh sach account_id.");
+    throw new Error("Vui lòng nhập pool_id và danh sách account_id.");
   }
 
   return { poolId, accountIds };

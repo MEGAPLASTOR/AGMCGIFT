@@ -354,7 +354,7 @@ export async function fetchAdminRawTables(authHeader) {
           endpoint: error?.endpoint || ADMIN_ENDPOINTS.giftPools,
           status: error?.status || 0,
           payload: error?.payload || null,
-          message: error?.message || "Khong tai duoc chi tiet be qua.",
+          message: error?.message || "Không tải được chi tiết bể quà.",
         }))
       );
     }

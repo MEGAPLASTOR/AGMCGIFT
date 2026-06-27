@@ -4,7 +4,7 @@ import { requestJson } from "../api/http/requestJson";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
-    throw new ApiRequestError("Vui long dang nhap admin truoc khi dong bo san pham.", {
+    throw new ApiRequestError("Vui lòng đăng nhập admin trước khi đồng bộ sản phẩm.", {
       status: 401,
       payload: null,
       endpoint,

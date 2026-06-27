@@ -4,7 +4,7 @@ import { requestJson } from "../api/http/requestJson";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
-    throw new ApiRequestError("Vui long dang nhap admin truoc khi cap nhat khach hang.", {
+    throw new ApiRequestError("Vui lòng đăng nhập admin trước khi cập nhật khách hàng.", {
       status: 401,
       payload: null,
       endpoint,
@@ -57,7 +57,7 @@ function buildCustomerStatusPayload(record) {
   const status = normalizeText(record.status).toUpperCase();
 
   if (!status) {
-    throw new Error("Vui long nhap trang thai khach hang.");
+    throw new Error("Vui lòng nhập trạng thái khách hàng.");
   }
 
   return {
@@ -72,7 +72,7 @@ export async function updateAdminCustomerStatus(customerCode, record, authHeader
   const endpoint = getAdminCustomerStatusEndpoint(normalizedCode);
 
   if (!normalizedCode) {
-    throw new Error("Khong tim thay ma khach hang can cap nhat.");
+    throw new Error("Không tìm thấy mã khách hàng cần cập nhật.");
   }
 
   const payload = await requestJson(endpoint, {

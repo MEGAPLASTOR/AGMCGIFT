@@ -129,12 +129,36 @@ function buildTierInventory(giftPools, giftAccounts, poolAccountMappings) {
     .sort((left, right) => left.tier.localeCompare(right.tier));
 }
 
-function buildMappedProductIds(products) {
-  return new Set(
-    products
-      .filter((product) => (product.mappings || []).length)
-      .map((product) => String(product.kvProductId || product.id || ""))
-  );
+function getProductId(product) {
+  return String(
+    product.kvProductId ||
+      product.kv_product_id ||
+      product.productId ||
+      product.id ||
+      ""
+  ).trim();
+}
+
+function buildMappedProductIds(products, productEggMappings = []) {
+  const mappedProductIds = new Set();
+
+  products.forEach((product) => {
+    const productId = getProductId(product);
+
+    if (productId && (product.mappings || []).length) {
+      mappedProductIds.add(productId);
+    }
+  });
+
+  productEggMappings.forEach((mapping) => {
+    const productId = getProductId(mapping);
+
+    if (productId) {
+      mappedProductIds.add(productId);
+    }
+  });
+
+  return mappedProductIds;
 }
 
 function buildOperationalAlerts({
@@ -143,13 +167,13 @@ function buildOperationalAlerts({
   giftPools,
   poolAvailableCount,
   products,
+  mappedProductIds,
   readyEggs,
   totalAccounts,
   availableAccounts,
 }) {
-  const mappedProductIds = buildMappedProductIds(products);
   const unmappedProducts = products.filter(
-    (product) => !mappedProductIds.has(String(product.kvProductId || product.id || ""))
+    (product) => !mappedProductIds.has(getProductId(product))
   ).length;
   const emptyPools = giftPools.filter(
     (pool) => !Number(poolAvailableCount[pool.id] || 0)
@@ -218,6 +242,7 @@ export function buildAdminDashboard(tables) {
   const giftPools = tables.giftPools || [];
   const giftAccounts = tables.giftAccounts || [];
   const poolAccountMappings = tables.poolAccountMappings || [];
+  const productEggMappings = tables.productEggMappings || [];
   const eggOpeningLogs = tables.eggOpeningLogs || [];
   const orderItemMap = getOrderItemMap(orderItems);
   const paidOrders = orders.filter((order) => normalizeStatus(order.status) === "paid");
@@ -254,7 +279,10 @@ export function buildAdminDashboard(tables) {
   const availableAccounts = giftAccounts.filter(
     (account) => normalizeStatus(account.status) === "available"
   );
-  const productMappings = products.flatMap((product) => product.mappings || []);
+  const productMappings = productEggMappings.length
+    ? productEggMappings
+    : products.flatMap((product) => product.mappings || []);
+  const mappedProductIds = buildMappedProductIds(products, productEggMappings);
 
   return {
     summary: {
@@ -287,6 +315,7 @@ export function buildAdminDashboard(tables) {
         giftPools,
         poolAvailableCount,
         products,
+        mappedProductIds,
         readyEggs: readyEggs.length,
         totalAccounts: giftAccounts.length,
         availableAccounts: availableAccounts.length,
@@ -331,10 +360,10 @@ export function buildAdminDashboard(tables) {
       },
       inventoryByTier,
       mapping: {
-        mappedProducts: buildMappedProductIds(products).size,
+        mappedProducts: mappedProductIds.size,
         totalProducts: products.length,
         mappingRules: productMappings.length,
-        mappedRate: percent(buildMappedProductIds(products).size, products.length),
+        mappedRate: percent(mappedProductIds.size, products.length),
       },
     },
     counts: {

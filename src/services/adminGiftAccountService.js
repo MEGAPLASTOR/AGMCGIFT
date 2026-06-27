@@ -78,7 +78,7 @@ export async function updateAdminGiftAccount(id, record, authHeader) {
   const payload = buildGiftAccountUpdatePayload(record);
 
   if (!payload.username || !payload.password || !payload.platform || !payload.status) {
-    throw new Error("Vui long nhap username, password, platform va status.");
+    throw new Error("Vui lòng nhập username, password, platform và status.");
   }
 
   const responsePayload = await requestJson(endpoint, {
@@ -98,7 +98,7 @@ export async function deleteAdminGiftAccounts(accountIds, authHeader) {
     .filter(Boolean);
 
   if (!normalizedIds.length) {
-    throw new Error("Vui long chon tai khoan can xoa.");
+    throw new Error("Vui lòng chọn tài khoản cần xóa.");
   }
 
   return requestJson(ADMIN_ENDPOINTS.giftAccountsBatchDelete, {

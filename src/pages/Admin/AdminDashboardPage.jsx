@@ -266,7 +266,7 @@ export default function AdminDashboardPage() {
         admin.authHeader
       );
 
-      return { ok: true, message: "Da cap nhat thong tin dang nhap admin." };
+      return { ok: true, message: "Đã cập nhật thông tin đăng nhập admin." };
     } catch (changeError) {
       handleAuthError(changeError);
       throw changeError;
@@ -452,7 +452,7 @@ export default function AdminDashboardPage() {
             onClick={handleSyncProducts}
           >
             <FaBoxesStacked aria-hidden="true" />
-            {isSyncingProducts ? "Dang dong bo san pham" : "Dong bo san pham"}
+            {isSyncingProducts ? "Đang đồng bộ sản phẩm" : "Đồng bộ sản phẩm"}
           </button>
           <button
             type="button"

@@ -7,7 +7,7 @@ import { requestJson } from "../api/http/requestJson";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
-    throw new ApiRequestError("Vui long dang nhap admin truoc khi quan ly mapping san pham.", {
+    throw new ApiRequestError("Vui lòng đăng nhập admin trước khi quản lý mapping sản phẩm.", {
       status: 401,
       payload: null,
       endpoint,
@@ -31,15 +31,15 @@ function buildProductEggMappingPayload(record) {
   const eggType = Number(record.eggType || record.egg_type);
 
   if (!Number.isFinite(productId) || productId <= 0) {
-    throw new Error("Vui long nhap kv_product_id hop le.");
+    throw new Error("Vui lòng nhập kv_product_id hợp lệ.");
   }
 
   if (!poolId) {
-    throw new Error("Vui long nhap gift_pool_id.");
+    throw new Error("Vui lòng nhập gift_pool_id.");
   }
 
   if (![1, 2].includes(eggType)) {
-    throw new Error("egg_type chi duoc la 1 hoac 2.");
+    throw new Error("egg_type chỉ được là 1 hoặc 2.");
   }
 
   return { productId, poolId, eggType };
@@ -111,7 +111,7 @@ export function deleteAdminProductEggMappings(mappingIds, authHeader) {
     .filter(Boolean);
 
   if (!normalizedIds.length) {
-    throw new Error("Vui long chon mapping can xoa.");
+    throw new Error("Vui lòng chọn mapping cần xóa.");
   }
 
   return requestJson(ADMIN_ENDPOINTS.productEggMappingsBatchDelete, {
