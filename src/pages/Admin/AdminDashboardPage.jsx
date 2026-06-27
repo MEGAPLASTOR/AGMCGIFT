@@ -94,6 +94,8 @@ export default function AdminDashboardPage() {
     useAdminAuth(adminTables.tables);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
+  const shouldShowCustomerTable =
+    adminTables.isLoadingRawData || hasRows(dashboard.customerRows);
   const visibleMetrics = [
     {
       label: "Khách hàng",
@@ -325,16 +327,14 @@ export default function AdminDashboardPage() {
         </section>
       ) : null}
 
-      <AdminDataTable
-        title="Danh sách khách hàng"
-        columns={customerColumns}
-        rows={dashboard.customerRows}
-        emptyMessage={
-          adminTables.isLoadingRawData
-            ? "Đang tải danh sách khách hàng từ API..."
-            : "Chưa có khách hàng từ /api/admin/customers. Bấm Tải lại dữ liệu sau khi đăng nhập JWT."
-        }
-      />
+      {shouldShowCustomerTable ? (
+        <AdminDataTable
+          title="Danh sách khách hàng"
+          columns={customerColumns}
+          rows={dashboard.customerRows}
+          emptyMessage="Đang tải danh sách khách hàng từ API..."
+        />
+      ) : null}
 
       <AdminDataCrudPanel
         tables={adminTables.tables}
