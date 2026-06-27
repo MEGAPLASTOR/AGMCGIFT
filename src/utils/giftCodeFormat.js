@@ -2,6 +2,7 @@ export const GIFT_CODE_EXAMPLE = "2606168FJ15CHF";
 export const GIFT_CODE_FORMAT_LABEL =
   "6 chữ số + 8 ký tự chữ/số";
 export const GIFT_CODE_PATTERN = /^\d{6}[A-Z0-9]{8}$/;
+export const GIFT_CODE_SERVER_PREFIX = "HDSPE_";
 
 export function formatGiftCodeInputValue(value) {
   return String(value || "")
@@ -12,4 +13,10 @@ export function formatGiftCodeInputValue(value) {
 
 export function isValidGiftCodeFormat(value) {
   return GIFT_CODE_PATTERN.test(formatGiftCodeInputValue(value));
+}
+
+export function formatGiftCodeForServer(value) {
+  const code = formatGiftCodeInputValue(value);
+
+  return code ? `${GIFT_CODE_SERVER_PREFIX}${code}` : "";
 }

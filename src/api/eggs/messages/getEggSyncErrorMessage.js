@@ -9,6 +9,10 @@ export function getEggSyncErrorMessage(error) {
     return "Bạn thao tác quá nhanh, vui lòng thử lại sau.";
   }
 
+  if (error.status === 404) {
+    return "Không tìm thấy API kiểm tra mã đơn. Vui lòng kiểm tra cấu hình proxy /api hoặc deploy lại frontend.";
+  }
+
   const customerStatus = normalizeApiText(error.payload?.customerStatus);
 
   if (customerStatus.includes("ban")) {

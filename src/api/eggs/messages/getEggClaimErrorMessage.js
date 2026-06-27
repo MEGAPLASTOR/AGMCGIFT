@@ -7,6 +7,10 @@ export function getEggClaimErrorMessage(error) {
     return "Bạn thao tác quá nhanh, vui lòng thử lại sau.";
   }
 
+  if (error.status === 404) {
+    return "Không tìm thấy API mở trứng. Vui lòng kiểm tra cấu hình proxy /api hoặc deploy lại frontend.";
+  }
+
   if (error.payload?.message) {
     return error.payload.message;
   }
