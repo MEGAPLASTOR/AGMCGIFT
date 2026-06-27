@@ -251,6 +251,11 @@ function getCell(row, index) {
   return index >= 0 ? String(row[index] || "").trim() : "";
 }
 
+function normalizeTier(value) {
+  const tier = String(value || "A").trim().toUpperCase();
+  return ["A", "B", "C", "D"].includes(tier) ? tier : "";
+}
+
 export function mapAccountImportRows(rows) {
   if (rows.length < 2) {
     throw new Error("File cần có dòng tiêu đề và ít nhất một account.");
@@ -278,11 +283,17 @@ export function mapAccountImportRows(rows) {
     const id = getCell(row, indexMap.id) || makeClientId();
     const poolId = getCell(row, indexMap.pool_id);
 
+    const tier = normalizeTier(getCell(row, indexMap.tier));
+
+    if (!tier) {
+      throw new Error("Tier trong file chỉ được dùng A, B, C hoặc D.");
+    }
+
     accounts.push({
       id,
       username,
       password,
-      tier: getCell(row, indexMap.tier) || "normal",
+      tier,
       status: getCell(row, indexMap.status) || "available",
       platform: getCell(row, indexMap.platform) || "blox-fruit",
       token: getCell(row, indexMap.token) || "",

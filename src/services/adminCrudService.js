@@ -29,8 +29,10 @@ const eggStatusOptions = [
 ];
 
 const poolTierOptions = [
-  { value: "normal", label: "normal" },
-  { value: "premium", label: "premium" },
+  { value: "A", label: "A" },
+  { value: "B", label: "B" },
+  { value: "C", label: "C" },
+  { value: "D", label: "D" },
 ];
 
 const accountStatusOptions = [
@@ -208,7 +210,7 @@ export const ADMIN_TABLES = [
       text("id", "ID", { required: true, wide: true }),
       text("username", "Tên tài khoản", { required: true }),
       text("password", "Mật khẩu", { required: true }),
-      select("tier", "Hạng quà", poolTierOptions, { defaultValue: "normal" }),
+      select("tier", "Tier", poolTierOptions, { defaultValue: "A" }),
       select("status", "Trạng thái", accountStatusOptions),
       text("platform", "Nền tảng", { defaultValue: "blox-fruit" }),
       text("token", "Token", { wide: true }),

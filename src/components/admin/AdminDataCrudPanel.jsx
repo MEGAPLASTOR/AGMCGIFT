@@ -13,6 +13,47 @@ import {
 
 const EMPTY_ROWS = [];
 const ALWAYS_VISIBLE_TABLE_KEYS = new Set(["giftAccounts"]);
+const DEFAULT_TABLE_KEY = "giftAccounts";
+const PRIORITY_COLUMNS_BY_TABLE = {
+  giftAccounts: ["username", "password", "tier", "platform", "status"],
+  customers: ["customerCode", "customerName", "status", "successCount", "warningCount"],
+  eggs: ["egg_type", "status", "hatch_at", "order_id", "account_id"],
+  giftPools: ["pool_name", "tier", "created_at"],
+  kiotvietOrders: ["order_code", "status", "financial_status", "fulfillment_status", "total_price"],
+  products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
+};
+
+function getPriorityColumns(tableKey, rows, fields) {
+  const preferredColumns = PRIORITY_COLUMNS_BY_TABLE[tableKey] || [];
+
+  if (!preferredColumns.length) {
+    return getVisibleColumns(rows);
+  }
+
+  const configuredKeys = new Set(fields.map((field) => field.key));
+  const rowKeys = new Set();
+
+  rows.slice(0, 12).forEach((row) => {
+    Object.keys(row).forEach((key) => rowKeys.add(key));
+  });
+
+  const availableKeys = rowKeys.size ? rowKeys : configuredKeys;
+  const columns = preferredColumns.filter((key) => availableKeys.has(key));
+
+  return columns.length ? columns : getVisibleColumns(rows);
+}
+
+function getColumnLabel(fields, column) {
+  return fields.find((field) => field.key === column)?.label || column;
+}
+
+function getRecordTitle(tableKey, formValues, selectedRecordId) {
+  if (tableKey === "giftAccounts") {
+    return formValues.username || "Tài khoản mới";
+  }
+
+  return selectedRecordId || "Bản ghi mới";
+}
 
 function AdminFormField({ field, value, onChange }) {
   const fieldId = `admin-field-${field.key}`;
@@ -67,7 +108,7 @@ export function AdminDataCrudPanel({
   onUploadGiftAccounts,
   onResetTables,
 }) {
-  const [tableKey, setTableKey] = useState(ADMIN_TABLES[0].key);
+  const [tableKey, setTableKey] = useState(DEFAULT_TABLE_KEY);
   const [keyword, setKeyword] = useState("");
   const [selectedRecordId, setSelectedRecordId] = useState("");
   const [formValues, setFormValues] = useState({});
@@ -85,16 +126,24 @@ export function AdminDataCrudPanel({
     [tables]
   );
   const fields = useMemo(() => getTableFields(tableKey), [tableKey]);
+  const isGiftAccountsTable = tableKey === "giftAccounts";
+  const visibleFields = useMemo(
+    () =>
+      fields.filter((field) => !(isGiftAccountsTable && field.key === "id")),
+    [fields, isGiftAccountsTable]
+  );
   const filteredRows = useMemo(
     () => searchTableRows(rows, keyword),
     [keyword, rows]
   );
   const visibleColumns = useMemo(
-    () => getVisibleColumns(filteredRows.length ? filteredRows : rows),
-    [filteredRows, rows]
+    () =>
+      getPriorityColumns(tableKey, filteredRows.length ? filteredRows : rows, fields),
+    [fields, filteredRows, rows, tableKey]
   );
   const hasActiveForm = Object.keys(formValues).length > 0;
-  const isGiftAccountsTable = tableKey === "giftAccounts";
+  const recordTitle = getRecordTitle(tableKey, formValues, selectedRecordId);
+  const addButtonLabel = isGiftAccountsTable ? "Thêm tài khoản" : "Thêm bản ghi";
 
   useEffect(() => {
     if (visibleTables.some((table) => table.key === tableKey)) {
@@ -181,8 +230,8 @@ export function AdminDataCrudPanel({
     <section className="admin-panel admin-crud-panel">
       <div className="admin-panel__head">
         <div>
-          <h2>Quản lý dữ liệu vận hành</h2>
-          <span>Thêm, sửa, xóa và tìm kiếm bản ghi</span>
+          <h2>Quản lý kho account</h2>
+          <span>Tạo account, upload Excel và kiểm tra dữ liệu raw từ API</span>
         </div>
         <button type="button" className="admin-light-button" onClick={onResetTables}>
           Khôi phục dữ liệu
@@ -204,13 +253,13 @@ export function AdminDataCrudPanel({
           Tìm kiếm
           <input
             type="search"
-            placeholder="Tìm theo mã đơn, trạng thái, tài khoản, ID..."
+            placeholder="Tìm username, tier, trạng thái, nền tảng..."
             value={keyword}
             onChange={(event) => setKeyword(event.target.value)}
           />
         </label>
         <button type="button" onClick={startAdd}>
-          Thêm bản ghi
+          {addButtonLabel}
         </button>
       </div>
 
@@ -229,7 +278,7 @@ export function AdminDataCrudPanel({
               <tr>
                 <th>Thao tác</th>
                 {visibleColumns.map((column) => (
-                  <th key={column}>{column}</th>
+                  <th key={column}>{getColumnLabel(fields, column)}</th>
                 ))}
               </tr>
             </thead>
@@ -273,8 +322,10 @@ export function AdminDataCrudPanel({
         <div className="admin-record-editor">
           <div className="admin-record-editor__head">
             <div>
-              <strong>Thông tin bản ghi</strong>
-              <span>{selectedRecordId || "Bản ghi mới"}</span>
+              <strong>
+                {isGiftAccountsTable ? "Thông tin tài khoản" : "Thông tin bản ghi"}
+              </strong>
+              <span>{recordTitle}</span>
             </div>
             <button type="button" className="admin-light-button" onClick={startAdd}>
               Tạo mới
@@ -283,7 +334,7 @@ export function AdminDataCrudPanel({
 
           {hasActiveForm ? (
             <div className="admin-form-grid">
-              {fields.map((field) => (
+              {visibleFields.map((field) => (
                 <AdminFormField
                   key={field.key}
                   field={field}
@@ -294,7 +345,7 @@ export function AdminDataCrudPanel({
             </div>
           ) : (
             <div className="admin-form-placeholder">
-              Chọn một dòng để sửa hoặc bấm Tạo mới để thêm bản ghi.
+              Chọn một dòng để sửa hoặc bấm Tạo mới để thêm tài khoản.
             </div>
           )}
 
@@ -314,7 +365,7 @@ export function AdminDataCrudPanel({
               onClick={deleteSelected}
               disabled={!selectedRecordId}
             >
-              Xóa bản ghi
+              {isGiftAccountsTable ? "Xóa tài khoản" : "Xóa bản ghi"}
             </button>
           </div>
         </div>

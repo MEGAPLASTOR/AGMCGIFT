@@ -21,11 +21,16 @@ function normalizeText(value) {
   return String(value || "").trim();
 }
 
+function normalizeTier(value) {
+  const tier = normalizeText(value || "A").toUpperCase();
+  return ["A", "B", "C", "D"].includes(tier) ? tier : "";
+}
+
 function buildGiftAccountPayload(record) {
   return {
     username: normalizeText(record.username),
     password: String(record.password || ""),
-    tier: normalizeText(record.tier || "normal"),
+    tier: normalizeTier(record.tier),
     token: normalizeText(record.token),
     platform: normalizeText(record.platform || "blox-fruit"),
   };
@@ -36,6 +41,10 @@ export async function createAdminGiftAccount(record, authHeader) {
 
   if (!payload.username || !payload.password) {
     throw new Error("Vui lòng nhập username và password.");
+  }
+
+  if (!payload.tier) {
+    throw new Error("Tier tài khoản chỉ được dùng A, B, C hoặc D.");
   }
 
   return postJson(ADMIN_ENDPOINTS.giftAccountsSingle, payload, {
