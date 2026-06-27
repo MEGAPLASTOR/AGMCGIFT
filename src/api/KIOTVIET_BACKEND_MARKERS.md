@@ -11,14 +11,29 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc4MjU1O
 ```
 
 - `POST /api/admin/auth/login`
+- `PUT /api/admin/auth/credentials`
 - `GET /api/admin/customers`
+- `PUT /api/admin/customers/{customerCode}/status`
 - `GET /api/admin/eggs`
 - `GET /api/admin/gift-accounts`
-- `GET /api/admin/gift-pools`
-- `GET /api/admin/orders`
-- `GET /api/admin/products`
+- `PUT /api/admin/gift-accounts/{id}`
+- `POST /api/admin/gift-accounts/batch-delete`
 - `POST /api/admin/gift-accounts/single`
 - `POST /api/admin/gift-accounts/upload`
+- `GET /api/admin/gift-pools`
+- `POST /api/admin/gift-pools`
+- `GET /api/admin/gift-pools/{id}`
+- `PUT /api/admin/gift-pools/{id}`
+- `DELETE /api/admin/gift-pools/{id}`
+- `POST /api/admin/gift-pools/add-account`
+- `POST /api/admin/gift-pools/add-accounts`
+- `POST /api/admin/gift-pools/remove-accounts`
+- `GET /api/admin/orders`
+- `GET /api/admin/products`
+- `POST /api/admin/products/sync/all`
+- `POST /api/admin/product-egg-mappings`
+- `DELETE /api/admin/product-egg-mappings/{id}`
+- `POST /api/admin/product-egg-mappings/batch-delete`
 
 ## Shape Dữ Liệu Frontend Chuẩn Hóa
 
