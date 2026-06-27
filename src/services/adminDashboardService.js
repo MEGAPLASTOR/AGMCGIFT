@@ -156,6 +156,7 @@ export function buildAdminDashboard(tables) {
     accountRows: giftAccounts.slice(0, 12).map((account) => ({
       username: account.username,
       platform: account.platform || "-",
+      tier: account.tier || "-",
       status: account.status,
       token: account.token || "-",
       assignedAt: formatDateTime(account.assigned_at),

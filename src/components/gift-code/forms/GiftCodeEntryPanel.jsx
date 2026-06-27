@@ -1,4 +1,8 @@
 import { GIFT_CODE_STATUS } from "../../../constants/giftCodeStatus";
+import {
+  formatGiftCodeInputValue,
+  GIFT_CODE_EXAMPLE,
+} from "../../../utils/giftCodeFormat";
 
 export function GiftCodeEntryPanel({
   inputValue,
@@ -25,9 +29,11 @@ export function GiftCodeEntryPanel({
       <form className="code-form" onSubmit={onSubmit}>
         <input
           type="text"
-          placeholder="Ví dụ: DHSPE_260622PSYR4BHX"
+          placeholder={`Ví dụ: ${GIFT_CODE_EXAMPLE}`}
           value={inputValue}
-          onChange={(event) => onInputChange(event.target.value)}
+          onChange={(event) =>
+            onInputChange(formatGiftCodeInputValue(event.target.value))
+          }
           aria-label="Nhập mã đơn hàng"
           disabled={isLoading}
         />

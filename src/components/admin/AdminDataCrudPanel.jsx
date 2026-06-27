@@ -61,7 +61,9 @@ export function AdminDataCrudPanel({
   tableCounts,
   onSaveRecord,
   onDeleteRecord,
+  onCreateGiftAccount,
   onImportGiftAccounts,
+  onUploadGiftAccounts,
   onResetTables,
 }) {
   const [tableKey, setTableKey] = useState(ADMIN_TABLES[0].key);
@@ -69,6 +71,7 @@ export function AdminDataCrudPanel({
   const [selectedRecordId, setSelectedRecordId] = useState("");
   const [formValues, setFormValues] = useState({});
   const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const rows = tables[tableKey] || EMPTY_ROWS;
   const fields = useMemo(() => getTableFields(tableKey), [tableKey]);
@@ -103,14 +106,31 @@ export function AdminDataCrudPanel({
     setMessage("Đang chỉnh sửa bản ghi đã chọn.");
   };
 
-  const saveForm = () => {
+  const saveForm = async () => {
+    if (isSaving) {
+      return;
+    }
+
     try {
-      const record = buildRecordFromForm(formValues, tableKey);
+      let record = buildRecordFromForm(formValues, tableKey);
+
+      if (isGiftAccountsTable && !selectedRecordId && onCreateGiftAccount) {
+        setIsSaving(true);
+        const payload = await onCreateGiftAccount(record);
+        record = { ...record, ...(payload?.data || payload?.account || {}) };
+      }
+
       onSaveRecord(tableKey, record);
       setSelectedRecordId(getRecordId(record, tableKey));
-      setMessage("Đã lưu thay đổi.");
+      setMessage(
+        isGiftAccountsTable && !selectedRecordId && onCreateGiftAccount
+          ? "Đã thêm tài khoản lên backend."
+          : "Đã lưu thay đổi."
+      );
     } catch (error) {
       setMessage(error.message || "Dữ liệu bản ghi không hợp lệ.");
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -176,6 +196,7 @@ export function AdminDataCrudPanel({
           {isGiftAccountsTable && onImportGiftAccounts ? (
             <AdminAccountImportPanel
               onImportGiftAccounts={onImportGiftAccounts}
+              onUploadGiftAccounts={onUploadGiftAccounts}
               onImported={setMessage}
             />
           ) : null}
@@ -257,8 +278,12 @@ export function AdminDataCrudPanel({
           {message ? <p>{message}</p> : null}
 
           <div className="admin-crud-actions">
-            <button type="button" onClick={saveForm} disabled={!hasActiveForm}>
-              Lưu thay đổi
+            <button
+              type="button"
+              onClick={saveForm}
+              disabled={!hasActiveForm || isSaving}
+            >
+              {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
             </button>
             <button
               type="button"

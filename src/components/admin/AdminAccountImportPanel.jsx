@@ -1,9 +1,29 @@
 import { useState } from "react";
 import { parseAccountImportFile } from "../../services/accountImportService";
 
-// BACKEND_ADMIN_IMPORT_ACCOUNT_EXCEL:
-// Khi có backend thật, form này sẽ gọi API upload file account thay vì parse ở frontend.
-export function AdminAccountImportPanel({ onImportGiftAccounts, onImported }) {
+function getUploadSuccessMessage(payload) {
+  const importedCount =
+    payload?.accountsImported ??
+    payload?.imported ??
+    payload?.successCount ??
+    payload?.count;
+
+  if (payload?.message) {
+    return payload.message;
+  }
+
+  if (Number.isFinite(Number(importedCount))) {
+    return `Đã upload và nhập ${importedCount} account lên backend.`;
+  }
+
+  return "Đã upload file Excel lên backend.";
+}
+
+export function AdminAccountImportPanel({
+  onImportGiftAccounts,
+  onUploadGiftAccounts,
+  onImported,
+}) {
   const [isImporting, setIsImporting] = useState(false);
 
   const handleFileChange = async (event) => {
@@ -16,6 +36,12 @@ export function AdminAccountImportPanel({ onImportGiftAccounts, onImported }) {
     setIsImporting(true);
 
     try {
+      if (onUploadGiftAccounts) {
+        const payload = await onUploadGiftAccounts(file);
+        onImported(getUploadSuccessMessage(payload));
+        return;
+      }
+
       const payload = await parseAccountImportFile(file);
       const result = onImportGiftAccounts(payload);
       const mappingMessage = result.mappingsImported
@@ -35,13 +61,13 @@ export function AdminAccountImportPanel({ onImportGiftAccounts, onImported }) {
     <div className="admin-account-import">
       <div>
         <strong>Nhập account từ Excel</strong>
-        <span>Cột bắt buộc: username, password. Có thể thêm status, platform, token, pool_id.</span>
+        <span>Cột bắt buộc: username, password. Có thể thêm tier, platform, token.</span>
       </div>
       <label className="admin-file-button">
         {isImporting ? "Đang nhập..." : "Chọn file"}
         <input
           type="file"
-          accept=".xlsx,.csv,.tsv,.txt"
+          accept=".xlsx"
           disabled={isImporting}
           onChange={handleFileChange}
         />

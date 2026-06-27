@@ -6,5 +6,5 @@ import { postJson } from "../http/postJson";
 // Backend dong bo don KiotViet/SAPO, kiem tra BAN/spam/trang thai giao hang,
 // sau do tra danh sach eggs cho trang chon trung.
 export function syncEggsByOrderCode(orderCode) {
-  return postJson(EGG_ENDPOINTS.sync, { code: orderCode });
+  return postJson(EGG_ENDPOINTS.sync, { orderCode: orderCode });
 }

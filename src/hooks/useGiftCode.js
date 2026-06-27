@@ -10,6 +10,12 @@ import {
 } from "../api/eggs";
 import { GIFT_CODE_STATUS } from "../constants/giftCodeStatus";
 import {
+  formatGiftCodeInputValue,
+  GIFT_CODE_EXAMPLE,
+  GIFT_CODE_FORMAT_LABEL,
+  isValidGiftCodeFormat,
+} from "../utils/giftCodeFormat";
+import {
   getDelayedRewardInfo,
   getRewardInfoFromTargetDate,
 } from "../utils/rewardDate";
@@ -72,13 +78,22 @@ export function useGiftCode(catalogData) {
   );
 
   const checkCode = useCallback(async (inputCode) => {
-    const trimmedCode = inputCode.trim().toUpperCase();
+    const trimmedCode = formatGiftCodeInputValue(inputCode);
 
     if (!trimmedCode) {
       setErrorMsg("Vui lòng nhập mã đơn hàng.");
       setStatus(GIFT_CODE_STATUS.invalid);
       return;
     }
+
+    if (!isValidGiftCodeFormat(trimmedCode)) {
+      setErrorMsg(
+        `Mã đơn phải đúng định dạng ${GIFT_CODE_FORMAT_LABEL}. Ví dụ: ${GIFT_CODE_EXAMPLE}.`
+      );
+      setStatus(GIFT_CODE_STATUS.invalid);
+      return;
+    }
+    // console.log(inputCode, trimmedCode);
 
     setIsChecking(true);
     setErrorMsg("");
@@ -92,6 +107,8 @@ export function useGiftCode(catalogData) {
       // rồi trả về danh sách trứng hợp lệ để khách chọn.
       const payload = await syncEggsByOrderCode(trimmedCode);
       const matchedEntry = normalizeSyncEggResponse(payload, trimmedCode);
+      
+      // console.log(payload);
 
       if (!matchedEntry.eggs.length) {
         setErrorMsg("Mã đơn hợp lệ nhưng chưa có trứng khả dụng.");
@@ -102,6 +119,7 @@ export function useGiftCode(catalogData) {
       setSelectedEntry(matchedEntry);
       setStatus(GIFT_CODE_STATUS.choosing);
     } catch (error) {
+      console.log(error);
       setErrorMsg(getEggSyncErrorMessage(error));
       setStatus(GIFT_CODE_STATUS.invalid);
     } finally {

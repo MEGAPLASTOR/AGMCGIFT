@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   createAdminTableState,
   getRecordId,
 } from "../services/adminCrudService";
+import { fetchAdminRawTables } from "../services/adminRawDataService";
 
 // BACKEND_ADMIN_CRUD_DU_LIEU:
 // Module CRUD hiện chỉ thao tác trên state trong trình duyệt, dữ liệu ban đầu lấy từ JSON.
@@ -10,6 +11,8 @@ import {
 // GET danh sách, POST thêm, PUT/PATCH sửa, DELETE xóa theo từng bảng.
 export function useAdminDataTables(sourceTables) {
   const [tables, setTables] = useState(() => createAdminTableState(sourceTables));
+  const [isLoadingRawData, setIsLoadingRawData] = useState(false);
+  const [rawDataError, setRawDataError] = useState("");
 
   const tableCounts = useMemo(
     () =>
@@ -168,9 +171,35 @@ export function useAdminDataTables(sourceTables) {
     setTables(createAdminTableState(sourceTables));
   };
 
+  const loadRawTables = useCallback(
+    async (authHeader) => {
+      setIsLoadingRawData(true);
+      setRawDataError("");
+
+      try {
+        const rawTables = await fetchAdminRawTables(authHeader);
+        setTables(createAdminTableState({ ...sourceTables, ...rawTables }));
+        return rawTables;
+      } catch (error) {
+        const statusText = error.status ? ` (${error.status})` : "";
+        const endpointText = error.endpoint ? ` tại ${error.endpoint}` : "";
+        setRawDataError(
+          `${error.message || "Không tải được dữ liệu raw database."}${statusText}${endpointText}`
+        );
+        throw error;
+      } finally {
+        setIsLoadingRawData(false);
+      }
+    },
+    [sourceTables]
+  );
+
   return {
     tables,
     tableCounts,
+    isLoadingRawData,
+    rawDataError,
+    loadRawTables,
     upsertRecord,
     deleteRecord,
     importGiftAccounts,

@@ -1,62 +1,140 @@
 import { useMemo, useState } from "react";
-import { authenticateAdmin } from "../services/adminDashboardService";
+import {
+  getAdminAuthorizationHeader,
+  loginAdmin,
+} from "../services/adminAuthService";
 
 const STORAGE_KEY = "agmc_admin_session";
 
-function readStoredAdminId() {
+function normalizeStoredSession(value) {
+  if (!value?.accessToken || !value?.username) {
+    return null;
+  }
+
+  return {
+    accessToken: value.accessToken,
+    tokenType: value.tokenType || "Bearer",
+    username: value.username,
+    role: value.role || "ADMIN",
+  };
+}
+
+function readStoredAdminSession() {
+  if (typeof window === "undefined") return null;
+
   try {
-    return window.sessionStorage.getItem(STORAGE_KEY);
+    const storedValue = window.sessionStorage.getItem(STORAGE_KEY);
+
+    if (!storedValue) {
+      return null;
+    }
+
+    return normalizeStoredSession(JSON.parse(storedValue));
   } catch {
     return null;
   }
 }
 
-function writeStoredAdminId(adminId) {
+function writeStoredAdminSession(session) {
+  if (typeof window === "undefined") return;
+
   try {
-    window.sessionStorage.setItem(STORAGE_KEY, adminId);
+    window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   } catch {
-    // Session storage is optional for the raw frontend dashboard.
+    // Session storage is optional; the current tab can still keep the token in React state.
   }
 }
 
-function clearStoredAdminId() {
+function clearStoredAdminSession() {
+  if (typeof window === "undefined") return;
+
   try {
     window.sessionStorage.removeItem(STORAGE_KEY);
   } catch {
-    // Session storage is optional for the raw frontend dashboard.
+    // Session storage is optional for the frontend dashboard.
   }
 }
 
-// BACKEND_ADMIN_PHIEN_DANG_NHAP:
-// Frontend đang lưu tạm admin id trong sessionStorage để demo.
-// Backend cần thay bằng token/session thật và API validate phiên đăng nhập.
+function findLocalAdmin(tables, username) {
+  const normalizedUsername = String(username || "").trim().toLowerCase();
+
+  return (tables.admins || []).find(
+    (item) =>
+      String(item.username || "")
+        .trim()
+        .toLowerCase() === normalizedUsername
+  );
+}
+
+function createAdminSessionView(session, tables) {
+  if (!session) {
+    return null;
+  }
+
+  const localAdmin = findLocalAdmin(tables, session.username);
+  const authHeader = getAdminAuthorizationHeader(session).Authorization;
+
+  return {
+    ...localAdmin,
+    accessToken: session.accessToken,
+    authHeader,
+    full_name: localAdmin?.full_name || session.username,
+    role: session.role || localAdmin?.role || "ADMIN",
+    tokenType: session.tokenType || "Bearer",
+    username: session.username,
+  };
+}
+
 export function useAdminAuth(tables) {
-  const [storedAdminId, setStoredAdminId] = useState(readStoredAdminId);
+  const [session, setSession] = useState(readStoredAdminSession);
   const [error, setError] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   const admin = useMemo(
-    () => (tables.admins || []).find((item) => item.id === storedAdminId),
-    [storedAdminId, tables.admins]
+    () => createAdminSessionView(session, tables),
+    [session, tables]
   );
 
-  const login = ({ username, password }) => {
-    const matchedAdmin = authenticateAdmin(tables, username, password);
+  const login = async ({ username, password }) => {
+    const trimmedUsername = String(username || "").trim();
 
-    if (!matchedAdmin) {
-      setError("Sai tài khoản hoặc mật khẩu admin.");
+    if (!trimmedUsername || !password) {
+      setError("Vui lòng nhập tài khoản và mật khẩu admin.");
       return false;
     }
 
-    writeStoredAdminId(matchedAdmin.id);
-    setStoredAdminId(matchedAdmin.id);
+    setIsLoggingIn(true);
     setError("");
-    return true;
+
+    try {
+      const nextSession = await loginAdmin({
+        username: trimmedUsername,
+        password,
+      });
+
+      writeStoredAdminSession(nextSession);
+      setSession(nextSession);
+      return true;
+    } catch (loginError) {
+      setError(loginError.message || "Không đăng nhập được admin.");
+      return false;
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   const logout = () => {
-    clearStoredAdminId();
-    setStoredAdminId(null);
+    clearStoredAdminSession();
+    setSession(null);
+    setError("");
   };
 
-  return { admin, error, login, logout };
+  return {
+    admin,
+    authHeader: admin?.authHeader || "",
+    error,
+    isLoggingIn,
+    login,
+    logout,
+  };
 }

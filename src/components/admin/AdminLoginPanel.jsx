@@ -1,12 +1,12 @@
 import { useState } from "react";
 
-export function AdminLoginPanel({ error, onLogin }) {
-  const [username, setUsername] = useState("admin_01");
-  const [password, setPassword] = useState("hash_demo_admin_01");
+export function AdminLoginPanel({ error, isLoading, onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    onLogin({ username, password });
+    await onLogin({ username, password });
   };
 
   return (
@@ -25,6 +25,8 @@ export function AdminLoginPanel({ error, onLogin }) {
           <input
             type="text"
             value={username}
+            autoComplete="username"
+            disabled={isLoading}
             onChange={(event) => setUsername(event.target.value)}
           />
         </label>
@@ -33,11 +35,15 @@ export function AdminLoginPanel({ error, onLogin }) {
           <input
             type="password"
             value={password}
+            autoComplete="current-password"
+            disabled={isLoading}
             onChange={(event) => setPassword(event.target.value)}
           />
         </label>
         {error ? <p className="admin-error">{error}</p> : null}
-        <button type="submit">Vào dashboard</button>
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Đang đăng nhập..." : "Vào dashboard"}
+        </button>
       </form>
     </section>
   );

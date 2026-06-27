@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdminDataTable } from "../../components/admin/AdminDataTable";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
@@ -13,6 +13,10 @@ import {
   buildAdminDashboard,
   formatCurrency,
 } from "../../services/adminDashboardService";
+import {
+  createAdminGiftAccount,
+  uploadAdminGiftAccounts,
+} from "../../services/adminGiftAccountService";
 
 const orderColumns = [
   { key: "code", label: "Mã đơn" },
@@ -34,6 +38,7 @@ const poolColumns = [
 const accountColumns = [
   { key: "username", label: "Username" },
   { key: "platform", label: "Platform" },
+  { key: "tier", label: "Tier" },
   { key: "status", label: "Status" },
   { key: "token", label: "Token" },
   { key: "assignedAt", label: "Assigned" },
@@ -49,14 +54,41 @@ const logColumns = [
 
 export default function AdminDashboardPage() {
   const adminTables = useAdminDataTables(giftCatalogData);
-  const { admin, error, login, logout } = useAdminAuth(adminTables.tables);
+  const { loadRawTables } = adminTables;
+  const { admin, error, isLoggingIn, login, logout } = useAdminAuth(
+    adminTables.tables
+  );
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
+
+  useEffect(() => {
+    if (!admin?.authHeader) {
+      return;
+    }
+
+    loadRawTables(admin.authHeader).catch(() => {
+      // The hook stores a user-facing error message.
+    });
+  }, [admin?.authHeader, loadRawTables]);
+
+  const handleReloadRawData = () => {
+    if (!admin?.authHeader || adminTables.isLoadingRawData) {
+      return;
+    }
+
+    loadRawTables(admin.authHeader).catch(() => {
+      // The hook stores a user-facing error message.
+    });
+  };
 
   if (!admin) {
     return (
       <main className="admin-page admin-page--login">
-        <AdminLoginPanel error={error} onLogin={login} />
+        <AdminLoginPanel
+          error={error}
+          isLoading={isLoggingIn}
+          onLogin={login}
+        />
       </main>
     );
   }
@@ -75,22 +107,47 @@ export default function AdminDashboardPage() {
           <button
             type="button"
             className="admin-light-button"
-            onClick={() => setPasswordModalOpen(true)}
+            disabled={adminTables.isLoadingRawData}
+            onClick={handleReloadRawData}
           >
-            Đổi mật khẩu
+            {adminTables.isLoadingRawData ? "Đang tải dữ liệu" : "Tải lại dữ liệu"}
           </button>
+          {admin.id ? (
+            <button
+              type="button"
+              className="admin-light-button"
+              onClick={() => setPasswordModalOpen(true)}
+            >
+              Đổi mật khẩu
+            </button>
+          ) : null}
           <button type="button" onClick={logout}>
             Đăng xuất
           </button>
         </div>
       </header>
 
-      {isPasswordModalOpen ? (
+      {isPasswordModalOpen && admin.id ? (
         <AdminPasswordPanel
           admin={admin}
           onChangePassword={adminTables.changeAdminPassword}
           onClose={() => setPasswordModalOpen(false)}
         />
+      ) : null}
+
+      {adminTables.isLoadingRawData || adminTables.rawDataError ? (
+        <section className="admin-panel">
+          <div className="admin-panel__head">
+            <div>
+              <h2>Dữ liệu raw database</h2>
+              <span>
+                {adminTables.isLoadingRawData
+                  ? "Đang tải từ API raw"
+                  : adminTables.rawDataError}
+              </span>
+            </div>
+          </div>
+        </section>
       ) : null}
 
       <section className="admin-metric-grid">
@@ -139,7 +196,13 @@ export default function AdminDashboardPage() {
         tableCounts={adminTables.tableCounts}
         onSaveRecord={adminTables.upsertRecord}
         onDeleteRecord={adminTables.deleteRecord}
+        onCreateGiftAccount={(record) =>
+          createAdminGiftAccount(record, admin.authHeader)
+        }
         onImportGiftAccounts={adminTables.importGiftAccounts}
+        onUploadGiftAccounts={(file) =>
+          uploadAdminGiftAccounts(file, admin.authHeader)
+        }
         onResetTables={adminTables.resetTables}
       />
 
