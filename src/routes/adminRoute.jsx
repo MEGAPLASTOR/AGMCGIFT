@@ -1,6 +1,6 @@
 import AdminDashboardPage from "../pages/Admin/AdminDashboardPage.jsx";
 
 export const adminRoute = {
-  path: "/agmcmyadmin",
+  path: "/agmcmyadmin/*",
   element: <AdminDashboardPage />,
 };

@@ -135,6 +135,7 @@ export function AdminDataCrudPanel({
   activeTableKey = DEFAULT_TABLE_KEY,
   panelTitle = "Quản lý kho account",
   panelDescription = "Tạo account, upload Excel và kiểm tra dữ liệu raw từ API",
+  allowedTableKeys = [],
   tables,
   tableCounts,
   onTableChange,
@@ -163,14 +164,19 @@ export function AdminDataCrudPanel({
   const [isSaving, setIsSaving] = useState(false);
 
   const rows = tables[tableKey] || EMPTY_ROWS;
+  const allowedTableKeySet = useMemo(
+    () => new Set(allowedTableKeys),
+    [allowedTableKeys]
+  );
   const visibleTables = useMemo(
     () =>
       ADMIN_TABLES.filter(
         (table) =>
-          ALWAYS_VISIBLE_TABLE_KEYS.has(table.key) ||
-          (tables[table.key] || []).length > 0
+          (!allowedTableKeySet.size || allowedTableKeySet.has(table.key)) &&
+          (ALWAYS_VISIBLE_TABLE_KEYS.has(table.key) ||
+            (tables[table.key] || []).length > 0)
       ),
-    [tables]
+    [allowedTableKeySet, tables]
   );
   const fields = useMemo(() => getTableFields(tableKey), [tableKey]);
   const isCustomersTable = tableKey === "customers";

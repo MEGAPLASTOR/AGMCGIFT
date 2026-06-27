@@ -103,6 +103,7 @@ const MANAGEMENT_PAGES = [
 const MANAGEMENT_PAGE_BY_TABLE = new Map(
   MANAGEMENT_PAGES.map((page) => [page.tableKey, page])
 );
+const MANAGEMENT_TABLE_KEYS = MANAGEMENT_PAGES.map((page) => page.tableKey);
 
 function getAdminPath(slug = "") {
   return slug ? `${ADMIN_BASE_PATH}/${slug}` : ADMIN_BASE_PATH;
@@ -177,6 +178,8 @@ function findProductEggMappingRow(tables, record) {
 }
 
 export default function AdminDashboardPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
   const adminTables = useAdminDataTables(giftCatalogData);
   const { loadRawTables } = adminTables;
   const { admin, error, handleAuthError, isLoggingIn, login, logout } =
@@ -184,13 +187,11 @@ export default function AdminDashboardPage() {
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const [isSyncingProducts, setIsSyncingProducts] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
-  const hasCustomerRows = hasRows(dashboard.customerRows);
-  const shouldShowCustomerTable =
-    adminTables.isLoadingRawData || hasCustomerRows;
-  const customerEmptyDetails = [
-    "/api/admin/customers: 0 dòng",
-    `${adminTables.tableCounts.giftAccounts || 0} account quà trong kho`,
-  ];
+  const activeSlug = getActiveSlug(location.pathname);
+  const activeManagementPage = MANAGEMENT_PAGES.find(
+    (page) => page.slug === activeSlug
+  );
+  const isOverviewPage = !activeSlug || !activeManagementPage;
   const visibleMetrics = [
     {
       label: "Khách hàng",
@@ -248,6 +249,12 @@ export default function AdminDashboardPage() {
       tone: "green",
     },
   ].filter((metric) => hasMetricValue(metric.rawValue ?? metric.value));
+
+  useEffect(() => {
+    if (activeSlug && !activeManagementPage) {
+      navigate(getAdminPath(), { replace: true });
+    }
+  }, [activeManagementPage, activeSlug, navigate]);
 
   useEffect(() => {
     if (!admin?.authHeader) {
@@ -451,6 +458,14 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleManagementTableChange = (nextTableKey) => {
+    const nextPage = MANAGEMENT_PAGE_BY_TABLE.get(nextTableKey);
+
+    if (nextPage) {
+      navigate(getAdminPath(nextPage.slug));
+    }
+  };
+
   if (!admin) {
     return (
       <main className="admin-page admin-page--login">
@@ -530,147 +545,56 @@ export default function AdminDashboardPage() {
         </section>
       ) : null}
 
-      {visibleMetrics.length ? (
-        <section className="admin-metric-grid">
-          {visibleMetrics.map((metric) => (
-            <AdminMetricCard
-              key={metric.label}
-              label={metric.label}
-              value={metric.value}
-              note={metric.note}
-              tone={metric.tone}
-            />
-          ))}
-        </section>
-      ) : null}
-
-      <AdminAnalyticsPanel analytics={dashboard.analytics} />
-
-      {shouldShowCustomerTable ? (
-        <AdminDataTable
-          title="Danh sách khách hàng"
-          columns={customerColumns}
-          rows={dashboard.customerRows}
-          emptyMessage="Đang tải danh sách khách hàng từ API..."
-        />
-      ) : (
-        <AdminEmptyState
-          eyebrow="Raw database"
-          title="Chưa có khách hàng đồng bộ"
-          description="Backend đang trả dữ liệu rỗng cho danh sách khách hàng. Các bảng có dữ liệu vẫn hiển thị và thao tác bình thường bên dưới."
-          details={customerEmptyDetails}
-          actionLabel="Tải lại dữ liệu"
-          isActionLoading={adminTables.isLoadingRawData}
-          onAction={handleReloadRawData}
-        />
-      )}
-
-      <AdminDataCrudPanel
-        tables={adminTables.tables}
+      <AdminManagementNav
+        activeSlug={isOverviewPage ? "" : activeManagementPage.slug}
         tableCounts={adminTables.tableCounts}
-        onSaveRecord={adminTables.upsertRecord}
-        onDeleteRecord={adminTables.deleteRecord}
-        onCreateGiftAccount={handleCreateGiftAccount}
-        onUpdateGiftAccount={handleUpdateGiftAccount}
-        onDeleteGiftAccount={handleDeleteGiftAccount}
-        onCreateGiftPool={handleCreateGiftPool}
-        onUpdateGiftPool={handleUpdateGiftPool}
-        onDeleteGiftPool={handleDeleteGiftPool}
-        onAddPoolAccount={handleAddPoolAccount}
-        onRemovePoolAccount={handleRemovePoolAccount}
-        onUpdateCustomerStatus={handleUpdateCustomerStatus}
-        onSaveProductEggMapping={handleSaveProductEggMapping}
-        onDeleteProductEggMapping={handleDeleteProductEggMapping}
-        onImportGiftAccounts={adminTables.importGiftAccounts}
-        onUploadGiftAccounts={handleUploadGiftAccounts}
-        onResetTables={adminTables.resetTables}
       />
 
-      {hasCounts(dashboard.counts.customerStatus) ? (
-        <AdminStatusBar
-          title="Trạng thái khách"
-          counts={dashboard.counts.customerStatus}
+      {isOverviewPage ? (
+        <>
+          {visibleMetrics.length ? (
+            <section className="admin-metric-grid">
+              {visibleMetrics.map((metric) => (
+                <AdminMetricCard
+                  key={metric.label}
+                  label={metric.label}
+                  value={metric.value}
+                  note={metric.note}
+                  tone={metric.tone}
+                />
+              ))}
+            </section>
+          ) : null}
+
+          <AdminAnalyticsPanel analytics={dashboard.analytics} />
+        </>
+      ) : (
+        <AdminDataCrudPanel
+          activeTableKey={activeManagementPage.tableKey}
+          panelTitle={activeManagementPage.title}
+          panelDescription={activeManagementPage.description}
+          allowedTableKeys={MANAGEMENT_TABLE_KEYS}
+          tables={adminTables.tables}
+          tableCounts={adminTables.tableCounts}
+          onTableChange={handleManagementTableChange}
+          onSaveRecord={adminTables.upsertRecord}
+          onDeleteRecord={adminTables.deleteRecord}
+          onCreateGiftAccount={handleCreateGiftAccount}
+          onUpdateGiftAccount={handleUpdateGiftAccount}
+          onDeleteGiftAccount={handleDeleteGiftAccount}
+          onCreateGiftPool={handleCreateGiftPool}
+          onUpdateGiftPool={handleUpdateGiftPool}
+          onDeleteGiftPool={handleDeleteGiftPool}
+          onAddPoolAccount={handleAddPoolAccount}
+          onRemovePoolAccount={handleRemovePoolAccount}
+          onUpdateCustomerStatus={handleUpdateCustomerStatus}
+          onSaveProductEggMapping={handleSaveProductEggMapping}
+          onDeleteProductEggMapping={handleDeleteProductEggMapping}
+          onImportGiftAccounts={adminTables.importGiftAccounts}
+          onUploadGiftAccounts={handleUploadGiftAccounts}
+          onResetTables={adminTables.resetTables}
         />
-      ) : null}
-
-      {hasCounts(dashboard.counts.orderStatus) ||
-      hasCounts(dashboard.counts.accountStatus) ? (
-        <section className="admin-grid-two">
-          {hasCounts(dashboard.counts.orderStatus) ? (
-            <AdminStatusBar
-              title="Trạng thái đơn"
-              counts={dashboard.counts.orderStatus}
-            />
-          ) : null}
-          {hasCounts(dashboard.counts.accountStatus) ? (
-            <AdminStatusBar
-              title="Trạng thái acc"
-              counts={dashboard.counts.accountStatus}
-            />
-          ) : null}
-        </section>
-      ) : null}
-
-      {hasCounts(dashboard.counts.eggStatus) ||
-      hasCounts(dashboard.counts.logAction) ? (
-        <section className="admin-grid-two">
-          {hasCounts(dashboard.counts.eggStatus) ? (
-            <AdminStatusBar
-              title="Trạng thái trứng"
-              counts={dashboard.counts.eggStatus}
-            />
-          ) : null}
-          {hasCounts(dashboard.counts.logAction) ? (
-            <AdminStatusBar
-              title="Log hành động"
-              counts={dashboard.counts.logAction}
-            />
-          ) : null}
-        </section>
-      ) : null}
-
-      {hasRows(dashboard.latestOrders) ? (
-        <AdminDataTable
-          title="Đơn KiotViet mới"
-          columns={orderColumns}
-          rows={dashboard.latestOrders}
-        />
-      ) : null}
-
-      {hasRows(dashboard.poolRows) || hasRows(dashboard.accountRows) ? (
-        <section className="admin-grid-two">
-          {hasRows(dashboard.poolRows) ? (
-            <AdminDataTable
-              title="Gift pools"
-              columns={poolColumns}
-              rows={dashboard.poolRows}
-            />
-          ) : null}
-          {hasRows(dashboard.accountRows) ? (
-            <AdminDataTable
-              title="Gift accounts"
-              columns={accountColumns}
-              rows={dashboard.accountRows}
-            />
-          ) : null}
-        </section>
-      ) : null}
-
-      {hasRows(dashboard.productRows) ? (
-        <AdminDataTable
-          title="Sản phẩm KiotViet"
-          columns={productColumns}
-          rows={dashboard.productRows}
-        />
-      ) : null}
-
-      {hasRows(dashboard.logRows) ? (
-        <AdminDataTable
-          title="Egg opening logs"
-          columns={logColumns}
-          rows={dashboard.logRows}
-        />
-      ) : null}
+      )}
     </main>
   );
 }
