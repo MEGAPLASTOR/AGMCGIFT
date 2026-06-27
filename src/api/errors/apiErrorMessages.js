@@ -4,6 +4,15 @@ import { EGG_ENDPOINTS } from "../endpoints/eggEndpoints";
 export const API_CONNECTION_ERROR_MESSAGE =
   "Không kết nối được backend API. Kiểm tra server backend hoặc VITE_API_BASE_URL.";
 
+const ADMIN_RAW_ENDPOINTS = [
+  ADMIN_ENDPOINTS.customers,
+  ADMIN_ENDPOINTS.eggs,
+  ADMIN_ENDPOINTS.giftAccounts,
+  ADMIN_ENDPOINTS.giftPools,
+  ADMIN_ENDPOINTS.orders,
+  ADMIN_ENDPOINTS.products,
+];
+
 export function getDefaultApiErrorMessage(status, endpoint) {
   if (status === 429) return "Thao tác quá nhanh.";
 
@@ -22,14 +31,11 @@ export function getDefaultApiErrorMessage(status, endpoint) {
     return "Phiên đăng nhập admin hết hạn hoặc không đủ quyền.";
   }
 
-  if (
-    endpoint === ADMIN_ENDPOINTS.rawDatabase &&
-    (status === 401 || status === 403)
-  ) {
+  if (ADMIN_RAW_ENDPOINTS.includes(endpoint) && (status === 401 || status === 403)) {
     return "Phiên đăng nhập admin hết hạn hoặc không đủ quyền tải dữ liệu raw.";
   }
 
-  if (endpoint === ADMIN_ENDPOINTS.rawDatabase && status >= 500) {
+  if (ADMIN_RAW_ENDPOINTS.includes(endpoint) && status >= 500) {
     return "API raw database đang lỗi phía backend.";
   }
 

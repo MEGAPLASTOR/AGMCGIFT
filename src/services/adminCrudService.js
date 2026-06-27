@@ -95,6 +95,22 @@ export const ADMIN_TABLES = [
     ],
   },
   {
+    key: "customers",
+    label: "customers",
+    idField: "id",
+    fields: [
+      text("id", "ID", { required: true, wide: true }),
+      text("customerCode", "Mã khách hàng", { required: true }),
+      text("customerName", "Tên khách hàng", { wide: true }),
+      text("status", "Trạng thái"),
+      number("successCount", "Mua thành công"),
+      number("returnStreak", "Chuỗi hoàn hàng"),
+      number("warningCount", "Số cảnh báo"),
+      dateTime("createdAt", "Ngày tạo"),
+      dateTime("updatedAt", "Ngày cập nhật"),
+    ],
+  },
+  {
     key: "sapoOrders",
     label: "sapo_orders",
     idField: "id",
@@ -122,6 +138,20 @@ export const ADMIN_TABLES = [
       text("product_name", "Tên sản phẩm", { wide: true }),
       text("sku", "SKU"),
       number("quantity", "Số lượng"),
+    ],
+  },
+  {
+    key: "products",
+    label: "products",
+    idField: "id",
+    fields: [
+      text("id", "ID", { required: true, wide: true }),
+      text("kvProductId", "ID KiotViet"),
+      text("name", "Tên sản phẩm"),
+      text("fullName", "Tên đầy đủ", { wide: true }),
+      number("basePrice", "Giá gốc"),
+      text("imageUrl", "Ảnh", { wide: true }),
+      dateTime("lastSyncedAt", "Đồng bộ cuối"),
     ],
   },
   {

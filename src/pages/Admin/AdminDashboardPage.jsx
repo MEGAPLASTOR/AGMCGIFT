@@ -35,6 +35,15 @@ const poolColumns = [
   { key: "createdAt", label: "Ngày tạo" },
 ];
 
+const customerColumns = [
+  { key: "code", label: "Mã khách" },
+  { key: "name", label: "Tên khách" },
+  { key: "status", label: "Trạng thái" },
+  { key: "success", label: "Thành công" },
+  { key: "warning", label: "Cảnh báo" },
+  { key: "updatedAt", label: "Cập nhật" },
+];
+
 const accountColumns = [
   { key: "username", label: "Username" },
   { key: "platform", label: "Platform" },
@@ -42,6 +51,13 @@ const accountColumns = [
   { key: "status", label: "Status" },
   { key: "token", label: "Token" },
   { key: "assignedAt", label: "Assigned" },
+];
+
+const productColumns = [
+  { key: "id", label: "ID KV" },
+  { key: "name", label: "Sản phẩm" },
+  { key: "price", label: "Giá" },
+  { key: "syncedAt", label: "Đồng bộ" },
 ];
 
 const logColumns = [
@@ -152,6 +168,12 @@ export default function AdminDashboardPage() {
 
       <section className="admin-metric-grid">
         <AdminMetricCard
+          label="Khách hàng"
+          value={dashboard.summary.totalCustomers}
+          note={`${dashboard.summary.warningCustomers} cảnh báo`}
+          tone="blue"
+        />
+        <AdminMetricCard
           label="Tổng đơn SAPO"
           value={dashboard.summary.totalOrders}
           note="sapo_orders"
@@ -174,6 +196,12 @@ export default function AdminDashboardPage() {
           value={formatCurrency(dashboard.summary.totalRevenue)}
           note="financial_status paid"
           tone="gold"
+        />
+        <AdminMetricCard
+          label="Tổng trứng"
+          value={dashboard.summary.totalEggs}
+          note={`${dashboard.summary.readyEggs} sẵn sàng`}
+          tone="purple"
         />
         <AdminMetricCard
           label="Trứng đang ấp"
@@ -217,6 +245,12 @@ export default function AdminDashboardPage() {
       </section>
 
       <AdminDataTable
+        title="Khách hàng"
+        columns={customerColumns}
+        rows={dashboard.customerRows}
+      />
+
+      <AdminDataTable
         title="Đơn SAPO mới"
         columns={orderColumns}
         rows={dashboard.latestOrders}
@@ -234,6 +268,12 @@ export default function AdminDashboardPage() {
           rows={dashboard.accountRows}
         />
       </section>
+
+      <AdminDataTable
+        title="Sản phẩm KiotViet"
+        columns={productColumns}
+        rows={dashboard.productRows}
+      />
 
       <AdminDataTable
         title="Egg opening logs"

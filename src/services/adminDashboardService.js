@@ -6,6 +6,10 @@ function countBy(items, getKey) {
   }, {});
 }
 
+function normalizeStatus(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
 function sum(items, getValue) {
   return items.reduce((total, item) => total + Number(getValue(item) || 0), 0);
 }
@@ -47,7 +51,9 @@ function getPoolAccountCount(poolAccountMappings) {
 
 function getAvailableAccountIds(accounts) {
   return new Set(
-    accounts.filter((account) => account.status === "available").map((item) => item.id)
+    accounts
+      .filter((account) => normalizeStatus(account.status) === "available")
+      .map((item) => item.id)
   );
 }
 
@@ -64,16 +70,18 @@ function getPoolAvailableCount(poolAccountMappings, availableAccountIds) {
 // Frontend đang tự tính analytics từ các bảng JSON.
 // Backend nên tạo API, ví dụ /admin/analytics, trả về cùng shape dữ liệu để thay thế hàm này.
 export function buildAdminDashboard(tables) {
+  const customers = tables.customers || [];
   const orders = tables.sapoOrders || [];
   const orderItems = tables.sapoOrderItems || [];
+  const products = tables.products || [];
   const eggs = tables.eggs || [];
   const giftPools = tables.giftPools || [];
   const giftAccounts = tables.giftAccounts || [];
   const poolAccountMappings = tables.poolAccountMappings || [];
   const eggOpeningLogs = tables.eggOpeningLogs || [];
   const orderItemMap = getOrderItemMap(orderItems);
-  const paidOrders = orders.filter((order) => order.status === "Paid");
-  const blockedOrders = orders.filter((order) => order.status !== "Paid");
+  const paidOrders = orders.filter((order) => normalizeStatus(order.status) === "paid");
+  const blockedOrders = orders.filter((order) => normalizeStatus(order.status) !== "paid");
   const availableAccountIds = getAvailableAccountIds(giftAccounts);
   const poolAccountCount = getPoolAccountCount(poolAccountMappings);
   const poolAvailableCount = getPoolAvailableCount(
@@ -84,21 +92,34 @@ export function buildAdminDashboard(tables) {
 
   return {
     summary: {
+      totalCustomers: customers.length,
+      warningCustomers: customers.filter(
+        (customer) =>
+          normalizeStatus(customer.status).includes("warning") ||
+          Number(customer.warningCount || 0) > 0
+      ).length,
+      bannedCustomers: customers.filter(
+        (customer) => normalizeStatus(customer.status).includes("banned")
+      ).length,
       totalOrders: orders.length,
       paidOrders: paidOrders.length,
       blockedOrders: blockedOrders.length,
       totalRevenue: sum(paidOrders, (order) => order.total_price),
+      totalProducts: products.length,
       totalEggs: eggs.length,
-      hatchingEggs: eggs.filter((egg) => egg.status === "incubating").length,
+      hatchingEggs: eggs.filter(
+        (egg) => normalizeStatus(egg.status) === "incubating"
+      ).length,
       readyEggs: eggs.filter(
         (egg) => egg.hatch_at && new Date(egg.hatch_at).getTime() <= now
       ).length,
       totalAccounts: giftAccounts.length,
       availableAccounts: giftAccounts.filter(
-        (account) => account.status === "available"
+        (account) => normalizeStatus(account.status) === "available"
       ).length,
     },
     counts: {
+      customerStatus: countBy(customers, (customer) => customer.status),
       orderStatus: countBy(orders, (order) => order.status),
       financialStatus: countBy(orders, (order) => order.financial_status),
       fulfillmentStatus: countBy(orders, (order) => order.fulfillment_status),
@@ -112,7 +133,12 @@ export function buildAdminDashboard(tables) {
       {
         title: "Webhook SAPO",
         value: orders.length,
-        note: "sapo_orders upsert",
+        note: "orders raw",
+      },
+      {
+        title: "Khách hàng",
+        value: customers.length,
+        note: "customers raw",
       },
       {
         title: "Khách nhập mã",
@@ -135,6 +161,14 @@ export function buildAdminDashboard(tables) {
         note: "egg_opening_logs",
       },
     ],
+    customerRows: customers.slice(0, 12).map((customer) => ({
+      code: customer.customerCode,
+      name: customer.customerName,
+      status: customer.status,
+      success: customer.successCount,
+      warning: customer.warningCount,
+      updatedAt: formatDateTime(customer.updatedAt),
+    })),
     latestOrders: orders.slice(0, 10).map((order) => {
       const item = orderItemMap.get(order.id);
       return {
@@ -152,6 +186,12 @@ export function buildAdminDashboard(tables) {
       accounts: poolAccountCount[pool.id] || 0,
       available: poolAvailableCount[pool.id] || 0,
       createdAt: formatDateTime(pool.created_at),
+    })),
+    productRows: products.slice(0, 12).map((product) => ({
+      id: product.kvProductId || product.id,
+      name: product.name,
+      price: formatCurrency(product.basePrice || 0),
+      syncedAt: formatDateTime(product.lastSyncedAt),
     })),
     accountRows: giftAccounts.slice(0, 12).map((account) => ({
       username: account.username,

@@ -4,149 +4,41 @@ import { getDefaultApiErrorMessage } from "../api/errors/apiErrorMessages";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { readResponsePayload } from "../api/http/readResponsePayload";
 
-const RAW_ENDPOINT_STORAGE_KEY = "AGMC_ADMIN_RAW_ENDPOINT";
-const RAW_TABLE_ENDPOINT_STORAGE_KEY = "AGMC_ADMIN_RAW_TABLE_ENDPOINT_TEMPLATE";
+const RAW_ENDPOINTS = [
+  ["customers", ADMIN_ENDPOINTS.customers],
+  ["eggs", ADMIN_ENDPOINTS.eggs],
+  ["giftAccounts", ADMIN_ENDPOINTS.giftAccounts],
+  ["giftPools", ADMIN_ENDPOINTS.giftPools],
+  ["orders", ADMIN_ENDPOINTS.orders],
+  ["products", ADMIN_ENDPOINTS.products],
+];
 
-const TABLE_KEY_ALIASES = {
-  admins: ["admins"],
-  sapoOrders: ["sapoOrders", "sapo_orders"],
-  sapoOrderItems: ["sapoOrderItems", "sapo_order_items"],
-  eggs: ["eggs"],
-  productEggMappings: ["productEggMappings", "product_egg_mappings"],
-  giftPools: ["giftPools", "gift_pools"],
-  giftAccounts: ["giftAccounts", "gift_accounts"],
-  poolAccountMappings: ["poolAccountMappings", "pool_account_mappings"],
-  eggOpeningLogs: ["eggOpeningLogs", "egg_opening_logs"],
-};
-
-const TABLE_ENDPOINTS = Object.entries(TABLE_KEY_ALIASES).map(
-  ([tableKey, aliases]) => ({
-    tableKey,
-    snakeName: aliases[1] || aliases[0],
-    kebabName: (aliases[1] || aliases[0]).replace(/_/g, "-"),
-  })
-);
-
-function getRuntimeRawEndpoint() {
-  if (typeof window === "undefined") return "";
-
-  try {
-    return window.localStorage?.getItem(RAW_ENDPOINT_STORAGE_KEY) || "";
-  } catch {
-    return "";
-  }
-}
-
-function getRuntimeRawTableEndpointTemplate() {
-  if (typeof window === "undefined") return "";
-
-  try {
-    return window.localStorage?.getItem(RAW_TABLE_ENDPOINT_STORAGE_KEY) || "";
-  } catch {
-    return "";
-  }
-}
-
-function getAdminRawEndpoint() {
-  return (
-    import.meta.env.VITE_ADMIN_RAW_ENDPOINT ||
-    getRuntimeRawEndpoint() ||
-    ADMIN_ENDPOINTS.rawDatabase
-  );
-}
-
-function getAdminRawTableEndpointTemplate() {
-  return (
-    import.meta.env.VITE_ADMIN_RAW_TABLE_ENDPOINT_TEMPLATE ||
-    getRuntimeRawTableEndpointTemplate() ||
-    ""
-  );
-}
-
-function applyTableEndpointTemplate(template, table) {
-  return template
-    .replaceAll("{tableKey}", table.tableKey)
-    .replaceAll("{table}", table.snakeName)
-    .replaceAll("{snake}", table.snakeName)
-    .replaceAll("{kebab}", table.kebabName);
-}
-
-function requireAuthHeader(authHeader) {
+function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
     throw new ApiRequestError("Vui lòng đăng nhập admin trước khi tải dữ liệu.", {
       status: 401,
       payload: null,
-      endpoint: getAdminRawEndpoint(),
+      endpoint,
     });
   }
 
   return authHeader;
 }
 
-function unwrapRawPayload(payload) {
-  return payload?.data?.tables || payload?.tables || payload?.data || payload || {};
-}
-
-function unwrapRowsPayload(payload) {
+function getArrayPayload(payload) {
   const source =
-    payload?.data?.rows ||
     payload?.data?.items ||
     payload?.data?.content ||
     payload?.data ||
-    payload?.rows ||
     payload?.items ||
     payload?.content ||
     payload?.records ||
-    payload?.result ||
     payload;
 
   return Array.isArray(source) ? source : [];
 }
 
-function normalizeTableListPayload(source) {
-  if (!Array.isArray(source)) {
-    return null;
-  }
-
-  return source.reduce((result, item) => {
-    const tableKey = item?.key || item?.table || item?.name;
-    const rows = item?.rows || item?.data || item?.items;
-
-    if (tableKey && Array.isArray(rows)) {
-      result[tableKey] = rows;
-    }
-
-    return result;
-  }, {});
-}
-
-function pickTableRows(source, aliases) {
-  const tableSource = normalizeTableListPayload(source) || source;
-
-  for (const alias of aliases) {
-    if (Array.isArray(tableSource?.[alias])) {
-      return tableSource[alias];
-    }
-  }
-
-  return [];
-}
-
-function getTableEndpointCandidates(table) {
-  const template = getAdminRawTableEndpointTemplate();
-
-  if (template) {
-    return [applyTableEndpointTemplate(template, table)];
-  }
-
-  return [
-    `${ADMIN_ENDPOINTS.rawDatabase}/${table.snakeName}`,
-    `${ADMIN_ENDPOINTS.rawDatabase}/${table.kebabName}`,
-    `${ADMIN_ENDPOINTS.rawDatabase}?table=${encodeURIComponent(table.snakeName)}`,
-  ];
-}
-
-async function fetchJsonEndpoint(endpoint, authHeader) {
+async function fetchAdminRawEndpoint(endpoint, authHeader) {
   let response;
 
   try {
@@ -154,7 +46,7 @@ async function fetchJsonEndpoint(endpoint, authHeader) {
       method: "GET",
       headers: {
         Accept: "application/json",
-        Authorization: requireAuthHeader(authHeader),
+        Authorization: requireAuthHeader(authHeader, endpoint),
       },
     });
   } catch (error) {
@@ -178,58 +70,254 @@ async function fetchJsonEndpoint(endpoint, authHeader) {
     );
   }
 
-  return payload;
+  return getArrayPayload(payload);
 }
 
-function getRawTableRecordCount(tables) {
-  return Object.values(tables).reduce(
-    (total, rows) => total + (Array.isArray(rows) ? rows.length : 0),
-    0
-  );
+function normalizeDate(value) {
+  return value || null;
 }
 
-async function fetchRawTable(table, authHeader) {
-  const errors = [];
+function normalizeAccountStatus(value) {
+  return String(value || "available").trim().toLowerCase();
+}
 
-  for (const endpoint of getTableEndpointCandidates(table)) {
-    try {
-      const payload = await fetchJsonEndpoint(endpoint, authHeader);
-      return unwrapRowsPayload(payload);
-    } catch (error) {
-      errors.push(error);
-    }
+function normalizeEggStatus(rawEgg) {
+  const status = String(rawEgg.status || "").trim().toUpperCase();
+
+  if (status === "CLAIMED") return "hatched";
+  if (status === "CANCELLED") return "locked";
+
+  if (Number(rawEgg.eggType) === 2 && rawEgg.hatchAt) {
+    return new Date(rawEgg.hatchAt).getTime() > Date.now() ? "incubating" : "ready";
   }
 
-  const lastError = errors.at(-1);
-
-  throw new ApiRequestError(lastError?.message || "Không tải được bảng raw.", {
-    status: lastError?.status || 0,
-    payload: lastError?.payload || null,
-    endpoint: lastError?.endpoint || getTableEndpointCandidates(table)[0],
-  });
+  return status ? status.toLowerCase() : "ready";
 }
 
-async function fetchRawTablesIndividually(authHeader) {
+function normalizeOrderStatus(order) {
+  const deliveryStatus = String(order.deliveryStatus || "").trim().toLowerCase();
+
+  if (deliveryStatus.includes("cancel") || deliveryStatus.includes("huy")) {
+    return "Cancel";
+  }
+
+  if (
+    deliveryStatus.includes("delivered") ||
+    deliveryStatus.includes("completed") ||
+    deliveryStatus.includes("success") ||
+    deliveryStatus.includes("giao")
+  ) {
+    return "Paid";
+  }
+
+  return "Pending";
+}
+
+function uniqueById(rows) {
+  const map = new Map();
+
+  rows.forEach((row) => {
+    if (row?.id && !map.has(row.id)) {
+      map.set(row.id, row);
+    }
+  });
+
+  return [...map.values()];
+}
+
+function normalizeCustomers(customers) {
+  return customers.map((customer) => ({
+    id: customer.id,
+    customerCode: customer.customerCode,
+    customerName: customer.customerName,
+    status: customer.status,
+    successCount: customer.successCount || 0,
+    returnStreak: customer.returnStreak || 0,
+    warningCount: customer.warningCount || 0,
+    createdAt: normalizeDate(customer.createdAt),
+    updatedAt: normalizeDate(customer.updatedAt),
+  }));
+}
+
+function normalizeGiftAccounts(accounts) {
+  return accounts.map((account) => ({
+    id: account.id,
+    username: account.username,
+    password: account.password || "",
+    status: normalizeAccountStatus(account.status),
+    tier: account.tier || "",
+    platform: account.platform || "",
+    token: account.token || "",
+    created_at: normalizeDate(account.createdAt || account.created_at),
+    assigned_at: normalizeDate(account.assignedAt || account.assigned_at),
+  }));
+}
+
+function normalizeGiftPools(pools) {
+  return pools.map((pool) => ({
+    id: pool.id,
+    pool_name: pool.poolName || pool.pool_name,
+    tier: pool.tier || "",
+    created_at: normalizeDate(pool.createdAt || pool.created_at),
+  }));
+}
+
+function normalizeOrders(orders) {
+  return orders.map((order) => ({
+    id: order.id,
+    order_code: order.orderCode || order.order_code,
+    customer_code: order.customerCode,
+    source_name: "KiotViet",
+    total_price: Number(order.totalPrice || order.total_price || 0),
+    financial_status: order.financialStatus || "",
+    fulfillment_status: order.deliveryStatus || order.fulfillment_status || "",
+    status: order.status || normalizeOrderStatus(order),
+    created_at: normalizeDate(order.createdAt || order.created_at),
+    updated_at: normalizeDate(order.updatedAt || order.updated_at || order.lastSyncedAt),
+  }));
+}
+
+function normalizeOrderItems(orders) {
+  return orders.flatMap((order) =>
+    (order.orderItems || []).map((item) => ({
+      id: item.id,
+      order_id: order.id,
+      sapo_product_id: item.kvProductId || item.sapo_product_id || "",
+      sapo_variant_id: "",
+      product_name: item.productName || "",
+      sku: item.sku || "",
+      quantity: Number(item.quantity || 0),
+    }))
+  );
+}
+
+function normalizeProductEggMappings(products) {
+  return products.flatMap((product) =>
+    (product.mappings || []).map((mapping) => ({
+      id: mapping.id,
+      sapo_product_id: String(product.kvProductId || ""),
+      sapo_variant_id: "",
+      egg_type: Number(mapping.eggType || 0),
+      gift_pool_id: mapping.giftPool?.id || "",
+      egg_tier: mapping.eggTier || mapping.giftPool?.tier || "",
+      created_at: normalizeDate(mapping.createdAt),
+      updated_at: normalizeDate(mapping.updatedAt),
+    }))
+  );
+}
+
+function normalizeProducts(products) {
+  return products.map((product) => ({
+    id: String(product.kvProductId || ""),
+    kvProductId: product.kvProductId,
+    name: product.name,
+    fullName: product.fullName,
+    basePrice: product.basePrice || 0,
+    imageUrl: product.imageUrl || "",
+    lastSyncedAt: normalizeDate(product.lastSyncedAt),
+  }));
+}
+
+function normalizeEggs(eggs) {
+  return eggs.map((egg) => ({
+    id: egg.id,
+    order_id: egg.order?.id || "",
+    account_id: egg.account?.id || "",
+    gift_pool_id: egg.giftPool?.id || "",
+    egg_type: Number(egg.eggType || 0),
+    status: normalizeEggStatus(egg),
+    hatch_at: normalizeDate(egg.hatchAt),
+    created_at: normalizeDate(egg.createdAt),
+    updated_at: normalizeDate(egg.updatedAt),
+  }));
+}
+
+function deriveOrdersFromEggs(eggs) {
+  return uniqueById(
+    eggs
+      .map((egg) => egg.order)
+      .filter(Boolean)
+      .map((order) => ({
+        id: order.id,
+        order_code: order.orderCode,
+        source_name: "KiotViet",
+        total_price: 0,
+        financial_status: "",
+        fulfillment_status: order.deliveryStatus || "",
+        status: normalizeOrderStatus(order),
+        created_at: "",
+        updated_at: "",
+      }))
+  );
+}
+
+function deriveAccountsFromEggs(eggs) {
+  return normalizeGiftAccounts(eggs.map((egg) => egg.account).filter(Boolean));
+}
+
+function derivePoolsFromEggs(eggs) {
+  return normalizeGiftPools(eggs.map((egg) => egg.giftPool).filter(Boolean));
+}
+
+function derivePoolsFromProducts(products) {
+  return normalizeGiftPools(
+    products
+      .flatMap((product) => product.mappings || [])
+      .map((mapping) => mapping.giftPool)
+      .filter(Boolean)
+  );
+}
+
+function mergeAdminRawRows(raw) {
+  const customers = normalizeCustomers(raw.customers || []);
+  const orders = normalizeOrders(raw.orders || []);
+  const eggs = normalizeEggs(raw.eggs || []);
+  const giftAccounts = normalizeGiftAccounts(raw.giftAccounts || []);
+  const giftPools = normalizeGiftPools(raw.giftPools || []);
+  const products = normalizeProducts(raw.products || []);
+
+  return {
+    customers,
+    products,
+    sapoOrders: uniqueById([...orders, ...deriveOrdersFromEggs(raw.eggs || [])]),
+    sapoOrderItems: normalizeOrderItems(raw.orders || []),
+    eggs,
+    productEggMappings: normalizeProductEggMappings(raw.products || []),
+    giftPools: uniqueById([
+      ...giftPools,
+      ...derivePoolsFromEggs(raw.eggs || []),
+      ...derivePoolsFromProducts(raw.products || []),
+    ]),
+    giftAccounts: uniqueById([
+      ...giftAccounts,
+      ...deriveAccountsFromEggs(raw.eggs || []),
+    ]),
+    poolAccountMappings: [],
+    eggOpeningLogs: [],
+  };
+}
+
+export async function fetchAdminRawTables(authHeader) {
   const results = await Promise.allSettled(
-    TABLE_ENDPOINTS.map(async (table) => [
-      table.tableKey,
-      await fetchRawTable(table, authHeader),
+    RAW_ENDPOINTS.map(async ([key, endpoint]) => [
+      key,
+      await fetchAdminRawEndpoint(endpoint, authHeader),
     ])
   );
-  const tables = {};
+  const raw = {};
   const errors = [];
 
   results.forEach((result) => {
     if (result.status === "fulfilled") {
-      const [tableKey, rows] = result.value;
-      tables[tableKey] = rows;
+      const [key, rows] = result.value;
+      raw[key] = rows;
       return;
     }
 
     errors.push(result.reason);
   });
 
-  if (!Object.keys(tables).length) {
+  if (!Object.keys(raw).length) {
     const firstError = errors[0];
 
     throw new ApiRequestError(
@@ -237,42 +325,10 @@ async function fetchRawTablesIndividually(authHeader) {
       {
         status: firstError?.status || 0,
         payload: firstError?.payload || null,
-        endpoint: firstError?.endpoint || ADMIN_ENDPOINTS.rawDatabase,
+        endpoint: firstError?.endpoint || ADMIN_ENDPOINTS.eggs,
       }
     );
   }
 
-  return normalizeAdminRawTables(tables);
-}
-
-export function normalizeAdminRawTables(payload) {
-  const source = unwrapRawPayload(payload);
-
-  return Object.fromEntries(
-    Object.entries(TABLE_KEY_ALIASES).map(([tableKey, aliases]) => [
-      tableKey,
-      pickTableRows(source, aliases),
-    ])
-  );
-}
-
-export async function fetchAdminRawTables(authHeader) {
-  const endpoint = getAdminRawEndpoint();
-
-  try {
-    const payload = await fetchJsonEndpoint(endpoint, authHeader);
-    const tables = normalizeAdminRawTables(payload);
-
-    if (getRawTableRecordCount(tables) > 0) {
-      return tables;
-    }
-  } catch (error) {
-    console.error("[AGMC API] Raw aggregate load failed", {
-      endpoint,
-      status: error.status,
-      payload: error.payload,
-    });
-  }
-
-  return fetchRawTablesIndividually(authHeader);
+  return mergeAdminRawRows(raw);
 }
