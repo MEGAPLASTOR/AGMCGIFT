@@ -25,6 +25,7 @@ export function AdminAccountImportPanel({
   onImported,
 }) {
   const [isImporting, setIsImporting] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleFileChange = async (event) => {
     const file = event.target.files?.[0];
@@ -57,8 +58,55 @@ export function AdminAccountImportPanel({
     }
   };
 
+  const handleDrop = async (event) => {
+    event.preventDefault();
+    setIsDragOver(false);
+
+    if (isImporting) {
+      return;
+    }
+
+    const file = event.dataTransfer.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    setIsImporting(true);
+
+    try {
+      if (onUploadGiftAccounts) {
+        const payload = await onUploadGiftAccounts(file);
+        onImported(getUploadSuccessMessage(payload));
+        return;
+      }
+
+      const payload = await parseAccountImportFile(file);
+      const result = onImportGiftAccounts(payload);
+      const mappingMessage = result.mappingsImported
+        ? ` và ${result.mappingsImported} liên kết kho`
+        : "";
+
+      onImported(`Đã nhập ${result.accountsImported} account${mappingMessage}.`);
+    } catch (error) {
+      onImported(error.message || "Không thể nhập file account.");
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
   return (
-    <div className="admin-account-import">
+    <div
+      className={`admin-account-import${isDragOver ? " is-drag-over" : ""}`}
+      onDragLeave={() => setIsDragOver(false)}
+      onDragOver={(event) => {
+        event.preventDefault();
+        if (!isImporting) {
+          setIsDragOver(true);
+        }
+      }}
+      onDrop={handleDrop}
+    >
       <div>
         <strong>Nhập account từ Excel</strong>
         <span>Cột bắt buộc: username, password. Có thể thêm tier A/B/C/D, platform, token.</span>

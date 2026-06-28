@@ -528,6 +528,16 @@
   background: #fff4a2;
   margin-bottom: 12px;
   padding: 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-account-import.is-drag-over {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.16);
+  transform: translateY(-2px);
 }
 
 .admin-account-import div {
@@ -622,6 +632,194 @@
 
 .admin-crud-actions button {
   flex: 1 1 150px;
+}
+
+.admin-dnd-wrap {
+  min-width: 0;
+}
+
+.admin-dnd-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  align-items: start;
+  min-width: 0;
+}
+
+.admin-dnd-column {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-width: 0;
+  min-height: 320px;
+  border: 1px solid rgba(23, 32, 42, 0.12);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-dnd-column.is-drag-over {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.14);
+  transform: translateY(-2px);
+}
+
+.admin-dnd-column__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-dnd-column__head div,
+.admin-dnd-card__main {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-dnd-column__head span,
+.admin-dnd-card__main span,
+.admin-dnd-card__meta small {
+  color: #526071;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.admin-dnd-column__head strong,
+.admin-dnd-card__main strong {
+  color: #17202a;
+  font-weight: 1000;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.admin-dnd-column__head strong {
+  font-size: 16px;
+}
+
+.admin-dnd-column__head em {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  min-width: 34px;
+  min-height: 30px;
+  border-radius: 999px;
+  background: #e8f5ff;
+  color: #17202a;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 1000;
+  padding: 5px 9px;
+}
+
+.admin-dnd-card-list {
+  display: grid;
+  gap: 8px;
+  min-height: 160px;
+}
+
+.admin-dnd-card {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(23, 32, 42, 0.14);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17202a;
+  cursor: grab;
+  padding: 10px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-dnd-card.is-readonly {
+  cursor: default;
+}
+
+.admin-dnd-card:active {
+  cursor: grabbing;
+}
+
+.admin-dnd-card.is-readonly:active {
+  cursor: default;
+}
+
+.admin-dnd-card:hover,
+.admin-dnd-card:focus-visible,
+.admin-dnd-card.is-selected {
+  border-color: #2563eb;
+  box-shadow: 0 8px 18px rgba(23, 32, 42, 0.12);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.admin-dnd-card.is-dragging {
+  opacity: 0.48;
+}
+
+.admin-dnd-card__grip {
+  color: #94a3b8;
+}
+
+.admin-dnd-card__main strong {
+  font-size: 14px;
+}
+
+.admin-dnd-card .admin-mini-button {
+  min-height: 34px;
+  padding: 7px 10px;
+}
+
+.admin-dnd-card__meta {
+  display: grid;
+  grid-column: 2 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  min-width: 0;
+}
+
+.admin-dnd-card__meta small {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 7px;
+}
+
+.admin-dnd-card__meta b {
+  color: #17202a;
+  font-size: 11px;
+  font-weight: 1000;
+  line-height: 1.2;
+}
+
+.admin-dnd-card__meta span {
+  overflow-wrap: anywhere;
+}
+
+.admin-dnd-empty {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 136px;
+  border: 1px dashed rgba(23, 32, 42, 0.22);
+  border-radius: 8px;
+  color: #64748b;
+  font-weight: 1000;
+  padding: 14px;
+  text-align: center;
 }
 
 .admin-pool-dnd-panel {
@@ -1490,6 +1688,7 @@
   .admin-pool-toolbar,
   .admin-pool-layout,
   .admin-pool-board,
+  .admin-dnd-board,
   .admin-pool-summary,
   .admin-form-grid {
     grid-template-columns: 1fr;
@@ -1587,8 +1786,22 @@
   .admin-mini-button,
   .admin-crud-toolbar button,
   .admin-pool-toolbar button,
+  .admin-dnd-card .admin-mini-button,
   .admin-pool-editor__actions button,
   .admin-crud-actions button {
     width: 100%;
+  }
+
+  .admin-dnd-card {
+    grid-template-columns: 16px minmax(0, 1fr);
+  }
+
+  .admin-dnd-card .admin-mini-button,
+  .admin-dnd-card__meta {
+    grid-column: 2 / -1;
+  }
+
+  .admin-dnd-card__meta {
+    grid-template-columns: 1fr;
   }
 }

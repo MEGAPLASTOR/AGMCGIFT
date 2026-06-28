@@ -3,7 +3,6 @@ import {
   FaBoxOpen,
   FaFloppyDisk,
   FaGripVertical,
-  FaLayerGroup,
   FaPen,
   FaPlus,
   FaRotateLeft,
