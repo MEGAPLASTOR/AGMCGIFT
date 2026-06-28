@@ -80,7 +80,7 @@ function hasCooldown(egg) {
   );
 }
 
-function getChoice(rawEgg, egg, index) {
+function getChoice(rawEgg, egg, index, totalEggs) {
   const explicitChoice = getExplicitChoice(rawEgg);
 
   if (explicitChoice) {
@@ -97,6 +97,10 @@ function getChoice(rawEgg, egg, index) {
     }
   }
 
+  if (totalEggs > 1) {
+    return index === 0 ? EGG_CHOICES.instant : EGG_CHOICES.delayed;
+  }
+
   if (Number(egg.eggType) === 2) {
     return EGG_CHOICES.delayed;
   }
@@ -104,7 +108,7 @@ function getChoice(rawEgg, egg, index) {
   return index === 0 ? EGG_CHOICES.instant : EGG_CHOICES.delayed;
 }
 
-export function normalizeEgg(rawEgg, index = 0) {
+export function normalizeEgg(rawEgg, index = 0, totalEggs = 0) {
   const egg = {
     eggId: rawEgg.eggId || rawEgg.id || rawEgg.egg_id,
     eggType: Number(rawEgg.eggType ?? rawEgg.egg_type ?? 0),
@@ -119,6 +123,6 @@ export function normalizeEgg(rawEgg, index = 0) {
   return {
     ...egg,
     requiresIncubation,
-    choice: getChoice(rawEgg, egg, index),
+    choice: getChoice(rawEgg, egg, index, totalEggs),
   };
 }

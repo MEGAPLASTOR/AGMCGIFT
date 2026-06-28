@@ -127,6 +127,8 @@ export const ADMIN_TABLES = [
       select("status", "Trạng thái nhận quà", orderStatusOptions),
       dateTime("created_at", "Ngày tạo"),
       dateTime("updated_at", "Ngày cập nhật"),
+      dateTime("delivered_at", "Ngày giao thành công", { nullable: true }),
+      dateTime("last_synced_at", "Đồng bộ cuối", { nullable: true }),
     ],
   },
   {

@@ -27,11 +27,12 @@ function createEggMap(eggs) {
 }
 
 function normalizeEggRows(root) {
-  return getEggRows(root)
-    .map((rawEgg, index) => normalizeEgg(rawEgg, index))
+  const rows = getEggRows(root).slice(0, 2);
+
+  return rows
+    .map((rawEgg, index) => normalizeEgg(rawEgg, index, rows.length))
     .filter((egg) => egg.eggId)
     .sort((first, second) => first.slot - second.slot)
-    .slice(0, 2);
 }
 
 export function normalizeSyncEggResponse(payload, orderCode) {

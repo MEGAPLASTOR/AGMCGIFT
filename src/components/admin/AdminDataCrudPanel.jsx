@@ -38,7 +38,7 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   customers: ["customerCode", "customerName", "status", "successCount", "warningCount"],
   eggs: ["egg_type", "status", "hatch_at", "order_id", "account_id"],
   giftPools: ["pool_name", "tier", "created_at"],
-  adminOrders: ["order_code", "status", "financial_status", "fulfillment_status", "total_price"],
+  adminOrders: ["order_code", "status", "fulfillment_status", "delivered_at", "last_synced_at"],
   poolAccountMappings: ["pool_id", "account_id"],
   productEggMappings: ["kv_product_id", "egg_type", "gift_pool_id", "egg_tier"],
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
