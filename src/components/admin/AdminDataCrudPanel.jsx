@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  FaBoxOpen,
   FaFloppyDisk,
+  FaGripVertical,
+  FaLayerGroup,
   FaPen,
   FaPlus,
   FaRotateLeft,
@@ -41,6 +44,176 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   productEggMappings: ["kv_product_id", "egg_type", "gift_pool_id", "egg_tier"],
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
 };
+
+const BOARD_CONFIG_BY_TABLE = {
+  giftAccounts: {
+    field: "status",
+    fallbackValue: "available",
+    values: ["available", "reserved", "used"],
+  },
+  customers: {
+    field: "status",
+    fallbackValue: "ACTIVE",
+    values: ["ACTIVE", "WARNING", "BANNED"],
+  },
+  eggs: {
+    field: "status",
+    fallbackValue: "ready",
+    values: ["locked", "ready", "incubating", "hatched"],
+  },
+  productEggMappings: {
+    field: "egg_type",
+    fallbackValue: 1,
+    values: [1, 2],
+  },
+  products: {
+    field: "__mappingStatus",
+    fallbackValue: "unmapped",
+    readOnly: true,
+    values: ["mapped", "unmapped"],
+  },
+  adminOrders: {
+    field: "status",
+    fallbackValue: "Pending",
+    values: ["Paid", "Pending", "Cancel"],
+  },
+};
+
+const PRODUCT_MAPPING_LABELS = {
+  mapped: "Đã mapping",
+  unmapped: "Chưa mapping",
+};
+
+function normalizeBoardValue(value) {
+  return String(value ?? "").trim();
+}
+
+function getProductComparableId(product) {
+  return normalizeBoardValue(
+    product?.kvProductId ||
+      product?.kv_product_id ||
+      product?.productId ||
+      product?.id
+  );
+}
+
+function getBoardConfig(tableKey) {
+  return BOARD_CONFIG_BY_TABLE[tableKey] || {
+    field: "id",
+    fallbackValue: "records",
+    readOnly: true,
+    values: ["records"],
+  };
+}
+
+function getBoardValue(tableKey, row, tables, config) {
+  if (config.field === "__mappingStatus") {
+    const productId = getProductComparableId(row);
+    const hasMapping = (tables.productEggMappings || []).some(
+      (mapping) => normalizeBoardValue(mapping.kv_product_id) === productId
+    );
+
+    return hasMapping ? "mapped" : "unmapped";
+  }
+
+  const rawValue = row?.[config.field];
+  const normalizedValue = normalizeBoardValue(rawValue);
+
+  if (!normalizedValue) {
+    return config.fallbackValue;
+  }
+
+  return rawValue;
+}
+
+function getBoardValues(tableKey, rows, tables) {
+  const config = getBoardConfig(tableKey);
+  const values = new Map();
+
+  (config.values || []).forEach((value) => {
+    values.set(normalizeBoardValue(value), value);
+  });
+
+  rows.forEach((row) => {
+    const value = getBoardValue(tableKey, row, tables, config);
+    values.set(normalizeBoardValue(value), value);
+  });
+
+  if (!values.size) {
+    values.set(normalizeBoardValue(config.fallbackValue), config.fallbackValue);
+  }
+
+  return [...values.values()];
+}
+
+function getOptionLabel(fields, fieldKey, value) {
+  const field = fields.find((item) => item.key === fieldKey);
+  const option = field?.options?.find(
+    (item) => normalizeBoardValue(item.value) === normalizeBoardValue(value)
+  );
+
+  return option?.label || normalizeBoardValue(value) || "Chưa phân loại";
+}
+
+function getBoardLabel(tableKey, fields, config, value) {
+  if (config.field === "__mappingStatus") {
+    return PRODUCT_MAPPING_LABELS[value] || value;
+  }
+
+  if (tableKey === "customers") {
+    const labels = {
+      ACTIVE: "Đang ổn",
+      WARNING: "Cảnh báo",
+      BANNED: "Bị khóa",
+    };
+
+    return labels[normalizeBoardValue(value).toUpperCase()] || normalizeBoardValue(value);
+  }
+
+  return getOptionLabel(fields, config.field, value);
+}
+
+function getRecordCardTitle(tableKey, row, recordId) {
+  if (tableKey === "giftAccounts") {
+    return row.username || recordId;
+  }
+
+  if (tableKey === "customers") {
+    return row.customerName || row.customerCode || recordId;
+  }
+
+  if (tableKey === "eggs") {
+    return row.id || recordId;
+  }
+
+  if (tableKey === "productEggMappings") {
+    return `${row.kv_product_id || "product"} -> ${row.gift_pool_id || "pool"}`;
+  }
+
+  if (tableKey === "products") {
+    return row.name || row.fullName || row.id || recordId;
+  }
+
+  if (tableKey === "adminOrders") {
+    return row.order_code || recordId;
+  }
+
+  return recordId || "Bản ghi";
+}
+
+function getRecordCardFields(tableKey, row, fields, boardField) {
+  const priorityColumns = PRIORITY_COLUMNS_BY_TABLE[tableKey] || getVisibleColumns([row]);
+
+  return priorityColumns
+    .filter((key) => key !== boardField)
+    .map((key) => ({
+      key,
+      label: getColumnLabel(fields, key),
+      value: row[key],
+    }))
+    .filter((item) => item.value !== undefined && item.value !== null && item.value !== "")
+    .slice(0, 4);
+}
 function getPriorityColumns(tableKey, rows, fields) {
   const preferredColumns = PRIORITY_COLUMNS_BY_TABLE[tableKey] || [];
 
@@ -163,6 +336,8 @@ export function AdminDataCrudPanel({
   const [formValues, setFormValues] = useState({});
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [draggingRecordId, setDraggingRecordId] = useState("");
+  const [dragOverValue, setDragOverValue] = useState("");
 
   const rows = tables[tableKey] || EMPTY_ROWS;
   const allowedTableKeySet = useMemo(
@@ -204,6 +379,29 @@ export function AdminDataCrudPanel({
       getPriorityColumns(tableKey, filteredRows.length ? filteredRows : rows, fields),
     [fields, filteredRows, rows, tableKey]
   );
+  const boardConfig = useMemo(() => getBoardConfig(tableKey), [tableKey]);
+  const boardValues = useMemo(
+    () => getBoardValues(tableKey, filteredRows.length ? filteredRows : rows, tables),
+    [filteredRows, rows, tableKey, tables]
+  );
+  const boardRowsByValue = useMemo(() => {
+    const map = new Map(
+      boardValues.map((value) => [normalizeBoardValue(value), []])
+    );
+
+    filteredRows.forEach((row) => {
+      const value = getBoardValue(tableKey, row, tables, boardConfig);
+      const key = normalizeBoardValue(value);
+
+      if (!map.has(key)) {
+        map.set(key, []);
+      }
+
+      map.get(key).push(row);
+    });
+
+    return map;
+  }, [boardConfig, boardValues, filteredRows, tableKey, tables]);
   const hasActiveForm = Object.keys(formValues).length > 0;
   const recordTitle = getRecordTitle(tableKey, formValues, selectedRecordId);
   const addButtonLabel = isGiftAccountsTable
@@ -430,6 +628,90 @@ export function AdminDataCrudPanel({
     changeTable(event.target.value);
   };
 
+  const persistDraggedRecord = async (recordId, nextValue) => {
+    if (isSaving || boardConfig.readOnly) {
+      return;
+    }
+
+    const currentRecord = rows.find(
+      (row) => normalizeBoardValue(getRecordId(row, tableKey)) === normalizeBoardValue(recordId)
+    );
+
+    if (!currentRecord) {
+      return;
+    }
+
+    const currentValue = getBoardValue(tableKey, currentRecord, tables, boardConfig);
+
+    if (normalizeBoardValue(currentValue) === normalizeBoardValue(nextValue)) {
+      setDraggingRecordId("");
+      setDragOverValue("");
+      return;
+    }
+
+    const nextRecord = {
+      ...currentRecord,
+      [boardConfig.field]: nextValue,
+    };
+
+    setIsSaving(true);
+
+    try {
+      let savedRecord = nextRecord;
+
+      if (isGiftAccountsTable && onUpdateGiftAccount) {
+        savedRecord = await onUpdateGiftAccount(nextRecord, recordId);
+      } else if (isCustomersTable && onUpdateCustomerStatus) {
+        savedRecord = await onUpdateCustomerStatus(nextRecord, recordId);
+      } else if (isProductMappingsTable && onSaveProductEggMapping) {
+        savedRecord = await onSaveProductEggMapping(nextRecord, recordId);
+      }
+
+      onSaveRecord(tableKey, savedRecord);
+      setSelectedRecordId(getRecordId(savedRecord, tableKey) || recordId);
+      setFormValues(normalizeRecordForForm(savedRecord, tableKey));
+      setMessage("Đã cập nhật bằng kéo thả.");
+    } catch (error) {
+      setMessage(error.message || "Không thể cập nhật bằng kéo thả.");
+    } finally {
+      setIsSaving(false);
+      setDraggingRecordId("");
+      setDragOverValue("");
+    }
+  };
+
+  const handleRecordDragStart = (event, recordId) => {
+    if (boardConfig.readOnly) {
+      event.preventDefault();
+      return;
+    }
+
+    setDraggingRecordId(recordId);
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", recordId);
+  };
+
+  const handleBoardDragOver = (event, value) => {
+    if (boardConfig.readOnly) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    setDragOverValue(normalizeBoardValue(value));
+  };
+
+  const handleBoardDrop = (event, value) => {
+    if (boardConfig.readOnly) {
+      return;
+    }
+
+    event.preventDefault();
+    const recordId = event.dataTransfer.getData("text/plain");
+
+    persistDraggedRecord(recordId, value);
+  };
+
   if (isGiftPoolsTable || isPoolMappingsTable) {
     return (
       <AdminGiftPoolDragPanel
@@ -492,7 +774,7 @@ export function AdminDataCrudPanel({
       </div>
 
       <div className="admin-crud-grid">
-        <div className="admin-table-wrap">
+        <div className="admin-dnd-wrap">
           {isGiftAccountsTable && onImportGiftAccounts ? (
             <AdminAccountImportPanel
               onImportGiftAccounts={onImportGiftAccounts}
@@ -501,7 +783,109 @@ export function AdminDataCrudPanel({
             />
           ) : null}
 
-          <table className="admin-table admin-crud-table">
+          <div className="admin-dnd-board">
+            {boardValues.map((value) => {
+              const valueKey = normalizeBoardValue(value);
+              const columnRows = boardRowsByValue.get(valueKey) || [];
+              const isDragOver = dragOverValue === valueKey;
+
+              return (
+                <section
+                  className={`admin-dnd-column${isDragOver ? " is-drag-over" : ""}`}
+                  key={valueKey || "empty"}
+                  onDragLeave={() => setDragOverValue("")}
+                  onDragOver={(event) => handleBoardDragOver(event, value)}
+                  onDrop={(event) => handleBoardDrop(event, value)}
+                >
+                  <div className="admin-dnd-column__head">
+                    <div>
+                      <span>{getColumnLabel(fields, boardConfig.field)}</span>
+                      <strong>
+                        {getBoardLabel(tableKey, fields, boardConfig, value)}
+                      </strong>
+                    </div>
+                    <em>{columnRows.length}</em>
+                  </div>
+
+                  <div className="admin-dnd-card-list" role="list">
+                    {columnRows.length ? (
+                      columnRows.map((row) => {
+                        const recordId = getRecordId(row, tableKey);
+                        const cardFields = getRecordCardFields(
+                          tableKey,
+                          row,
+                          fields,
+                          boardConfig.field
+                        );
+                        const isDragging =
+                          normalizeBoardValue(draggingRecordId) ===
+                          normalizeBoardValue(recordId);
+
+                        return (
+                          <article
+                            className={`admin-dnd-card${
+                              selectedRecordId === recordId ? " is-selected" : ""
+                            }${isDragging ? " is-dragging" : ""}${
+                              boardConfig.readOnly ? " is-readonly" : ""
+                            }`}
+                            draggable={!boardConfig.readOnly}
+                            key={recordId}
+                            role="listitem"
+                            tabIndex={0}
+                            onClick={() => startEdit(row)}
+                            onDragEnd={() => {
+                              setDraggingRecordId("");
+                              setDragOverValue("");
+                            }}
+                            onDragStart={(event) =>
+                              handleRecordDragStart(event, recordId)
+                            }
+                          >
+                            <FaGripVertical
+                              aria-hidden="true"
+                              className="admin-dnd-card__grip"
+                            />
+                            <div className="admin-dnd-card__main">
+                              <strong>
+                                {getRecordCardTitle(tableKey, row, recordId)}
+                              </strong>
+                              <span>{recordId || "no-id"}</span>
+                            </div>
+                            <button
+                              type="button"
+                              className="admin-mini-button"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                startEdit(row);
+                              }}
+                            >
+                              <FaPen aria-hidden="true" />
+                              Sửa
+                            </button>
+                            <div className="admin-dnd-card__meta">
+                              {cardFields.map((item) => (
+                                <small key={item.key}>
+                                  <b>{item.label}</b>
+                                  <span>{String(item.value ?? "-")}</span>
+                                </small>
+                              ))}
+                            </div>
+                          </article>
+                        );
+                      })
+                    ) : (
+                      <div className="admin-dnd-empty">
+                        <FaBoxOpen aria-hidden="true" />
+                        <span>Trống</span>
+                      </div>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          <table className="admin-table admin-crud-table" hidden>
             <thead>
               <tr>
                 <th>Thao tác</th>
