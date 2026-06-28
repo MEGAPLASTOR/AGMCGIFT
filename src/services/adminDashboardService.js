@@ -235,8 +235,8 @@ function buildOperationalAlerts({
 // Backend nên tạo API, ví dụ /admin/analytics, trả về cùng shape dữ liệu để thay thế hàm này.
 export function buildAdminDashboard(tables) {
   const customers = tables.customers || [];
-  const orders = tables.kiotvietOrders || [];
-  const orderItems = tables.kiotvietOrderItems || [];
+  const orders = tables.adminOrders || [];
+  const orderItems = tables.adminOrderItems || [];
   const products = tables.products || [];
   const eggs = tables.eggs || [];
   const giftPools = tables.giftPools || [];
@@ -379,7 +379,7 @@ export function buildAdminDashboard(tables) {
     },
     workflow: [
       {
-        title: "Đồng bộ KiotViet",
+        title: "Đồng bộ đơn hàng",
         value: orders.length,
         note: "orders raw",
       },

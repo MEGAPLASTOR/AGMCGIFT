@@ -12,10 +12,10 @@ export function AdminLoginPanel({ error, isLoading, onLogin }) {
   return (
     <section className="admin-login-card">
       <div>
-        <p className="admin-eyebrow">AGMC KiotViet Admin</p>
+        <p className="admin-eyebrow">Anh Gà MC Gift Code Admin</p>
         <h1>Đăng nhập quản trị</h1>
         <p>
-          Quản lý đơn KiotViet, trứng thưởng và kho tài khoản quà.
+          Quản lý đơn hàng gift code, trứng thưởng và kho tài khoản quà.
         </p>
       </div>
 

@@ -6,20 +6,20 @@ function normalizeCode(value) {
     .toUpperCase();
 }
 
-// KIOTVIET_BACKEND_CHUAN_HOA_TRANG_THAI:
-// Backend nên map trạng thái đơn KiotViet về đúng 3 giá trị: Pending, Paid, Cancel.
+// BACKEND_CHUAN_HOA_TRANG_THAI:
+// Backend nên map trạng thái đơn hàng về đúng 3 giá trị: Pending, Paid, Cancel.
 function normalizeStatus(value) {
   return String(value || "")
     .trim()
     .toUpperCase();
 }
 
-function getKiotvietOrders(catalogData) {
-  return catalogData.kiotvietOrders || [];
+function getAdminOrders(catalogData) {
+  return catalogData.adminOrders || [];
 }
 
-function getKiotvietOrderItems(catalogData) {
-  return catalogData.kiotvietOrderItems || [];
+function getAdminOrderItems(catalogData) {
+  return catalogData.adminOrderItems || [];
 }
 
 function getProductEggMappings(catalogData) {
@@ -39,7 +39,7 @@ function getPoolAccountMappings(catalogData) {
 }
 
 function getOrderItemByOrderId(catalogData, orderId) {
-  return getKiotvietOrderItems(catalogData).find((item) => item.order_id === orderId);
+  return getAdminOrderItems(catalogData).find((item) => item.order_id === orderId);
 }
 
 function normalizeProductFromOrderItem(orderItem) {
@@ -49,8 +49,8 @@ function normalizeProductFromOrderItem(orderItem) {
     id: orderItem.kv_product_id,
     tenSanPham: orderItem.product_name,
     maSanPham: orderItem.sku,
-    moTa: `KiotViet variant: ${orderItem.kv_variant_id || "-"}`,
-    kiotvietVariantId: orderItem.kv_variant_id,
+    moTa: `Biến thể sản phẩm: ${orderItem.kv_variant_id || "-"}`,
+    productVariantId: orderItem.kv_variant_id,
   };
 }
 
@@ -61,7 +61,7 @@ function getProducts(catalogData) {
 
   const products = new Map();
 
-  getKiotvietOrderItems(catalogData).forEach((item) => {
+  getAdminOrderItems(catalogData).forEach((item) => {
     const productId = item.kv_product_id;
 
     if (!products.has(productId)) {
@@ -92,8 +92,8 @@ function normalizeAccount(account, tier, productId, pool) {
   };
 }
 
-// KIOTVIET_BACKEND_DANH_SACH_DON:
-// Frontend đọc dữ liệu đơn KiotViet qua API backend.
+// BACKEND_DANH_SACH_DON:
+// Frontend đọc dữ liệu đơn hàng qua API backend.
 // Field cần có: order_code, status, kv_product_id.
 export function getCustomerOrders(catalogData) {
   if (catalogData.customerOrders?.length || catalogData.orders?.length) {
@@ -105,7 +105,7 @@ export function getCustomerOrders(catalogData) {
     }));
   }
 
-  return getKiotvietOrders(catalogData).map((order) => {
+  return getAdminOrders(catalogData).map((order) => {
     const orderItem = getOrderItemByOrderId(catalogData, order.id);
 
     return {
@@ -120,15 +120,15 @@ export function getCustomerOrders(catalogData) {
   });
 }
 
-// KIOTVIET_BACKEND_CHAN_DON_CHUA_HOP_LE:
+// BACKEND_CHAN_DON_CHUA_HOP_LE:
 // Chỉ đơn Paid mới được đi tiếp vào bước chọn trứng.
 // Pending/Cancel vẫn tìm được đơn nhưng bị chặn trong hook useGiftCode.
 export function isPaidOrder(order) {
   return normalizeStatus(order?.trangThai || order?.status) === "PAID";
 }
 
-// KIOTVIET_BACKEND_CHECK_MA_DON:
-// Người dùng nhập mã đơn KiotViet.
+// BACKEND_CHECK_MA_DON:
+// Người dùng nhập mã đơn hàng gift code.
 // Hàm này join theo luồng: order -> order_item -> product.
 export function findCodeInCatalog(catalogData, inputCode) {
   const normalizedCode = normalizeCode(inputCode);

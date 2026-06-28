@@ -171,7 +171,7 @@ function normalizeOrders(orders) {
     id: order.id,
     order_code: order.orderCode || order.order_code,
     customer_code: order.customerCode,
-    source_name: "KiotViet",
+    source_name: "Anh Gà MC Gift Code",
     total_price: Number(order.totalPrice || order.total_price || 0),
     financial_status: order.financialStatus || "",
     fulfillment_status: order.deliveryStatus || order.fulfillment_status || "",
@@ -244,7 +244,7 @@ function deriveOrdersFromEggs(eggs) {
       .map((order) => ({
         id: order.id,
         order_code: order.orderCode,
-        source_name: "KiotViet",
+        source_name: "Anh Gà MC Gift Code",
         total_price: 0,
         financial_status: "",
         fulfillment_status: order.deliveryStatus || "",
@@ -283,8 +283,8 @@ function mergeAdminRawRows(raw) {
   return {
     customers,
     products,
-    kiotvietOrders: uniqueById([...orders, ...deriveOrdersFromEggs(raw.eggs || [])]),
-    kiotvietOrderItems: normalizeOrderItems(raw.orders || []),
+    adminOrders: uniqueById([...orders, ...deriveOrdersFromEggs(raw.eggs || [])]),
+    adminOrderItems: normalizeOrderItems(raw.orders || []),
     eggs,
     productEggMappings: normalizeProductEggMappings(raw.products || []),
     giftPools: uniqueById([

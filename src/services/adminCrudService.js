@@ -113,8 +113,8 @@ export const ADMIN_TABLES = [
     ],
   },
   {
-    key: "kiotvietOrders",
-    label: "kiotviet_orders",
+    key: "adminOrders",
+    label: "orders",
     idField: "id",
     fields: [
       text("id", "ID", { required: true, wide: true }),
@@ -129,14 +129,14 @@ export const ADMIN_TABLES = [
     ],
   },
   {
-    key: "kiotvietOrderItems",
-    label: "kiotviet_order_items",
+    key: "adminOrderItems",
+    label: "order_items",
     idField: "id",
     fields: [
       text("id", "ID", { required: true, wide: true }),
       text("order_id", "ID đơn hàng", { required: true }),
-      text("kv_product_id", "ID sản phẩm KiotViet"),
-      text("kv_variant_id", "ID biến thể KiotViet"),
+      text("kv_product_id", "ID sản phẩm AGMC"),
+      text("kv_variant_id", "ID biến thể AGMC"),
       text("product_name", "Tên sản phẩm", { wide: true }),
       text("sku", "SKU"),
       number("quantity", "Số lượng"),
@@ -148,7 +148,7 @@ export const ADMIN_TABLES = [
     idField: "id",
     fields: [
       text("id", "ID", { required: true, wide: true }),
-      text("kvProductId", "ID KiotViet"),
+      text("kvProductId", "ID sản phẩm AGMC"),
       text("name", "Tên sản phẩm"),
       text("fullName", "Tên đầy đủ", { wide: true }),
       number("basePrice", "Giá gốc"),
@@ -180,8 +180,8 @@ export const ADMIN_TABLES = [
     idField: "id",
     fields: [
       text("id", "ID", { required: true, wide: true }),
-      text("kv_product_id", "ID sản phẩm KiotViet", { required: true }),
-      text("kv_variant_id", "ID biến thể KiotViet"),
+      text("kv_product_id", "ID sản phẩm AGMC", { required: true }),
+      text("kv_variant_id", "ID biến thể AGMC"),
       select("egg_type", "Loại trứng", eggTypeOptions, {
         valueType: "number",
       }),

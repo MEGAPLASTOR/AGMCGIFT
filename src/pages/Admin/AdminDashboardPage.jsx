@@ -61,7 +61,7 @@ const MANAGEMENT_PAGES = [
     tableKey: "productEggMappings",
     label: "Mapping trứng",
     title: "Quản lý mapping trứng",
-    description: "Liên kết sản phẩm KiotViet với loại trứng và bể quà phát thưởng.",
+    description: "Liên kết sản phẩm AGMC với loại trứng và bể quà phát thưởng.",
   },
   {
     slug: "pool-accounts",
@@ -89,14 +89,14 @@ const MANAGEMENT_PAGES = [
     tableKey: "products",
     label: "Sản phẩm",
     title: "Quản lý sản phẩm",
-    description: "Xem sản phẩm đã đồng bộ từ KiotViet và đối chiếu mapping phát trứng.",
+    description: "Xem sản phẩm đã đồng bộ từ hệ thống AGMC và đối chiếu mapping phát trứng.",
   },
   {
     slug: "orders",
-    tableKey: "kiotvietOrders",
+    tableKey: "adminOrders",
     label: "Đơn hàng",
     title: "Quản lý đơn hàng",
-    description: "Kiểm tra đơn KiotViet, trạng thái thanh toán, giao hàng và điều kiện nhận quà.",
+    description: "Kiểm tra đơn hàng gift code, trạng thái thanh toán, giao hàng và điều kiện nhận quà.",
   },
 ];
 
@@ -200,7 +200,7 @@ export default function AdminDashboardPage() {
       tone: "blue",
     },
     {
-      label: "Tổng đơn KiotViet",
+      label: "Tổng đơn gift code",
       value: dashboard.summary.totalOrders,
       note: "orders raw",
       tone: "blue",
@@ -482,8 +482,8 @@ export default function AdminDashboardPage() {
     <main className="admin-page">
       <header className="admin-header">
         <div>
-          <p className="admin-eyebrow">AGMC KiotViet Admin</p>
-          <h1>Dashboard vận hành KiotViet</h1>
+          <p className="admin-eyebrow">Anh Gà MC Gift Code Admin</p>
+          <h1>Dashboard vận hành gift code</h1>
           <span>
             Đăng nhập: {admin.full_name} / {admin.role}
           </span>

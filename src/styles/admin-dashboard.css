@@ -624,6 +624,347 @@
   flex: 1 1 150px;
 }
 
+.admin-pool-dnd-panel {
+  background: #ffffff;
+}
+
+.admin-pool-toolbar {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) minmax(260px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.admin-pool-toolbar label,
+.admin-pool-editor label {
+  display: grid;
+  gap: 7px;
+  color: #526071;
+  font-size: 12px;
+  font-weight: 1000;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.admin-pool-toolbar button,
+.admin-pool-editor__actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  border: 1px solid #17202a;
+  border-radius: 8px;
+  background: #17202a;
+  color: #fff4a2;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 1000;
+  padding: 10px 15px;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+}
+
+.admin-pool-toolbar button:hover,
+.admin-pool-editor__actions button:hover {
+  background: #233042;
+  box-shadow: 0 8px 18px rgba(23, 32, 42, 0.16);
+  transform: translateY(-2px);
+}
+
+.admin-pool-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-pool-summary article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  border: 1px solid rgba(23, 32, 42, 0.1);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 12px;
+}
+
+.admin-pool-summary span,
+.admin-pool-column__head span,
+.admin-pool-editor__head span,
+.admin-pool-account-card span,
+.admin-pool-account-card small {
+  color: #526071;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.admin-pool-summary strong {
+  color: #17202a;
+  font-size: 24px;
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.admin-pool-message {
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.4;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+}
+
+.admin-pool-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(280px, 340px);
+  gap: 14px;
+  align-items: start;
+}
+
+.admin-pool-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.admin-pool-column,
+.admin-pool-editor,
+.admin-pool-empty-board {
+  min-width: 0;
+  border: 1px solid rgba(23, 32, 42, 0.12);
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.admin-pool-column {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 320px;
+  padding: 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-pool-column--source {
+  position: sticky;
+  top: 14px;
+  background: #fffdf0;
+}
+
+.admin-pool-column.is-selected {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.admin-pool-column.is-drag-over {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.14);
+  transform: translateY(-2px);
+}
+
+.admin-pool-column__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-pool-column__head button {
+  display: inline-flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 9px;
+  border: 0;
+  background: transparent;
+  color: #17202a;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.admin-pool-column__head button svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.admin-pool-column__head button div,
+.admin-pool-column__head > div,
+.admin-pool-editor__head div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-pool-column__head strong,
+.admin-pool-editor__head strong,
+.admin-pool-empty-board strong {
+  color: #17202a;
+  font-size: 16px;
+  font-weight: 1000;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.admin-pool-column__head em {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  min-width: 34px;
+  min-height: 30px;
+  border-radius: 999px;
+  background: #e8f5ff;
+  color: #17202a;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 1000;
+  padding: 5px 9px;
+}
+
+.admin-pool-column__actions,
+.admin-pool-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-pool-column__actions .admin-mini-button {
+  flex: 1 1 82px;
+}
+
+.admin-pool-card-list {
+  display: grid;
+  gap: 8px;
+  min-height: 160px;
+}
+
+.admin-pool-account-card {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  border: 1px solid rgba(23, 32, 42, 0.14);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17202a;
+  cursor: grab;
+  padding: 10px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-pool-account-card:active {
+  cursor: grabbing;
+}
+
+.admin-pool-account-card:hover,
+.admin-pool-account-card:focus-visible {
+  border-color: #2563eb;
+  box-shadow: 0 8px 18px rgba(23, 32, 42, 0.12);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.admin-pool-account-card.is-dragging {
+  opacity: 0.48;
+}
+
+.admin-pool-account-card svg {
+  color: #94a3b8;
+}
+
+.admin-pool-account-card div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.admin-pool-account-card strong {
+  color: #17202a;
+  font-size: 14px;
+  font-weight: 1000;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.admin-pool-account-card em {
+  border-radius: 999px;
+  background: #fff4a2;
+  color: #17202a;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 1000;
+  line-height: 1;
+  padding: 7px 8px;
+}
+
+.admin-pool-account-card small {
+  grid-column: 2 / -1;
+}
+
+.admin-pool-empty-drop,
+.admin-pool-empty-board {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  min-height: 136px;
+  border: 1px dashed rgba(23, 32, 42, 0.22);
+  border-radius: 8px;
+  color: #64748b;
+  font-weight: 1000;
+  padding: 14px;
+  text-align: center;
+}
+
+.admin-pool-empty-board {
+  min-height: 260px;
+}
+
+.admin-pool-editor {
+  position: sticky;
+  top: 14px;
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.admin-pool-editor__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-pool-editor__head .admin-light-button {
+  min-height: 40px;
+  padding: 8px 11px;
+}
+
+.admin-pool-editor form {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-pool-editor__actions button {
+  flex: 1 1 120px;
+}
+
 .admin-page {
   background:
     linear-gradient(180deg, #f7f9fc 0%, #eef3f8 100%);
@@ -1065,6 +1406,16 @@
     grid-template-columns: 1fr;
   }
 
+  .admin-pool-layout {
+    grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  }
+
+  .admin-pool-editor {
+    position: static;
+    grid-column: 1 / -1;
+    order: -1;
+  }
+
   .admin-record-editor {
     order: -1;
   }
@@ -1079,8 +1430,18 @@
   .admin-grid-two,
   .admin-section-heading,
   .admin-crud-toolbar,
+  .admin-pool-toolbar,
+  .admin-pool-layout,
   .admin-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-pool-column--source {
+    position: static;
+  }
+
+  .admin-pool-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .admin-section-heading {
@@ -1126,6 +1487,10 @@
   .admin-password-form,
   .admin-crud-toolbar,
   .admin-crud-grid,
+  .admin-pool-toolbar,
+  .admin-pool-layout,
+  .admin-pool-board,
+  .admin-pool-summary,
   .admin-form-grid {
     grid-template-columns: 1fr;
   }
@@ -1157,6 +1522,7 @@
   .admin-panel__head,
   .admin-empty-state,
   .admin-record-editor__head,
+  .admin-pool-editor__head,
   .admin-crud-actions {
     align-items: stretch;
     flex-direction: column;
@@ -1164,7 +1530,10 @@
 
   .admin-crud-actions button,
   .admin-panel__head button,
-  .admin-record-editor__head button {
+  .admin-record-editor__head button,
+  .admin-pool-editor__head button,
+  .admin-pool-toolbar button,
+  .admin-pool-editor__actions button {
     width: 100%;
   }
 
@@ -1217,6 +1586,8 @@
   .admin-light-button,
   .admin-mini-button,
   .admin-crud-toolbar button,
+  .admin-pool-toolbar button,
+  .admin-pool-editor__actions button,
   .admin-crud-actions button {
     width: 100%;
   }

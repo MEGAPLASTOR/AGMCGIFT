@@ -17,6 +17,7 @@ import {
   normalizeRecordForForm,
   searchTableRows,
 } from "../../services/adminCrudService";
+import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
 
 const EMPTY_ROWS = [];
 const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
@@ -27,7 +28,7 @@ const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
   "customers",
   "eggs",
   "products",
-  "kiotvietOrders",
+  "adminOrders",
 ]);
 const DEFAULT_TABLE_KEY = "giftAccounts";
 const PRIORITY_COLUMNS_BY_TABLE = {
@@ -35,7 +36,7 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   customers: ["customerCode", "customerName", "status", "successCount", "warningCount"],
   eggs: ["egg_type", "status", "hatch_at", "order_id", "account_id"],
   giftPools: ["pool_name", "tier", "created_at"],
-  kiotvietOrders: ["order_code", "status", "financial_status", "fulfillment_status", "total_price"],
+  adminOrders: ["order_code", "status", "financial_status", "fulfillment_status", "total_price"],
   poolAccountMappings: ["pool_id", "account_id"],
   productEggMappings: ["kv_product_id", "egg_type", "gift_pool_id", "egg_tier"],
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
@@ -130,7 +131,7 @@ function AdminFormField({ field, value, onChange }) {
 
 // BACKEND_ADMIN_CRUD_GIAO_DIEN:
 // Giao diện quản trị dữ liệu hiện thao tác trên state frontend.
-// Backend thay các handler thêm/sửa/xóa bằng endpoint CRUD thật khi nối KiotViet/database.
+// Backend thay các handler thêm/sửa/xóa bằng endpoint CRUD thật khi nối database.
 export function AdminDataCrudPanel({
   activeTableKey = DEFAULT_TABLE_KEY,
   panelTitle = "Quản lý kho account",
@@ -428,6 +429,28 @@ export function AdminDataCrudPanel({
   const handleTableChange = (event) => {
     changeTable(event.target.value);
   };
+
+  if (isGiftPoolsTable || isPoolMappingsTable) {
+    return (
+      <AdminGiftPoolDragPanel
+        activeTableKey={tableKey}
+        panelTitle={panelTitle}
+        panelDescription={panelDescription}
+        visibleTables={visibleTables}
+        tableCounts={tableCounts}
+        tables={tables}
+        onTableChange={changeTable}
+        onSaveRecord={onSaveRecord}
+        onDeleteRecord={onDeleteRecord}
+        onCreateGiftPool={onCreateGiftPool}
+        onUpdateGiftPool={onUpdateGiftPool}
+        onDeleteGiftPool={onDeleteGiftPool}
+        onAddPoolAccount={onAddPoolAccount}
+        onRemovePoolAccount={onRemovePoolAccount}
+        onResetTables={onResetTables}
+      />
+    );
+  }
 
   return (
     <section className="admin-panel admin-crud-panel">

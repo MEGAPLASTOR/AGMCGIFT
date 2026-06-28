@@ -1,6 +1,6 @@
-# Ghi Chú Cho Backend KiotViet
+# Ghi Chú Cho Backend AGMC Gift Code
 
-Frontend hiện lấy dữ liệu từ API backend KiotViet, không đọc dữ liệu mẫu JSON.
+Frontend hiện lấy dữ liệu từ API backend AGMC Gift Code, không đọc dữ liệu mẫu JSON.
 
 ## API Admin Đang Dùng
 
@@ -37,10 +37,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc4MjU1O
 
 ## Shape Dữ Liệu Frontend Chuẩn Hóa
 
-- `kiotvietOrders`: danh sách đơn KiotViet.
-- `kiotvietOrderItems`: dòng sản phẩm trong đơn KiotViet.
+- `adminOrders`: danh sách đơn hàng gift code.
+- `adminOrderItems`: dòng sản phẩm trong đơn hàng.
 - `customers`: danh sách khách hàng.
-- `products`: danh sách sản phẩm KiotViet.
+- `products`: danh sách sản phẩm AGMC.
 - `eggs`: danh sách trứng.
 - `giftAccounts`: kho tài khoản quà.
 - `giftPools`: bể quà.
@@ -48,7 +48,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc4MjU1O
 ## Luồng Khách Nhập Mã
 
 - Frontend gọi `POST /api/eggs/sync`.
-- Backend kiểm tra mã đơn KiotViet, trạng thái khách, trạng thái giao hàng và trả danh sách trứng hợp lệ.
+- Backend kiểm tra mã đơn hàng gift code, trạng thái khách, trạng thái giao hàng và trả danh sách trứng hợp lệ.
 - Khi khách mở trứng, frontend gọi `POST /api/eggs/claim`.
 
 ## Admin Dashboard
