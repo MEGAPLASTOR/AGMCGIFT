@@ -19,6 +19,7 @@ import {
   getDelayedRewardInfo,
   getRewardInfoFromTargetDate,
 } from "../utils/rewardDate";
+import { normalizeApiText } from "../api/eggs/utils/normalizeApiText";
 
 const LUA_CHON_NHAN_NGAY = EGG_CHOICES.instant;
 const LUA_CHON_CHO_NHAN_THUONG_XIN = EGG_CHOICES.delayed;
@@ -28,13 +29,66 @@ function getEggReadyInfo(egg, fallbackDays) {
     return getRewardInfoFromTargetDate(egg.hatchAt);
   }
 
-  return getDelayedRewardInfo(new Date().toISOString(), fallbackDays);
+  return getDelayedRewardInfo(egg.createdAt || new Date().toISOString(), fallbackDays);
 }
 
 function isEggReady(egg) {
   if (!egg.hatchAt) return true;
 
   return new Date(egg.hatchAt).getTime() <= Date.now();
+}
+
+function isReturnedOrder(order) {
+  const statusText = [
+    order?.trangThai,
+    order?.status,
+    order?.deliveryStatus,
+    order?.financialStatus,
+  ]
+    .map(normalizeApiText)
+    .join(" ");
+
+  return (
+    statusText.includes("chuyen hoan") ||
+    statusText.includes("hoan tra") ||
+    statusText.includes("tra hang") ||
+    statusText.includes("returned") ||
+    statusText.includes("refund") ||
+    statusText.includes("cancel")
+  );
+}
+
+function isBannedCustomer(order) {
+  const customerStatus = normalizeApiText(order?.customerStatus);
+
+  return (
+    Number(order?.returnStreak || 0) >= 2 ||
+    customerStatus.includes("ban") ||
+    customerStatus.includes("banned") ||
+    customerStatus.includes("khoa") ||
+    customerStatus.includes("cam")
+  );
+}
+
+function getBlockingMessage(entry) {
+  if (isBannedCustomer(entry?.order)) {
+    return "Tài khoản bị khóa do vi phạm chính sách.";
+  }
+
+  if (isReturnedOrder(entry?.order)) {
+    return "Đơn hàng đang hoàn/trả nên trứng liên quan đã bị hủy.";
+  }
+
+  return "";
+}
+
+function shouldHoldEggForIncubation(egg, choice) {
+  const isDelayedChoice = choice === LUA_CHON_CHO_NHAN_THUONG_XIN;
+
+  return (
+    (isDelayedChoice || egg.requiresIncubation) &&
+    (!egg.hatchAt || !isEggReady(egg))
+  );
 }
 
 function createBaseRedemption(selectedEntry, egg) {
@@ -45,13 +99,19 @@ function createBaseRedemption(selectedEntry, egg) {
     orderId: selectedEntry.order.id,
     orderCode: selectedEntry.order.maDonHang,
     customerName: selectedEntry.order.tenKhachHang,
+    customerCode: selectedEntry.order.customerCode,
     customerStatus: selectedEntry.order.customerStatus,
+    returnStreak: selectedEntry.order.returnStreak,
     deliveryStatus: selectedEntry.order.deliveryStatus,
     productId: selectedEntry.product.id,
     productName: selectedEntry.product.tenSanPham,
     eggId: egg.eggId,
     eggType: egg.eggType,
+    eggTier: egg.eggTier,
+    eggSlot: egg.slot,
     eggStatus: egg.displayStatus,
+    eggCreatedAt: egg.createdAt,
+    requiresIncubation: egg.requiresIncubation,
     redeemedAt: now,
   };
 }
@@ -105,6 +165,14 @@ export function useGiftCode(catalogData) {
       // rồi trả về danh sách trứng hợp lệ để khách chọn.
       const payload = await syncEggsByOrderCode(trimmedCode);
       const matchedEntry = normalizeSyncEggResponse(payload, trimmedCode);
+      const blockingMessage = getBlockingMessage(matchedEntry);
+
+      if (blockingMessage) {
+        setErrorMsg(blockingMessage);
+        setStatus(GIFT_CODE_STATUS.invalid);
+        return;
+      }
+
       if (!matchedEntry.eggs.length) {
         setErrorMsg("Mã đơn hợp lệ nhưng chưa có trứng khả dụng.");
         setStatus(GIFT_CODE_STATUS.invalid);
@@ -136,10 +204,7 @@ export function useGiftCode(catalogData) {
 
       const baseRedemption = createBaseRedemption(selectedEntry, selectedEgg);
 
-      if (
-        choice === LUA_CHON_CHO_NHAN_THUONG_XIN &&
-        (!selectedEgg.hatchAt || !isEggReady(selectedEgg))
-      ) {
+      if (shouldHoldEggForIncubation(selectedEgg, choice)) {
         setRedemptionInfo({
           ...baseRedemption,
           choice,
@@ -229,6 +294,7 @@ export function useGiftCode(catalogData) {
     isChecking,
     isClaiming,
     availableChoices,
+    choiceEggs: selectedEntry?.eggsByChoice || {},
     checkCode,
     claimReward,
     claimReadyReward,

@@ -58,7 +58,7 @@ const BOARD_CONFIG_BY_TABLE = {
   eggs: {
     field: "status",
     fallbackValue: "ready",
-    values: ["locked", "ready", "incubating", "hatched"],
+    values: ["locked", "ready", "incubating", "hatched", "invalidated"],
   },
   productEggMappings: {
     field: "egg_type",

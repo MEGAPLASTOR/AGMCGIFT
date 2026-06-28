@@ -1,10 +1,13 @@
 export function normalizeClaimEggResponse(payload) {
+  const root = payload?.data || payload?.result || payload || {};
+  const account = root.account || root.giftAccount || root.reward || root;
+
   return {
-    tenAcc: payload?.platform || "Acc Blox Fruit",
-    taiKhoan: payload?.username || "",
-    matKhau: payload?.password || "",
-    platform: payload?.platform || "",
-    ghiChu: payload?.message || "",
-    raw: payload,
+    tenAcc: account.platform || root.platform || "Acc Blox Fruit",
+    taiKhoan: account.username || account.taiKhoan || root.username || "",
+    matKhau: account.password || account.matKhau || root.password || "",
+    platform: account.platform || root.platform || "",
+    ghiChu: root.message || account.message || "",
+    raw: root,
   };
 }

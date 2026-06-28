@@ -1,8 +1,8 @@
 import { EGG_CHOICES } from "../constants/eggChoices";
 import { normalizeApiText } from "../utils/normalizeApiText";
 
-function getEggSlot(rawEgg, index) {
-  const slot = Number(
+function getRawEggSlot(rawEgg) {
+  return Number(
     rawEgg.eggSlot ??
       rawEgg.egg_slot ??
       rawEgg.eggIndex ??
@@ -10,11 +10,20 @@ function getEggSlot(rawEgg, index) {
       rawEgg.slot ??
       rawEgg.position ??
       rawEgg.sequence ??
-      rawEgg.order ??
-      index + 1
+      rawEgg.order
   );
+}
+
+function getEggSlot(rawEgg, index) {
+  const slot = getRawEggSlot(rawEgg);
 
   return Number.isFinite(slot) && slot > 0 ? slot : index + 1;
+}
+
+function hasExplicitSlot(rawEgg) {
+  const slot = getRawEggSlot(rawEgg);
+
+  return Number.isFinite(slot) && slot > 0;
 }
 
 function getExplicitChoice(rawEgg) {
@@ -78,12 +87,14 @@ function getChoice(rawEgg, egg, index) {
     return explicitChoice;
   }
 
-  if (egg.slot === 1) {
-    return EGG_CHOICES.instant;
-  }
+  if (hasExplicitSlot(rawEgg)) {
+    if (egg.slot === 1) {
+      return EGG_CHOICES.instant;
+    }
 
-  if (egg.slot === 2) {
-    return EGG_CHOICES.delayed;
+    if (egg.slot === 2) {
+      return EGG_CHOICES.delayed;
+    }
   }
 
   if (Number(egg.eggType) === 2) {
@@ -100,6 +111,7 @@ export function normalizeEgg(rawEgg, index = 0) {
     eggTier: rawEgg.eggTier || rawEgg.egg_tier || rawEgg.tier || rawEgg.giftPool?.tier || "",
     displayStatus: rawEgg.displayStatus || rawEgg.status || "Sẵn sàng",
     hatchAt: rawEgg.hatchAt || rawEgg.hatch_at || null,
+    createdAt: rawEgg.createdAt || rawEgg.created_at || null,
     slot: getEggSlot(rawEgg, index),
   };
   const requiresIncubation = hasCooldown(egg);

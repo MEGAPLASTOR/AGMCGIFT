@@ -7,6 +7,8 @@ export function RewardChoicePage({
   daysToWait,
   isClaiming = false,
   availableChoices,
+  instantEgg,
+  delayedEgg,
   claimError,
   onClaimNow,
   onClaimLater,
@@ -14,6 +16,15 @@ export function RewardChoicePage({
 }) {
   const canClaimNow = availableChoices?.now ?? true;
   const canClaimLater = availableChoices?.later ?? true;
+  const instantNeedsIncubation = Boolean(instantEgg?.requiresIncubation);
+  const instantActionLabel = instantNeedsIncubation
+    ? `Ấp ${daysToWait} ngày`
+    : isClaiming
+      ? "Đang mở..."
+      : "Nhận ngay";
+  const instantDescription = instantNeedsIncubation
+    ? "Trứng này cần chờ đủ cooldown trước khi mở."
+    : "Nhận acc ngay sau khi random.";
 
   return (
     <section className="gift-panel reward-choice-page">
@@ -42,10 +53,10 @@ export function RewardChoicePage({
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>Trứng vàng</strong>
-              <span>Nhận acc ngay sau khi random.</span>
+              <strong>{instantNeedsIncubation ? "Trứng vàng đang ấp" : "Trứng vàng"}</strong>
+              <span>{instantDescription}</span>
             </span>
-            <em>{isClaiming ? "Đang mở..." : "Nhận ngay"}</em>
+            <em>{instantActionLabel}</em>
           </span>
         </button>
 
@@ -61,9 +72,17 @@ export function RewardChoicePage({
           <span className="reward-egg-card__content">
             <span>
               <strong>Trứng kim cương</strong>
-              <span>Ấp đủ ngày để mở phần thưởng xịn hơn.</span>
+              <span>
+                {delayedEgg?.requiresIncubation === false
+                  ? "Trứng đã sẵn sàng mở."
+                  : "Ấp đủ ngày để mở phần thưởng xịn hơn."}
+              </span>
             </span>
-            <em>Ấp {daysToWait} ngày</em>
+            <em>
+              {delayedEgg?.requiresIncubation === false
+                ? "Mở trứng"
+                : `Ấp ${daysToWait} ngày`}
+            </em>
           </span>
         </button>
       </div>

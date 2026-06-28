@@ -33,6 +33,7 @@ export default function GiftCodePage() {
     isChecking,
     isClaiming,
     availableChoices,
+    choiceEggs,
     checkCode,
     claimReward,
     claimReadyReward,
@@ -104,6 +105,8 @@ export default function GiftCodePage() {
               daysToWait={daysToWait}
               isClaiming={isClaiming}
               availableChoices={availableChoices}
+              instantEgg={choiceEggs[choices.now]}
+              delayedEgg={choiceEggs[choices.later]}
               claimError={errorMsg}
               onClaimNow={() => claimReward(choices.now)}
               onClaimLater={() => claimReward(choices.later)}

@@ -13,6 +13,8 @@ export function IncubatingRewardPage({
   const [isCountdownComplete, setIsCountdownComplete] = useState(false);
   const isReady = redemptionInfo.isReady || isCountdownComplete;
   const hasReward = Boolean(redemptionInfo.reward || redemptionInfo.account);
+  const eggName =
+    redemptionInfo.eggSlot === 1 ? "Trứng vàng" : "Trứng kim cương";
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
   }, []);
@@ -21,8 +23,8 @@ export function IncubatingRewardPage({
     <section className="gift-panel gift-panel--result gift-panel--incubating">
       <div className="incubating-page__hero">
         <div>
-          <p className="eyebrow">Trứng kim cương đang ấp</p>
-          <h2>Đợi đủ ngày để nhận acc xịn</h2>
+          <p className="eyebrow">{eggName} đang ấp</p>
+          <h2>Đợi đủ ngày để nhận acc</h2>
         </div>
         <img src={eggPremium15Days} alt="" />
       </div>
@@ -37,17 +39,17 @@ export function IncubatingRewardPage({
         hasReward ? (
           <>
             <p className="message message--success">
-              Trứng kim cương đã nở. Đây là phần thưởng của bạn.
+              {eggName} đã nở. Đây là phần thưởng của bạn.
             </p>
             <AccountRewardCard reward={redemptionInfo.reward} />
           </>
         ) : (
           <>
             <p className="message message--success">
-              Trứng kim cương đã sẵn sàng. Bấm mở để nhận acc.
+              {eggName} đã sẵn sàng. Bấm mở để nhận acc.
             </p>
             <button type="button" onClick={onClaimReady} disabled={isClaiming}>
-              {isClaiming ? "Đang mở trứng..." : "Mở trứng kim cương"}
+              {isClaiming ? "Đang mở trứng..." : `Mở ${eggName.toLowerCase()}`}
             </button>
           </>
         )

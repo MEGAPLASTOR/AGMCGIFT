@@ -9,7 +9,9 @@ import {
   normalizeAdminGiftAccount,
   normalizeAdminGiftPool,
 } from "./adminGiftPoolService";
+import { normalizeApiText } from "../api/eggs/utils/normalizeApiText";
 
+const ABSOLUTE_SUCCESS_DAYS = 15;
 const RAW_ENDPOINTS = [
   ["customers", ADMIN_ENDPOINTS.customers],
   ["eggs", ADMIN_ENDPOINTS.eggs],
@@ -102,7 +104,9 @@ function normalizeEggStatus(rawEgg) {
   const status = String(rawEgg.status || "").trim().toUpperCase();
 
   if (status === "CLAIMED") return "hatched";
-  if (status === "CANCELLED") return "locked";
+  if (status === "CANCELLED" || status === "INVALIDATED" || status === "INVALIDED") {
+    return "invalidated";
+  }
 
   if (Number(rawEgg.eggType) === 2 && rawEgg.hatchAt) {
     return new Date(rawEgg.hatchAt).getTime() > Date.now() ? "incubating" : "ready";
@@ -111,20 +115,71 @@ function normalizeEggStatus(rawEgg) {
   return status ? status.toLowerCase() : "ready";
 }
 
-function normalizeOrderStatus(order) {
-  const deliveryStatus = String(order.deliveryStatus || "").trim().toLowerCase();
+function getDeliveredAt(order) {
+  return (
+    order.deliveredAt ||
+    order.delivered_at ||
+    order.deliveryCompletedAt ||
+    order.delivery_completed_at ||
+    order.completedAt ||
+    order.completed_at ||
+    null
+  );
+}
 
-  if (deliveryStatus.includes("cancel") || deliveryStatus.includes("huy")) {
+function isOlderThanDays(dateValue, days) {
+  if (!dateValue) {
+    return false;
+  }
+
+  const date = new Date(dateValue);
+
+  if (Number.isNaN(date.getTime())) {
+    return false;
+  }
+
+  return Date.now() - date.getTime() >= days * 24 * 60 * 60 * 1000;
+}
+
+function normalizeOrderStatus(order) {
+  const statusText = normalizeApiText(
+    [
+      order.status,
+      order.orderStatus,
+      order.financialStatus,
+      order.financial_status,
+      order.deliveryStatus,
+      order.delivery_status,
+      order.fulfillmentStatus,
+      order.fulfillment_status,
+    ].join(" ")
+  );
+
+  if (
+    statusText.includes("cancel") ||
+    statusText.includes("huy") ||
+    statusText.includes("chuyen hoan") ||
+    statusText.includes("hoan tra") ||
+    statusText.includes("tra hang") ||
+    statusText.includes("returned") ||
+    statusText.includes("refund")
+  ) {
     return "Cancel";
   }
 
-  if (
-    deliveryStatus.includes("delivered") ||
-    deliveryStatus.includes("completed") ||
-    deliveryStatus.includes("success") ||
-    deliveryStatus.includes("giao")
-  ) {
+  if (statusText.includes("paid") || statusText.includes("tuyet doi")) {
     return "Paid";
+  }
+
+  if (
+    statusText.includes("delivered") ||
+    statusText.includes("completed") ||
+    statusText.includes("success") ||
+    statusText.includes("da giao")
+  ) {
+    return isOlderThanDays(getDeliveredAt(order), ABSOLUTE_SUCCESS_DAYS)
+      ? "Paid"
+      : "Pending";
   }
 
   return "Pending";
@@ -175,9 +230,11 @@ function normalizeOrders(orders) {
     total_price: Number(order.totalPrice || order.total_price || 0),
     financial_status: order.financialStatus || "",
     fulfillment_status: order.deliveryStatus || order.fulfillment_status || "",
-    status: order.status || normalizeOrderStatus(order),
+    status: normalizeOrderStatus(order),
     created_at: normalizeDate(order.createdAt || order.created_at),
     updated_at: normalizeDate(order.updatedAt || order.updated_at || order.lastSyncedAt),
+    delivered_at: normalizeDate(getDeliveredAt(order)),
+    last_synced_at: normalizeDate(order.lastSyncedAt || order.last_synced_at),
   }));
 }
 
@@ -251,6 +308,8 @@ function deriveOrdersFromEggs(eggs) {
         status: normalizeOrderStatus(order),
         created_at: "",
         updated_at: "",
+        delivered_at: normalizeDate(getDeliveredAt(order)),
+        last_synced_at: normalizeDate(order.lastSyncedAt || order.last_synced_at),
       }))
   );
 }

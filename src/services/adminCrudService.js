@@ -26,6 +26,7 @@ const eggStatusOptions = [
   { value: "ready", label: "ready" },
   { value: "incubating", label: "incubating" },
   { value: "hatched", label: "hatched" },
+  { value: "invalidated", label: "invalidated" },
 ];
 
 const poolTierOptions = [
