@@ -1,6 +1,6 @@
-export const GIFT_CODE_EXAMPLE = "DHSPE_260622PSYR4BHX";
+export const GIFT_CODE_EXAMPLE = "HDSPE_260622PSYR4BHX";
 export const GIFT_CODE_FORMAT_LABEL =
-  "DHSPE_ + 6 chữ số + 8 ký tự chữ/số";
+  "HDSPE_ + 6 chữ số + 8 ký tự chữ/số";
 export const GIFT_CODE_PATTERN = /^DHSPE_\d{6}[A-Z0-9]{8}$/;
 
 export function formatGiftCodeInputValue(value) {

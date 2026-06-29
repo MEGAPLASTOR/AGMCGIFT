@@ -132,25 +132,50 @@ function getActiveSlug(pathname) {
     .split("/")[0];
 }
 
-function AdminManagementNav({ activeSlug, tableCounts }) {
+function shouldCollapseAdminNav() {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(max-width: 900px)").matches
+  );
+}
+
+function AdminManagementNav({ activeSlug, onNavigate, tableCounts }) {
   const overviewActive = !activeSlug;
 
   return (
-    <nav className="admin-management-nav" aria-label="Điều hướng quản trị">
-      <Link className={overviewActive ? "is-active" : ""} to={getAdminPath()}>
+    <nav
+      className="admin-management-nav"
+      id="admin-management-nav"
+      aria-label="Dieu huong quan tri"
+    >
+      <Link
+        className={overviewActive ? "is-active" : ""}
+        title="Tong quan"
+        to={getAdminPath()}
+        onClick={onNavigate}
+      >
+        <FaChartLine className="admin-management-nav__icon" aria-hidden="true" />
         <span>Tổng quan</span>
         <strong>Analytics</strong>
       </Link>
-      {MANAGEMENT_PAGES.map((page) => (
-        <Link
-          className={activeSlug === page.slug ? "is-active" : ""}
-          key={page.slug}
-          to={getAdminPath(page.slug)}
-        >
-          <span>{page.label}</span>
-          <strong>{tableCounts[page.tableKey] || 0}</strong>
-        </Link>
-      ))}
+      {MANAGEMENT_PAGES.map((page) => {
+        const Icon = page.icon;
+
+        return (
+          <Link
+            className={activeSlug === page.slug ? "is-active" : ""}
+            key={page.slug}
+            title={page.label}
+            to={getAdminPath(page.slug)}
+            onClick={onNavigate}
+          >
+            <Icon className="admin-management-nav__icon" aria-hidden="true" />
+            <span>{page.label}</span>
+            <strong>{tableCounts[page.tableKey] || 0}</strong>
+          </Link>
+        );
+      })}
     </nav>
   );
 }
@@ -200,6 +225,7 @@ export default function AdminDashboardPage() {
   const { loadRawTables } = adminTables;
   const { admin, error, handleAuthError, isLoggingIn, login, logout } =
     useAdminAuth(adminTables.tables);
+  const [isNavCollapsed, setNavCollapsed] = useState(shouldCollapseAdminNav);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const [isSyncingProducts, setIsSyncingProducts] = useState(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
@@ -267,6 +293,23 @@ export default function AdminDashboardPage() {
   ].filter((metric) => hasMetricValue(metric.rawValue ?? metric.value));
 
   useEffect(() => {
+    if (
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
+      return undefined;
+    }
+
+    const mediaQuery = window.matchMedia("(max-width: 900px)");
+    const syncNavState = () => setNavCollapsed(mediaQuery.matches);
+
+    syncNavState();
+    mediaQuery.addEventListener("change", syncNavState);
+
+    return () => mediaQuery.removeEventListener("change", syncNavState);
+  }, []);
+
+  useEffect(() => {
     if (activeSlug && !activeManagementPage) {
       navigate(getAdminPath(), { replace: true });
     }
@@ -282,6 +325,20 @@ export default function AdminDashboardPage() {
       // The hook stores a user-facing error message.
     });
   }, [admin?.authHeader, handleAuthError, loadRawTables]);
+
+  const handleToggleAdminNav = () => {
+    setNavCollapsed((currentValue) => !currentValue);
+  };
+
+  const handleCloseAdminNav = () => {
+    setNavCollapsed(true);
+  };
+
+  const handleAdminNavNavigate = () => {
+    if (shouldCollapseAdminNav()) {
+      handleCloseAdminNav();
+    }
+  };
 
   const handleReloadRawData = () => {
     if (!admin?.authHeader || adminTables.isLoadingRawData) {
@@ -474,6 +531,8 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const SidebarToggleIcon = isNavCollapsed ? FaChevronRight : FaChevronLeft;
+
   if (!admin) {
     return (
       <main className="admin-page admin-page--login">
@@ -553,11 +612,52 @@ export default function AdminDashboardPage() {
         </section>
       ) : null}
 
-      <div className="admin-shell">
-        <AdminManagementNav
-          activeSlug={isOverviewPage ? "" : activeManagementPage.slug}
-          tableCounts={adminTables.tableCounts}
-        />
+      <div
+        className={`admin-shell${
+          isNavCollapsed ? " is-nav-collapsed" : " is-nav-open"
+        }`}
+      >
+        <button
+          type="button"
+          className="admin-sidebar__mobile-toggle"
+          aria-controls="admin-management-nav"
+          aria-expanded={!isNavCollapsed}
+          onClick={handleToggleAdminNav}
+        >
+          <FaBars aria-hidden="true" />
+          <span>Menu</span>
+        </button>
+
+        <aside className="admin-sidebar" aria-label="Admin navigation">
+          <button
+            type="button"
+            className="admin-sidebar__toggle"
+            aria-controls="admin-management-nav"
+            aria-expanded={!isNavCollapsed}
+            aria-label={
+              isNavCollapsed ? "Mo menu quan tri" : "Dong menu quan tri"
+            }
+            onClick={handleToggleAdminNav}
+          >
+            <SidebarToggleIcon aria-hidden="true" />
+            <span>{isNavCollapsed ? "Mo rong" : "Thu gon"}</span>
+          </button>
+
+          <AdminManagementNav
+            activeSlug={isOverviewPage ? "" : activeManagementPage.slug}
+            tableCounts={adminTables.tableCounts}
+            onNavigate={handleAdminNavNavigate}
+          />
+        </aside>
+
+        {!isNavCollapsed ? (
+          <button
+            type="button"
+            className="admin-sidebar__scrim"
+            aria-label="Dong menu quan tri"
+            onClick={handleCloseAdminNav}
+          />
+        ) : null}
 
         <div className="admin-shell__content">
           {isOverviewPage ? (

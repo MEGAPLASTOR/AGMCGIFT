@@ -1280,13 +1280,18 @@
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
+  transition: grid-template-columns 180ms ease;
+}
+
+.admin-shell.is-nav-collapsed {
+  grid-template-columns: 68px minmax(0, 1fr);
 }
 
 .admin-shell__content {
   min-width: 0;
 }
 
-.admin-management-nav {
+.admin-sidebar {
   position: sticky;
   top: 16px;
   display: grid;
@@ -1295,9 +1300,58 @@
   min-width: 0;
 }
 
+.admin-sidebar__toggle,
+.admin-sidebar__mobile-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  border: 1px solid rgba(23, 32, 42, 0.14);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #17202a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 1000;
+  padding: 10px 12px;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-sidebar__toggle:hover,
+.admin-sidebar__mobile-toggle:hover {
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow: 0 8px 18px rgba(23, 32, 42, 0.1);
+  transform: translateY(-1px);
+}
+
+.admin-sidebar__mobile-toggle,
+.admin-sidebar__scrim {
+  display: none;
+}
+
+.admin-sidebar__toggle svg,
+.admin-sidebar__mobile-toggle svg {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+}
+
+.admin-management-nav {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+}
+
 .admin-management-nav a {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  position: relative;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   min-height: 46px;
@@ -1309,6 +1363,10 @@
   font-weight: 900;
   padding: 10px 12px;
   text-decoration: none;
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
 }
 
 .admin-management-nav a:hover {
@@ -1320,6 +1378,16 @@
   border-color: #2563eb;
   background: #eff6ff;
   box-shadow: inset 0 0 0 1px #2563eb;
+}
+
+.admin-management-nav__icon {
+  width: 17px;
+  height: 17px;
+  color: #526071;
+}
+
+.admin-management-nav a.is-active .admin-management-nav__icon {
+  color: #2563eb;
 }
 
 .admin-management-nav span,
@@ -1344,6 +1412,44 @@
 .admin-management-nav a.is-active strong {
   background: #2563eb;
   color: #ffffff;
+}
+
+.admin-shell.is-nav-collapsed .admin-sidebar__toggle {
+  width: 100%;
+  padding-inline: 0;
+}
+
+.admin-shell.is-nav-collapsed .admin-sidebar__toggle span,
+.admin-shell.is-nav-collapsed .admin-management-nav span {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.admin-shell.is-nav-collapsed .admin-management-nav a {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  min-height: 48px;
+  padding: 10px;
+}
+
+.admin-shell.is-nav-collapsed .admin-management-nav strong {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  max-width: 30px;
+  font-size: 10px;
+  line-height: 1;
+  padding: 3px 5px;
+}
+
+.admin-shell.is-nav-collapsed .admin-management-nav a:first-child strong {
+  display: none;
 }
 
 .admin-analytics {
@@ -1649,9 +1755,49 @@
     grid-template-columns: 1fr;
   }
 
+  .admin-shell.is-nav-collapsed {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-sidebar__mobile-toggle {
+    display: inline-flex;
+    width: fit-content;
+    margin-bottom: 12px;
+  }
+
+  .admin-shell.is-nav-open .admin-sidebar__mobile-toggle {
+    visibility: hidden;
+  }
+
+  .admin-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 80;
+    width: min(300px, calc(100vw - 42px));
+    padding: 14px;
+    overflow-y: auto;
+    background: #eef3f8;
+    box-shadow: 18px 0 42px rgba(23, 32, 42, 0.18);
+    transform: translateX(0);
+    transition: transform 180ms ease;
+  }
+
+  .admin-shell.is-nav-collapsed .admin-sidebar {
+    transform: translateX(calc(-100% - 18px));
+  }
+
+  .admin-sidebar__scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    display: block;
+    border: 0;
+    background: rgba(23, 32, 42, 0.36);
+    cursor: pointer;
+  }
+
   .admin-management-nav {
-    position: static;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .admin-pool-column--source {
