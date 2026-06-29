@@ -501,7 +501,7 @@
 
 .admin-crud-toolbar {
   display: grid;
-  grid-template-columns: minmax(180px, 240px) minmax(260px, 1fr) auto;
+  grid-template-columns: minmax(260px, 1fr) auto;
   gap: 12px;
   align-items: end;
   margin-bottom: 16px;
@@ -828,7 +828,7 @@
 
 .admin-pool-toolbar {
   display: grid;
-  grid-template-columns: minmax(180px, 240px) minmax(260px, 1fr) auto;
+  grid-template-columns: minmax(260px, 1fr) auto;
   gap: 12px;
   align-items: end;
   margin-bottom: 14px;
@@ -1268,33 +1268,46 @@
   background: #ffffff;
 }
 
+.admin-shell,
 .admin-section-heading,
-.admin-analytics,
-.admin-management-nav {
+.admin-analytics {
   width: min(1440px, 100%);
   margin-inline: auto;
 }
 
+.admin-shell {
+  display: grid;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-shell__content {
+  min-width: 0;
+}
+
 .admin-management-nav {
-  display: flex;
-  flex-wrap: wrap;
+  position: sticky;
+  top: 16px;
+  display: grid;
   gap: 8px;
-  align-items: center;
-  margin-bottom: 14px;
+  align-content: start;
+  min-width: 0;
 }
 
 .admin-management-nav a {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
-  min-height: 42px;
+  min-height: 46px;
   border: 1px solid rgba(23, 32, 42, 0.14);
   border-radius: 8px;
   background: #ffffff;
   color: #17202a;
   font-size: 13px;
   font-weight: 900;
-  padding: 9px 12px;
+  padding: 10px 12px;
   text-decoration: none;
 }
 
@@ -1317,6 +1330,7 @@
 }
 
 .admin-management-nav strong {
+  justify-self: end;
   min-width: 24px;
   border-radius: 999px;
   background: #e5e7eb;
@@ -1625,6 +1639,7 @@
   }
 
   .admin-login-card,
+  .admin-shell,
   .admin-grid-two,
   .admin-section-heading,
   .admin-crud-toolbar,
@@ -1632,6 +1647,11 @@
   .admin-pool-layout,
   .admin-form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-management-nav {
+    position: static;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   }
 
   .admin-pool-column--source {
@@ -1705,13 +1725,13 @@
   }
 
   .admin-management-nav {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 4px;
+    grid-template-columns: 1fr;
+    overflow: visible;
+    padding-bottom: 0;
   }
 
   .admin-management-nav a {
-    flex: 0 0 auto;
+    min-width: 0;
   }
 
   .admin-panel {

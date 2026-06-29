@@ -100,9 +100,6 @@ const MANAGEMENT_PAGES = [
   },
 ];
 
-const MANAGEMENT_PAGE_BY_TABLE = new Map(
-  MANAGEMENT_PAGES.map((page) => [page.tableKey, page])
-);
 const MANAGEMENT_TABLE_KEYS = MANAGEMENT_PAGES.map((page) => page.tableKey);
 
 function getAdminPath(slug = "") {
@@ -458,14 +455,6 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const handleManagementTableChange = (nextTableKey) => {
-    const nextPage = MANAGEMENT_PAGE_BY_TABLE.get(nextTableKey);
-
-    if (nextPage) {
-      navigate(getAdminPath(nextPage.slug));
-    }
-  };
-
   if (!admin) {
     return (
       <main className="admin-page admin-page--login">
@@ -545,56 +534,58 @@ export default function AdminDashboardPage() {
         </section>
       ) : null}
 
-      <AdminManagementNav
-        activeSlug={isOverviewPage ? "" : activeManagementPage.slug}
-        tableCounts={adminTables.tableCounts}
-      />
-
-      {isOverviewPage ? (
-        <>
-          {visibleMetrics.length ? (
-            <section className="admin-metric-grid">
-              {visibleMetrics.map((metric) => (
-                <AdminMetricCard
-                  key={metric.label}
-                  label={metric.label}
-                  value={metric.value}
-                  note={metric.note}
-                  tone={metric.tone}
-                />
-              ))}
-            </section>
-          ) : null}
-
-          <AdminAnalyticsPanel analytics={dashboard.analytics} />
-        </>
-      ) : (
-        <AdminDataCrudPanel
-          activeTableKey={activeManagementPage.tableKey}
-          panelTitle={activeManagementPage.title}
-          panelDescription={activeManagementPage.description}
-          allowedTableKeys={MANAGEMENT_TABLE_KEYS}
-          tables={adminTables.tables}
+      <div className="admin-shell">
+        <AdminManagementNav
+          activeSlug={isOverviewPage ? "" : activeManagementPage.slug}
           tableCounts={adminTables.tableCounts}
-          onTableChange={handleManagementTableChange}
-          onSaveRecord={adminTables.upsertRecord}
-          onDeleteRecord={adminTables.deleteRecord}
-          onCreateGiftAccount={handleCreateGiftAccount}
-          onUpdateGiftAccount={handleUpdateGiftAccount}
-          onDeleteGiftAccount={handleDeleteGiftAccount}
-          onCreateGiftPool={handleCreateGiftPool}
-          onUpdateGiftPool={handleUpdateGiftPool}
-          onDeleteGiftPool={handleDeleteGiftPool}
-          onAddPoolAccount={handleAddPoolAccount}
-          onRemovePoolAccount={handleRemovePoolAccount}
-          onUpdateCustomerStatus={handleUpdateCustomerStatus}
-          onSaveProductEggMapping={handleSaveProductEggMapping}
-          onDeleteProductEggMapping={handleDeleteProductEggMapping}
-          onImportGiftAccounts={adminTables.importGiftAccounts}
-          onUploadGiftAccounts={handleUploadGiftAccounts}
-          onResetTables={adminTables.resetTables}
         />
-      )}
+
+        <div className="admin-shell__content">
+          {isOverviewPage ? (
+            <>
+              {visibleMetrics.length ? (
+                <section className="admin-metric-grid">
+                  {visibleMetrics.map((metric) => (
+                    <AdminMetricCard
+                      key={metric.label}
+                      label={metric.label}
+                      value={metric.value}
+                      note={metric.note}
+                      tone={metric.tone}
+                    />
+                  ))}
+                </section>
+              ) : null}
+
+              <AdminAnalyticsPanel analytics={dashboard.analytics} />
+            </>
+          ) : (
+            <AdminDataCrudPanel
+              activeTableKey={activeManagementPage.tableKey}
+              panelTitle={activeManagementPage.title}
+              panelDescription={activeManagementPage.description}
+              allowedTableKeys={MANAGEMENT_TABLE_KEYS}
+              tables={adminTables.tables}
+              onSaveRecord={adminTables.upsertRecord}
+              onDeleteRecord={adminTables.deleteRecord}
+              onCreateGiftAccount={handleCreateGiftAccount}
+              onUpdateGiftAccount={handleUpdateGiftAccount}
+              onDeleteGiftAccount={handleDeleteGiftAccount}
+              onCreateGiftPool={handleCreateGiftPool}
+              onUpdateGiftPool={handleUpdateGiftPool}
+              onDeleteGiftPool={handleDeleteGiftPool}
+              onAddPoolAccount={handleAddPoolAccount}
+              onRemovePoolAccount={handleRemovePoolAccount}
+              onUpdateCustomerStatus={handleUpdateCustomerStatus}
+              onSaveProductEggMapping={handleSaveProductEggMapping}
+              onDeleteProductEggMapping={handleDeleteProductEggMapping}
+              onImportGiftAccounts={adminTables.importGiftAccounts}
+              onUploadGiftAccounts={handleUploadGiftAccounts}
+              onResetTables={adminTables.resetTables}
+            />
+          )}
+        </div>
+      </div>
     </main>
   );
 }

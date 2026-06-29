@@ -310,8 +310,6 @@ export function AdminDataCrudPanel({
   panelDescription = "Tạo account, upload Excel và kiểm tra dữ liệu raw từ API",
   allowedTableKeys = [],
   tables,
-  tableCounts,
-  onTableChange,
   onSaveRecord,
   onDeleteRecord,
   onCreateGiftAccount,
@@ -435,13 +433,8 @@ export function AdminDataCrudPanel({
 
     const nextTableKey = visibleTables[0]?.key || "giftAccounts";
 
-    if (onTableChange) {
-      onTableChange(nextTableKey);
-      return;
-    }
-
     resetTableState(nextTableKey);
-  }, [onTableChange, tableKey, visibleTables]);
+  }, [tableKey, visibleTables]);
 
   const updateField = (fieldKey, value) => {
     setFormValues((currentValues) => ({
@@ -610,23 +603,6 @@ export function AdminDataCrudPanel({
     }
   };
 
-  const changeTable = (nextTableKey) => {
-    if (nextTableKey === tableKey) {
-      return;
-    }
-
-    if (onTableChange) {
-      onTableChange(nextTableKey);
-      return;
-    }
-
-    resetTableState(nextTableKey);
-  };
-
-  const handleTableChange = (event) => {
-    changeTable(event.target.value);
-  };
-
   const persistDraggedRecord = async (recordId, nextValue) => {
     if (isSaving || boardConfig.readOnly) {
       return;
@@ -714,13 +690,9 @@ export function AdminDataCrudPanel({
   if (isGiftPoolsTable || isPoolMappingsTable) {
     return (
       <AdminGiftPoolDragPanel
-        activeTableKey={tableKey}
         panelTitle={panelTitle}
         panelDescription={panelDescription}
-        visibleTables={visibleTables}
-        tableCounts={tableCounts}
         tables={tables}
-        onTableChange={changeTable}
         onSaveRecord={onSaveRecord}
         onDeleteRecord={onDeleteRecord}
         onCreateGiftPool={onCreateGiftPool}
@@ -747,16 +719,6 @@ export function AdminDataCrudPanel({
       </div>
 
       <div className="admin-crud-toolbar">
-        <label>
-          Chuyển trang quản lý
-          <select value={tableKey} onChange={handleTableChange}>
-            {visibleTables.map((table) => (
-              <option key={table.key} value={table.key}>
-                {table.label} ({tableCounts[table.key] || 0})
-              </option>
-            ))}
-          </select>
-        </label>
         <label>
           Tìm kiếm
           <input

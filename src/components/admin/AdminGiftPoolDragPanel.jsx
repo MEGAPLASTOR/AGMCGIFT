@@ -154,13 +154,9 @@ function PoolAccountCard({ account, isDragging, onDragEnd, onDragStart }) {
 }
 
 export function AdminGiftPoolDragPanel({
-  activeTableKey,
   panelTitle = "Quản lý bể quà",
   panelDescription = "Tạo bể quà và kéo account vào từng bể để đồng bộ nguồn phát thưởng.",
-  visibleTables,
-  tableCounts,
   tables,
-  onTableChange,
   onSaveRecord,
   onDeleteRecord,
   onCreateGiftPool,
@@ -472,19 +468,6 @@ export function AdminGiftPoolDragPanel({
       </div>
 
       <div className="admin-pool-toolbar">
-        <label>
-          Chuyển trang quản lý
-          <select
-            value={activeTableKey}
-            onChange={(event) => onTableChange(event.target.value)}
-          >
-            {visibleTables.map((table) => (
-              <option key={table.key} value={table.key}>
-                {table.label} ({tableCounts[table.key] || 0})
-              </option>
-            ))}
-          </select>
-        </label>
         <label>
           Tìm kiếm
           <input
