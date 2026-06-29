@@ -19,6 +19,263 @@ function percent(value, total) {
   return Math.round((Number(value || 0) / total) * 100);
 }
 
+const TIME_SERIES_CONFIG = {
+  day: {
+    label: "Ngày",
+    points: 14,
+  },
+  week: {
+    label: "Tuần",
+    points: 8,
+  },
+  month: {
+    label: "Tháng",
+    points: 12,
+  },
+  year: {
+    label: "Năm",
+    points: 5,
+  },
+};
+
+function padDatePart(value) {
+  return String(value).padStart(2, "0");
+}
+
+function getLocalDateKey(date) {
+  return [
+    date.getFullYear(),
+    padDatePart(date.getMonth() + 1),
+    padDatePart(date.getDate()),
+  ].join("-");
+}
+
+function getValidDate(...values) {
+  for (const value of values) {
+    if (!value) {
+      continue;
+    }
+
+    const date = new Date(value);
+
+    if (!Number.isNaN(date.getTime())) {
+      return date;
+    }
+  }
+
+  return null;
+}
+
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function startOfWeek(date) {
+  const start = startOfDay(date);
+  const day = start.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  start.setDate(start.getDate() + diff);
+  return start;
+}
+
+function startOfBucket(date, range) {
+  if (range === "week") {
+    return startOfWeek(date);
+  }
+
+  if (range === "month") {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
+
+  if (range === "year") {
+    return new Date(date.getFullYear(), 0, 1);
+  }
+
+  return startOfDay(date);
+}
+
+function shiftBucket(date, range, amount) {
+  const nextDate = new Date(date);
+
+  if (range === "week") {
+    nextDate.setDate(nextDate.getDate() + amount * 7);
+    return startOfBucket(nextDate, range);
+  }
+
+  if (range === "month") {
+    nextDate.setMonth(nextDate.getMonth() + amount);
+    return startOfBucket(nextDate, range);
+  }
+
+  if (range === "year") {
+    nextDate.setFullYear(nextDate.getFullYear() + amount);
+    return startOfBucket(nextDate, range);
+  }
+
+  nextDate.setDate(nextDate.getDate() + amount);
+  return startOfBucket(nextDate, range);
+}
+
+function formatShortDate(date) {
+  return date.toLocaleDateString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+  });
+}
+
+function formatBucketLabel(date, range) {
+  if (range === "week") {
+    const endDate = shiftBucket(date, "day", 6);
+    return `${formatShortDate(date)}-${formatShortDate(endDate)}`;
+  }
+
+  if (range === "month") {
+    return `T${date.getMonth() + 1}/${date.getFullYear()}`;
+  }
+
+  if (range === "year") {
+    return String(date.getFullYear());
+  }
+
+  return formatShortDate(date);
+}
+
+function getBucketKey(date, range) {
+  const start = startOfBucket(date, range);
+
+  if (range === "month") {
+    return `${start.getFullYear()}-${padDatePart(start.getMonth() + 1)}`;
+  }
+
+  if (range === "year") {
+    return String(start.getFullYear());
+  }
+
+  return getLocalDateKey(start);
+}
+
+function getOrderActivityDate(order) {
+  return getValidDate(
+    order.created_at,
+    order.createdAt,
+    order.delivered_at,
+    order.deliveredAt,
+    order.last_synced_at,
+    order.lastSyncedAt,
+    order.updated_at,
+    order.updatedAt
+  );
+}
+
+function getEggActivityDate(egg) {
+  return getValidDate(
+    egg.created_at,
+    egg.createdAt,
+    egg.claimed_at,
+    egg.claimedAt,
+    egg.hatch_at,
+    egg.hatchAt,
+    egg.updated_at,
+    egg.updatedAt
+  );
+}
+
+function getTimeSeriesReferenceDate(orders, eggs) {
+  const dates = [
+    ...orders.map(getOrderActivityDate),
+    ...eggs.map(getEggActivityDate),
+  ].filter(Boolean);
+
+  if (!dates.length) {
+    return new Date();
+  }
+
+  return dates.reduce((latestDate, date) =>
+    date.getTime() > latestDate.getTime() ? date : latestDate
+  );
+}
+
+function createTimeSeriesPoints(range, referenceDate) {
+  const config = TIME_SERIES_CONFIG[range];
+  const currentBucket = startOfBucket(referenceDate, range);
+  const firstBucket = shiftBucket(currentBucket, range, -(config.points - 1));
+
+  return Array.from({ length: config.points }, (_, index) => {
+    const date = shiftBucket(firstBucket, range, index);
+
+    return {
+      key: getBucketKey(date, range),
+      label: formatBucketLabel(date, range),
+      orders: 0,
+      blockedOrders: 0,
+      eggs: 0,
+      claimedEggs: 0,
+      incubatingEggs: 0,
+    };
+  });
+}
+
+function buildTimeSeries(orders, eggs) {
+  const referenceDate = getTimeSeriesReferenceDate(orders, eggs);
+
+  return Object.keys(TIME_SERIES_CONFIG).reduce((result, range) => {
+    const points = createTimeSeriesPoints(range, referenceDate);
+    const pointByKey = new Map(points.map((point) => [point.key, point]));
+
+    orders.forEach((order) => {
+      const date = getOrderActivityDate(order);
+
+      if (!date) {
+        return;
+      }
+
+      const point = pointByKey.get(getBucketKey(date, range));
+
+      if (!point) {
+        return;
+      }
+
+      point.orders += 1;
+
+      if (normalizeStatus(order.status) !== "paid") {
+        point.blockedOrders += 1;
+      }
+    });
+
+    eggs.forEach((egg) => {
+      const date = getEggActivityDate(egg);
+
+      if (!date) {
+        return;
+      }
+
+      const point = pointByKey.get(getBucketKey(date, range));
+
+      if (!point) {
+        return;
+      }
+
+      const status = normalizeStatus(egg.status);
+      point.eggs += 1;
+
+      if (["hatched", "claimed", "opened"].includes(status)) {
+        point.claimedEggs += 1;
+      }
+
+      if (status === "incubating") {
+        point.incubatingEggs += 1;
+      }
+    });
+
+    result[range] = {
+      label: TIME_SERIES_CONFIG[range].label,
+      points,
+    };
+
+    return result;
+  }, {});
+}
+
 function formatDateTime(value) {
   if (!value) return "-";
   return new Date(value).toLocaleString("vi-VN");
@@ -365,6 +622,7 @@ export function buildAdminDashboard(tables) {
         mappingRules: productMappings.length,
         mappedRate: percent(mappedProductIds.size, products.length),
       },
+      timeSeries: buildTimeSeries(orders, eggs),
     },
     counts: {
       customerStatus: countBy(customers, (customer) => customer.status),
