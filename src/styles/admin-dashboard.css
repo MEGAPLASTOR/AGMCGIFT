@@ -192,8 +192,8 @@
   align-items: center;
   justify-content: space-between;
   gap: 18px;
-  width: min(1440px, 100%);
-  margin: 0 auto 18px;
+  width: 100%;
+  margin: 0 0 18px;
   padding: 18px;
 }
 
@@ -241,8 +241,8 @@
 .admin-metric-grid,
 .admin-grid-two,
 .admin-panel {
-  width: min(1440px, 100%);
-  margin-inline: auto;
+  width: 100%;
+  margin-inline: 0;
 }
 
 .admin-metric-grid {
@@ -1272,8 +1272,8 @@
 .admin-shell,
 .admin-section-heading,
 .admin-analytics {
-  width: min(1440px, 100%);
-  margin-inline: auto;
+  width: 100%;
+  margin-inline: 0;
 }
 
 .admin-shell {
@@ -1281,9 +1281,6 @@
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
-  width: calc(100% + var(--admin-page-padding));
-  margin-left: calc(var(--admin-page-padding) * -1);
-  margin-right: 0;
   transition: grid-template-columns 180ms ease;
 }
 
@@ -1546,8 +1543,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
   gap: 14px;
-  width: min(1440px, 100%);
-  margin-inline: auto;
+  width: 100%;
+  margin-inline: 0;
 }
 
 .admin-analytics-band {

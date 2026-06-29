@@ -70,6 +70,7 @@ export function useGiftCode(catalogData) {
     }),
     [selectedEntry]
   );
+  const choiceEggs = selectedEntry?.eggsByChoice || {};
 
   const checkCode = useCallback(async (inputCode) => {
     const trimmedCode = inputCode.trim().toUpperCase();
@@ -218,6 +219,7 @@ export function useGiftCode(catalogData) {
     redemptionInfo,
     errorMsg,
     daysToWait: soNgayCho,
+    choiceEggs,
     isChecking,
     isClaiming,
     availableChoices,

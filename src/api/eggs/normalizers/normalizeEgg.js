@@ -97,12 +97,16 @@ function getChoice(rawEgg, egg, index, totalEggs) {
     }
   }
 
-  if (totalEggs > 1) {
-    return index === 0 ? EGG_CHOICES.instant : EGG_CHOICES.delayed;
+  if (Number(egg.eggType) === 1) {
+    return EGG_CHOICES.instant;
   }
 
   if (Number(egg.eggType) === 2) {
     return EGG_CHOICES.delayed;
+  }
+
+  if (totalEggs > 1) {
+    return index === 0 ? EGG_CHOICES.instant : EGG_CHOICES.delayed;
   }
 
   return index === 0 ? EGG_CHOICES.instant : EGG_CHOICES.delayed;
