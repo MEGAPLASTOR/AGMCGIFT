@@ -1606,6 +1606,212 @@
   padding: 16px;
 }
 
+.admin-time-chart {
+  display: grid;
+  gap: 14px;
+}
+
+.admin-time-chart__head {
+  align-items: center;
+}
+
+.admin-time-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.admin-time-tabs button {
+  min-height: 40px;
+  border: 1px solid rgba(23, 32, 42, 0.18);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #17202a;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 1000;
+  padding: 9px 14px;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-time-tabs button:hover,
+.admin-time-tabs button.is-active {
+  border-color: #17202a;
+  background: #17202a;
+  color: #fff4a2;
+  transform: translateY(-1px);
+}
+
+.admin-time-chart__summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-time-chart__summary article {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(23, 32, 42, 0.1);
+  border-radius: 8px;
+  background: #f8fafc;
+  padding: 12px;
+}
+
+.admin-time-chart__summary span,
+.admin-time-chart__legend,
+.admin-time-chart__bar-group small {
+  color: #526071;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.admin-time-chart__summary strong {
+  color: #17202a;
+  font-size: clamp(22px, 2.2vw, 30px);
+  font-weight: 1000;
+  line-height: 1;
+}
+
+.admin-time-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+}
+
+.admin-time-chart__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.admin-time-chart__dot {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #2563eb;
+}
+
+.admin-time-chart__dot--eggs {
+  background: #ca8a04;
+}
+
+.admin-time-chart__dot--claimed {
+  background: #16a34a;
+}
+
+.admin-time-chart__dot--incubating {
+  background: #7c3aed;
+}
+
+.admin-time-chart__plot-wrap {
+  overflow-x: auto;
+  border: 1px solid rgba(23, 32, 42, 0.1);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, #ffffff, #f8fafc);
+  padding: 14px 12px 12px;
+}
+
+.admin-time-chart__plot {
+  display: grid;
+  grid-auto-columns: minmax(58px, 1fr);
+  grid-auto-flow: column;
+  gap: 10px;
+  min-width: 820px;
+}
+
+.admin-time-chart__bar-group {
+  display: grid;
+  grid-template-rows: 180px auto auto;
+  gap: 7px;
+  min-width: 0;
+  text-align: center;
+}
+
+.admin-time-chart__bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+  border-bottom: 2px solid #d7dde6;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(82, 96, 113, 0.14) 0,
+      rgba(82, 96, 113, 0.14) 1px,
+      transparent 1px,
+      transparent 45px
+    );
+  padding-inline: 3px;
+}
+
+.admin-time-chart__bar {
+  position: relative;
+  display: block;
+  width: 11px;
+  height: var(--bar-height);
+  min-height: 3px;
+  border-radius: 7px 7px 0 0;
+  background: #2563eb;
+}
+
+.admin-time-chart__bar--eggs {
+  background: #ca8a04;
+}
+
+.admin-time-chart__bar--claimed {
+  background: #16a34a;
+}
+
+.admin-time-chart__bar--incubating {
+  background: #7c3aed;
+}
+
+.admin-time-chart__bar em {
+  position: absolute;
+  right: 50%;
+  bottom: calc(100% + 5px);
+  z-index: 1;
+  border-radius: 999px;
+  background: #17202a;
+  color: #ffffff;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 1000;
+  line-height: 1;
+  opacity: 0;
+  padding: 4px 6px;
+  pointer-events: none;
+  transform: translateX(50%);
+  transition: opacity 160ms ease;
+}
+
+.admin-time-chart__bar:hover em {
+  opacity: 1;
+}
+
+.admin-time-chart__bar-group strong {
+  color: #17202a;
+  font-size: 12px;
+  font-weight: 1000;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.admin-time-chart__bar-group small {
+  overflow-wrap: anywhere;
+}
+
 .admin-funnel {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -1771,6 +1977,10 @@
     grid-template-columns: 1fr;
   }
 
+  .admin-time-chart__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .admin-funnel {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1926,6 +2136,7 @@
 
   .admin-alert-grid,
   .admin-funnel,
+  .admin-time-chart__summary,
   .admin-tier-list article {
     grid-template-columns: 1fr;
   }
@@ -1945,6 +2156,7 @@
   }
 
   .admin-panel__head,
+  .admin-time-chart__head,
   .admin-empty-state,
   .admin-record-editor__head,
   .admin-pool-editor__head,
@@ -1955,11 +2167,20 @@
 
   .admin-crud-actions button,
   .admin-panel__head button,
+  .admin-time-tabs button,
   .admin-record-editor__head button,
   .admin-pool-editor__head button,
   .admin-pool-toolbar button,
   .admin-pool-editor__actions button {
     width: 100%;
+  }
+
+  .admin-time-tabs {
+    justify-content: stretch;
+  }
+
+  .admin-time-chart__plot {
+    min-width: 720px;
   }
 
   .admin-status-row {

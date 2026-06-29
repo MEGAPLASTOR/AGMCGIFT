@@ -1,12 +1,77 @@
+import { useMemo, useState } from "react";
+
+const EMPTY_TIME_SERIES = {
+  points: [],
+};
+
+const TIME_RANGE_OPTIONS = [
+  { key: "day", label: "Ngày" },
+  { key: "week", label: "Tuần" },
+  { key: "month", label: "Tháng" },
+  { key: "year", label: "Năm" },
+];
+
+const TIME_CHART_SERIES = [
+  { key: "orders", label: "Đơn", tone: "orders" },
+  { key: "eggs", label: "Trứng cấp", tone: "eggs" },
+  { key: "claimedEggs", label: "Đã nhận", tone: "claimed" },
+  { key: "incubatingEggs", label: "Đang ấp", tone: "incubating" },
+];
+
 function formatPercent(value) {
   return `${Math.max(0, Math.min(100, Number(value || 0)))}%`;
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat("vi-VN").format(Number(value || 0));
 }
 
 function getAlertClassName(tone) {
   return `admin-alert-card admin-alert-card--${tone || "blue"}`;
 }
 
+function getBarStyle(value, maxValue) {
+  const numberValue = Number(value || 0);
+
+  if (!numberValue || !maxValue) {
+    return { "--bar-height": "3px" };
+  }
+
+  return {
+    "--bar-height": `${Math.max(10, Math.round((numberValue / maxValue) * 100))}%`,
+  };
+}
+
 export function AdminAnalyticsPanel({ analytics }) {
+  const [selectedRange, setSelectedRange] = useState("day");
+  const selectedSeries =
+    analytics?.timeSeries?.[selectedRange] ||
+    analytics?.timeSeries?.day ||
+    EMPTY_TIME_SERIES;
+  const timePoints = selectedSeries.points || EMPTY_TIME_SERIES.points;
+  const chartTotals = useMemo(
+    () =>
+      timePoints.reduce(
+        (result, point) => {
+          TIME_CHART_SERIES.forEach((series) => {
+            const value = Number(point[series.key] || 0);
+            result[series.key] += value;
+            result.maxValue = Math.max(result.maxValue, value);
+          });
+
+          return result;
+        },
+        {
+          orders: 0,
+          eggs: 0,
+          claimedEggs: 0,
+          incubatingEggs: 0,
+          maxValue: 0,
+        }
+      ),
+    [timePoints]
+  );
+
   if (!analytics) {
     return null;
   }
@@ -32,6 +97,84 @@ export function AdminAnalyticsPanel({ analytics }) {
           </article>
         ))}
       </div>
+
+      <section className="admin-analytics-band admin-time-chart">
+        <div className="admin-panel__head admin-time-chart__head">
+          <div>
+            <h2>Biểu đồ theo thời gian thật</h2>
+            <span>Gom theo ngày tạo/cập nhật thật của đơn và trứng</span>
+          </div>
+          <div className="admin-time-tabs" role="group" aria-label="Chọn khoảng thời gian">
+            {TIME_RANGE_OPTIONS.map((option) => (
+              <button
+                aria-pressed={selectedRange === option.key}
+                className={selectedRange === option.key ? "is-active" : ""}
+                key={option.key}
+                onClick={() => setSelectedRange(option.key)}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="admin-time-chart__summary">
+          {TIME_CHART_SERIES.map((series) => (
+            <article key={series.key}>
+              <span>{series.label}</span>
+              <strong>{formatNumber(chartTotals[series.key])}</strong>
+            </article>
+          ))}
+        </div>
+
+        <div className="admin-time-chart__legend">
+          {TIME_CHART_SERIES.map((series) => (
+            <span key={series.key}>
+              <i className={`admin-time-chart__dot admin-time-chart__dot--${series.tone}`} />
+              {series.label}
+            </span>
+          ))}
+        </div>
+
+        {chartTotals.maxValue ? (
+          <div className="admin-time-chart__plot-wrap">
+            <div
+              aria-label={`Biểu đồ ${selectedSeries.label || "thời gian"} của đơn và trứng`}
+              className="admin-time-chart__plot"
+              role="img"
+              style={{ "--point-count": String(Math.max(timePoints.length, 1)) }}
+            >
+              {timePoints.map((point) => (
+                <article className="admin-time-chart__bar-group" key={point.key}>
+                  <div className="admin-time-chart__bars">
+                    {TIME_CHART_SERIES.map((series) => {
+                      const value = Number(point[series.key] || 0);
+
+                      return (
+                        <span
+                          className={`admin-time-chart__bar admin-time-chart__bar--${series.tone}`}
+                          key={series.key}
+                          style={getBarStyle(value, chartTotals.maxValue)}
+                          title={`${series.label}: ${formatNumber(value)}`}
+                        >
+                          {value ? <em>{formatNumber(value)}</em> : null}
+                        </span>
+                      );
+                    })}
+                  </div>
+                  <strong>{point.label}</strong>
+                  <small>
+                    {formatNumber(point.orders)} đơn / {formatNumber(point.eggs)} trứng
+                  </small>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="admin-analytics-empty">Chưa có dữ liệu thời gian để vẽ biểu đồ.</p>
+        )}
+      </section>
 
       <div className="admin-analytics-grid">
         <section className="admin-analytics-band admin-analytics-band--wide">
