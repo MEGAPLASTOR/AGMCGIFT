@@ -1,4 +1,5 @@
 .admin-page {
+  --admin-page-padding: 28px;
   min-height: 100vh;
   overflow-x: hidden;
   background:
@@ -11,7 +12,7 @@
       rgba(255, 255, 255, 0.38) 28px
     );
   color: #17130a;
-  padding: 28px;
+  padding: var(--admin-page-padding);
 }
 
 .admin-page--login {
@@ -1280,6 +1281,9 @@
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
+  width: calc(100% + var(--admin-page-padding));
+  margin-left: calc(var(--admin-page-padding) * -1);
+  margin-right: 0;
   transition: grid-template-columns 180ms ease;
 }
 
@@ -1741,7 +1745,7 @@
 
 @media (max-width: 900px) {
   .admin-page {
-    padding: 20px;
+    --admin-page-padding: 20px;
   }
 
   .admin-login-card,
@@ -1757,6 +1761,11 @@
 
   .admin-shell.is-nav-collapsed {
     grid-template-columns: 1fr;
+  }
+
+  .admin-shell {
+    width: 100%;
+    margin-left: 0;
   }
 
   .admin-sidebar__mobile-toggle {
@@ -1843,7 +1852,7 @@
 
 @media (max-width: 760px) {
   .admin-page {
-    padding: 14px;
+    --admin-page-padding: 14px;
   }
 
   .admin-login-card,
@@ -1922,7 +1931,7 @@
 
 @media (max-width: 430px) {
   .admin-page {
-    padding: 10px;
+    --admin-page-padding: 10px;
   }
 
   .admin-login-card,
