@@ -590,37 +590,60 @@ export function AdminGiftPoolDragPanel({
                   onDrop={(event) => handleDrop(event, poolId)}
                 >
                   <div className="admin-pool-column__head">
-                    <button type="button" onClick={() => startEditPool(pool)}>
+                    <button
+                      type="button"
+                      className="admin-pool-column__title"
+                      onClick={() => startEditPool(pool)}
+                    >
                       <FaLayerGroup aria-hidden="true" />
                       <div>
                         <span>Tier {normalizeText(pool.tier || "-")}</span>
                         <strong>{getPoolName(pool) || "Bể chưa đặt tên"}</strong>
                       </div>
                     </button>
-                    <em>{poolAccounts.length}</em>
+                    <div className="admin-pool-column__head-actions">
+                      <em>{poolAccounts.length}</em>
+                      <button
+                        type="button"
+                        className="admin-pool-column__toggle"
+                        aria-expanded={isExpanded}
+                        aria-controls={`pool-accounts-${poolId}`}
+                        title={isExpanded ? "Thu gọn" : "Xổ xuống"}
+                        onClick={() => togglePoolExpanded(poolId)}
+                      >
+                        <FaChevronDown aria-hidden="true" />
+                      </button>
+                    </div>
                   </div>
-                  <div className="admin-pool-column__actions">
-                    <button
-                      type="button"
-                      className="admin-mini-button"
-                      onClick={() => startEditPool(pool)}
+                  {isExpanded ? (
+                    <div
+                      className="admin-pool-column__body"
+                      id={`pool-accounts-${poolId}`}
                     >
-                      <FaPen aria-hidden="true" />
-                      Sửa
-                    </button>
-                    <button
-                      type="button"
-                      className="admin-mini-button admin-danger-button"
-                      disabled={isSaving}
-                      onClick={() => deletePool(poolId)}
-                    >
-                      <FaTrashCan aria-hidden="true" />
-                      Xóa
-                    </button>
-                  </div>
-                  <div className="admin-pool-card-list" role="list">
-                    {renderAccountList(poolAccounts)}
-                  </div>
+                      <div className="admin-pool-column__actions">
+                        <button
+                          type="button"
+                          className="admin-mini-button"
+                          onClick={() => startEditPool(pool)}
+                        >
+                          <FaPen aria-hidden="true" />
+                          Sửa
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-mini-button admin-danger-button"
+                          disabled={isSaving}
+                          onClick={() => deletePool(poolId)}
+                        >
+                          <FaTrashCan aria-hidden="true" />
+                          Xóa
+                        </button>
+                      </div>
+                      <div className="admin-pool-card-list" role="list">
+                        {renderAccountList(poolAccounts)}
+                      </div>
+                    </div>
+                  ) : null}
                 </section>
               );
             })

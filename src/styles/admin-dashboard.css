@@ -930,8 +930,9 @@
 
 .admin-pool-board {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 12px;
+  align-items: start;
   min-width: 0;
 }
 
@@ -956,6 +957,15 @@
     transform 160ms ease;
 }
 
+.admin-pool-column--compact {
+  min-height: auto;
+  background: #ffffff;
+}
+
+.admin-pool-column--compact.is-collapsed {
+  padding-block: 10px;
+}
+
 .admin-pool-column--source {
   position: sticky;
   top: 14px;
@@ -975,7 +985,7 @@
 
 .admin-pool-column__head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
@@ -997,6 +1007,43 @@
 .admin-pool-column__head button svg {
   flex: 0 0 auto;
   margin-top: 2px;
+}
+
+.admin-pool-column__title {
+  flex: 1 1 auto;
+}
+
+.admin-pool-column__head-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-pool-column__toggle {
+  display: inline-grid !important;
+  place-items: center;
+  width: 34px;
+  min-width: 34px;
+  min-height: 30px;
+  border: 1px solid rgba(23, 32, 42, 0.16) !important;
+  border-radius: 8px;
+  background: #ffffff !important;
+  padding: 0 !important;
+}
+
+.admin-pool-column__toggle svg {
+  margin: 0 !important;
+  transition: transform 160ms ease;
+}
+
+.admin-pool-column.is-expanded .admin-pool-column__toggle svg {
+  transform: rotate(180deg);
+}
+
+.admin-pool-column__body {
+  display: grid;
+  gap: 10px;
 }
 
 .admin-pool-column__head button div,
@@ -1047,6 +1094,13 @@
   display: grid;
   gap: 8px;
   min-height: 160px;
+}
+
+.admin-pool-column--compact .admin-pool-card-list {
+  min-height: 96px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 2px;
 }
 
 .admin-pool-account-card {
