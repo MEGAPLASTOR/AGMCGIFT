@@ -78,14 +78,6 @@ const MANAGEMENT_PAGES = [
     description: "Liên kết sản phẩm AGMC với loại trứng và bể quà phát thưởng.",
   },
   {
-    slug: "pool-accounts",
-    tableKey: "poolAccountMappings",
-    icon: FaBoxesStacked,
-    label: "Gán account",
-    title: "Quản lý gán account",
-    description: "Gắn hoặc gỡ account vào từng bể quà để backend có nguồn phát thưởng.",
-  },
-  {
     slug: "customers",
     tableKey: "customers",
     icon: FaUserGroup,
