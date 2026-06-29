@@ -1,10 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
+  FaBars,
+  FaBoxOpen,
   FaBoxesStacked,
+  FaCartShopping,
+  FaChartLine,
+  FaChevronLeft,
+  FaChevronRight,
+  FaCube,
+  FaEgg,
   FaKey,
+  FaLayerGroup,
+  FaLink,
   FaRightFromBracket,
   FaRotateRight,
+  FaUserGroup,
 } from "react-icons/fa6";
 import { AdminAnalyticsPanel } from "../../components/admin/AdminAnalyticsPanel";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
@@ -45,6 +56,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "accounts",
     tableKey: "giftAccounts",
+    icon: FaBoxOpen,
     label: "Kho account",
     title: "Quản lý kho account",
     description: "Tạo account, upload Excel, sửa trạng thái và quản lý tồn kho quà.",
@@ -52,6 +64,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "pools",
     tableKey: "giftPools",
+    icon: FaLayerGroup,
     label: "Bể quà",
     title: "Quản lý bể quà",
     description: "Tạo bể quà, chỉnh tier và chuẩn bị nguồn account theo hạng.",
@@ -59,6 +72,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "egg-mappings",
     tableKey: "productEggMappings",
+    icon: FaLink,
     label: "Mapping trứng",
     title: "Quản lý mapping trứng",
     description: "Liên kết sản phẩm AGMC với loại trứng và bể quà phát thưởng.",
@@ -66,6 +80,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "pool-accounts",
     tableKey: "poolAccountMappings",
+    icon: FaBoxesStacked,
     label: "Gán account",
     title: "Quản lý gán account",
     description: "Gắn hoặc gỡ account vào từng bể quà để backend có nguồn phát thưởng.",
@@ -73,6 +88,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "customers",
     tableKey: "customers",
+    icon: FaUserGroup,
     label: "Khách hàng",
     title: "Quản lý khách hàng",
     description: "Theo dõi trạng thái, đơn thành công, cảnh báo và return streak.",
@@ -80,6 +96,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "eggs",
     tableKey: "eggs",
+    icon: FaEgg,
     label: "Trứng",
     title: "Quản lý trứng",
     description: "Kiểm tra loại trứng, trạng thái ấp, thời gian mở và tài khoản được cấp.",
@@ -87,6 +104,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "products",
     tableKey: "products",
+    icon: FaCube,
     label: "Sản phẩm",
     title: "Quản lý sản phẩm",
     description: "Xem sản phẩm đã đồng bộ từ hệ thống AGMC và đối chiếu mapping phát trứng.",
@@ -94,6 +112,7 @@ const MANAGEMENT_PAGES = [
   {
     slug: "orders",
     tableKey: "adminOrders",
+    icon: FaCartShopping,
     label: "Đơn hàng",
     title: "Quản lý đơn hàng",
     description: "Kiểm tra đơn hàng gift code, trạng thái thanh toán, giao hàng và điều kiện nhận quà.",
