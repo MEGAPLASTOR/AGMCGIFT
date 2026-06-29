@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   FaBoxOpen,
+  FaChevronDown,
   FaCirclePlus,
   FaFloppyDisk,
   FaGripVertical,
@@ -173,6 +174,7 @@ export function AdminGiftPoolDragPanel({
   const [isSaving, setIsSaving] = useState(false);
   const [draggingAccountId, setDraggingAccountId] = useState("");
   const [dragOverPoolId, setDragOverPoolId] = useState("");
+  const [expandedPoolIds, setExpandedPoolIds] = useState(() => new Set());
 
   const pools = tables.giftPools || EMPTY_ROWS;
   const accounts = tables.giftAccounts || EMPTY_ROWS;
@@ -256,6 +258,32 @@ export function AdminGiftPoolDragPanel({
     (account) => normalizeSearch(account.status) === "available"
   ).length;
 
+  const expandPool = (poolId) => {
+    setExpandedPoolIds((currentIds) => {
+      if (currentIds.has(poolId)) {
+        return currentIds;
+      }
+
+      const nextIds = new Set(currentIds);
+      nextIds.add(poolId);
+      return nextIds;
+    });
+  };
+
+  const togglePoolExpanded = (poolId) => {
+    setExpandedPoolIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      if (nextIds.has(poolId)) {
+        nextIds.delete(poolId);
+      } else {
+        nextIds.add(poolId);
+      }
+
+      return nextIds;
+    });
+  };
+
   const startCreatePool = () => {
     setSelectedPoolId("");
     setPoolForm(createEmptyPoolForm());
@@ -263,8 +291,11 @@ export function AdminGiftPoolDragPanel({
   };
 
   const startEditPool = (pool) => {
-    setSelectedPoolId(getPoolId(pool));
+    const poolId = getPoolId(pool);
+
+    setSelectedPoolId(poolId);
     setPoolForm(createPoolForm(pool));
+    expandPool(poolId);
     setMessage("Đang chỉnh sửa bể quà đã chọn.");
   };
 
@@ -309,6 +340,7 @@ export function AdminGiftPoolDragPanel({
 
       onSaveRecord("giftPools", nextPool);
       setSelectedPoolId(nextPoolId);
+      expandPool(nextPoolId);
       setPoolForm(createPoolForm(nextPool));
       setMessage(
         selectedPoolId ? "Đã cập nhật bể quà." : "Đã tạo bể quà mới."
@@ -340,6 +372,12 @@ export function AdminGiftPoolDragPanel({
         setSelectedPoolId("");
         setPoolForm(createEmptyPoolForm());
       }
+
+      setExpandedPoolIds((currentIds) => {
+        const nextIds = new Set(currentIds);
+        nextIds.delete(poolId);
+        return nextIds;
+      });
 
       setMessage("Đã xóa bể quà.");
     } catch (error) {
@@ -416,6 +454,9 @@ export function AdminGiftPoolDragPanel({
   const handleDragOver = (event, poolId) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
+    if (poolId !== UNASSIGNED_POOL_ID) {
+      expandPool(poolId);
+    }
     setDragOverPoolId(poolId);
   };
 
@@ -534,10 +575,13 @@ export function AdminGiftPoolDragPanel({
                   poolMatchesKeyword(pool, normalizedKeyword) ||
                   accountMatchesKeyword(account, normalizedKeyword)
               );
+              const isExpanded = expandedPoolIds.has(poolId);
 
               return (
                 <section
-                  className={`admin-pool-column${
+                  className={`admin-pool-column admin-pool-column--compact${
+                    isExpanded ? " is-expanded" : " is-collapsed"
+                  }${
                     selectedPoolId === poolId ? " is-selected" : ""
                   }${dragOverPoolId === poolId ? " is-drag-over" : ""}`}
                   key={poolId}
