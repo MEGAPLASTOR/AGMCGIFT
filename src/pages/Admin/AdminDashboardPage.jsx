@@ -24,7 +24,10 @@ import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
 import { giftCatalogData } from "../../config/giftCatalogData";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { useAdminDataTables } from "../../hooks/useAdminDataTables";
-import { buildAdminDashboard } from "../../services/adminDashboardService";
+import {
+  buildAdminDashboard,
+  formatCurrency,
+} from "../../services/adminDashboardService";
 import { updateAdminCredentials } from "../../services/adminAuthService";
 import { updateAdminCustomerStatus } from "../../services/adminCustomerService";
 import {
@@ -166,6 +169,10 @@ function AdminManagementNav({ activeSlug, onNavigate, tableCounts }) {
       })}
     </nav>
   );
+}
+
+function hasMetricValue(value) {
+  return Number(value) > 0;
 }
 
 function normalizeComparable(value) {
@@ -645,23 +652,12 @@ export default function AdminDashboardPage() {
 
         <div className="admin-shell__content">
           {isOverviewPage ? (
-            <>
-              {visibleMetrics.length ? (
-                <section className="admin-metric-grid">
-                  {visibleMetrics.map((metric) => (
-                    <AdminMetricCard
-                      key={metric.label}
-                      label={metric.label}
-                      value={metric.value}
-                      note={metric.note}
-                      tone={metric.tone}
-                    />
-                  ))}
-                </section>
-              ) : null}
-
-              <AdminAnalyticsPanel analytics={dashboard.analytics} />
-            </>
+            <AdminAnalyticsPanel
+              dashboard={dashboard}
+              isRefreshing={adminTables.isLoadingRawData}
+              metrics={visibleMetrics}
+              onRefresh={handleReloadRawData}
+            />
           ) : (
             <AdminDataCrudPanel
               activeTableKey={activeManagementPage.tableKey}
