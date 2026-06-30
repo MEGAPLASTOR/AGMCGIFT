@@ -3451,6 +3451,187 @@
   }
 }
 
+.admin-egg-manager-panel {
+  display: grid;
+  gap: 0;
+  padding: 20px 18px;
+}
+
+.admin-egg-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--admin-galaxy-line);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background:
+    linear-gradient(90deg, rgba(34, 211, 238, 0.08), rgba(255, 217, 102, 0.05)),
+    rgba(36, 38, 44, 0.96);
+  padding: 20px 18px 16px;
+}
+
+.admin-egg-search {
+  position: relative;
+  width: min(280px, 100%);
+}
+
+.admin-egg-search svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  color: #9bbcff;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.admin-egg-search span {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.admin-egg-search input {
+  min-height: 34px;
+  border-radius: 4px;
+  padding: 7px 12px 7px 36px;
+}
+
+.admin-egg-toolbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.admin-egg-toolbar__actions select,
+.admin-egg-toolbar__actions button {
+  min-height: 36px;
+  border-radius: 4px;
+  font-size: 13px;
+  padding: 7px 12px;
+}
+
+.admin-egg-toolbar__actions select {
+  width: min(160px, 100%);
+}
+
+.admin-egg-toolbar__actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid rgba(130, 174, 244, 0.5);
+  background:
+    linear-gradient(135deg, rgba(130, 174, 244, 0.18), rgba(34, 211, 238, 0.12)),
+    #111827;
+  color: #dbeafe;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 1000;
+}
+
+.admin-egg-toolbar__actions button:hover {
+  border-color: #8bdcff;
+  background:
+    linear-gradient(135deg, rgba(130, 174, 244, 0.26), rgba(34, 211, 238, 0.18)),
+    #172033;
+}
+
+.admin-egg-table-wrap {
+  border-radius: 0 0 6px 6px;
+}
+
+.admin-egg-table {
+  min-width: 1180px;
+}
+
+.admin-egg-table th,
+.admin-egg-table td {
+  height: 44px;
+  color: #ffffff;
+  vertical-align: middle;
+}
+
+.admin-egg-id {
+  color: #bfd0e8 !important;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.admin-egg-order-code {
+  color: #22d3ee;
+  font-weight: 1000;
+}
+
+.admin-egg-type,
+.admin-egg-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 19px;
+  border: 1px solid var(--admin-galaxy-line);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 1000;
+  line-height: 1;
+  padding: 4px 8px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-egg-type.is-instant {
+  border-color: rgba(130, 174, 244, 0.58);
+  background: rgba(130, 174, 244, 0.18);
+  color: #a8c6ff;
+}
+
+.admin-egg-type.is-incubate,
+.admin-egg-status.is-pending {
+  border-color: rgba(255, 217, 102, 0.58);
+  background: rgba(255, 217, 102, 0.18);
+  color: #ffe08a;
+}
+
+.admin-egg-status.is-claimed {
+  border-color: rgba(130, 201, 147, 0.56);
+  background: rgba(130, 201, 147, 0.18);
+  color: #93e2a8;
+}
+
+.admin-egg-status.is-ready {
+  border-color: rgba(34, 211, 238, 0.56);
+  background: rgba(34, 211, 238, 0.16);
+  color: #8beeff;
+}
+
+.admin-egg-status.is-cancelled {
+  border-color: rgba(242, 139, 131, 0.56);
+  background: rgba(242, 139, 131, 0.16);
+  color: #ffc9c5;
+}
+
+@media (max-width: 900px) {
+  .admin-egg-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-egg-search,
+  .admin-egg-toolbar__actions,
+  .admin-egg-toolbar__actions select,
+  .admin-egg-toolbar__actions button {
+    width: 100%;
+  }
+}
+
 .admin-modal-backdrop {
   background: rgba(4, 6, 13, 0.78);
 }

@@ -723,6 +723,8 @@ export default function AdminDashboardPage() {
               onDeleteProductEggMapping={handleDeleteProductEggMapping}
               onImportGiftAccounts={adminTables.importGiftAccounts}
               onUploadGiftAccounts={handleUploadGiftAccounts}
+              isRefreshing={adminTables.isLoadingRawData}
+              onRefresh={handleReloadRawData}
               onResetTables={adminTables.resetTables}
             />
           )}

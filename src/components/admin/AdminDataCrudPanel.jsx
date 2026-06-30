@@ -24,6 +24,7 @@ import {
   searchTableRows,
 } from "../../services/adminCrudService";
 import { parseAccountImportFile } from "../../services/accountImportService";
+import { AdminEggTablePanel } from "./AdminEggTablePanel";
 import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
 import { AdminGiftPoolTablePanel } from "./AdminGiftPoolTablePanel";
 
@@ -832,6 +833,8 @@ export function AdminDataCrudPanel({
   onDeleteProductEggMapping,
   onImportGiftAccounts,
   onUploadGiftAccounts,
+  isRefreshing,
+  onRefresh,
   onResetTables,
 }) {
   const [tableKey, setTableKey] = useState(activeTableKey);
@@ -868,6 +871,7 @@ export function AdminDataCrudPanel({
   );
   const fields = useMemo(() => getTableFields(tableKey), [tableKey]);
   const isCustomersTable = tableKey === "customers";
+  const isEggsTable = tableKey === "eggs";
   const isGiftAccountsTable = tableKey === "giftAccounts";
   const isGiftPoolsTable = tableKey === "giftPools";
   const isPoolMappingsTable = tableKey === "poolAccountMappings";
@@ -1465,6 +1469,16 @@ export function AdminDataCrudPanel({
         onDeleteGiftPool={onDeleteGiftPool}
         onAddPoolAccount={onAddPoolAccount}
         onRemovePoolAccount={onRemovePoolAccount}
+      />
+    );
+  }
+
+  if (isEggsTable) {
+    return (
+      <AdminEggTablePanel
+        isRefreshing={isRefreshing}
+        tables={tables}
+        onRefresh={onRefresh}
       />
     );
   }
