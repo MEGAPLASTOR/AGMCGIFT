@@ -1,4 +1,4 @@
-export const DEFAULT_DEV_API_BASE_URL = "http://14.225.212.94";
+export const DEFAULT_DEV_API_BASE_URL = "https://backend.anhgamc.com";
 export const RUNTIME_API_BASE_KEY = "AGMC_API_BASE_URL";
 
 export function normalizeApiBaseUrl(value) {

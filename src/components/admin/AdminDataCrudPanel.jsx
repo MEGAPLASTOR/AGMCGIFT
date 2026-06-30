@@ -24,6 +24,7 @@ import {
   searchTableRows,
 } from "../../services/adminCrudService";
 import { parseAccountImportFile } from "../../services/accountImportService";
+import { AdminCustomerTablePanel } from "./AdminCustomerTablePanel";
 import { AdminEggTablePanel } from "./AdminEggTablePanel";
 import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
 import { AdminGiftPoolTablePanel } from "./AdminGiftPoolTablePanel";
@@ -1473,6 +1474,18 @@ export function AdminDataCrudPanel({
         onDeleteGiftPool={onDeleteGiftPool}
         onAddPoolAccount={onAddPoolAccount}
         onRemovePoolAccount={onRemovePoolAccount}
+      />
+    );
+  }
+
+  if (isCustomersTable) {
+    return (
+      <AdminCustomerTablePanel
+        isRefreshing={isRefreshing}
+        tables={tables}
+        onRefresh={onRefresh}
+        onSaveRecord={onSaveRecord}
+        onUpdateCustomerStatus={onUpdateCustomerStatus}
       />
     );
   }
