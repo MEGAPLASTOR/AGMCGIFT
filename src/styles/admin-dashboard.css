@@ -2874,17 +2874,31 @@
   --admin-galaxy-line: #3a3f48;
   --admin-galaxy-text: #f4f7fb;
   --admin-galaxy-muted: #a7b1c0;
+  --admin-accent-blue: #82aef4;
+  --admin-accent-cyan: #22d3ee;
+  --admin-accent-gold: #ffd966;
+  --admin-accent-green: #82c993;
+  --admin-accent-pink: #f472b6;
   min-height: 100vh;
   background:
     radial-gradient(circle at 12% 18%, rgba(170, 197, 255, 0.8) 0 1px, transparent 1.4px),
     radial-gradient(circle at 72% 14%, rgba(255, 255, 255, 0.55) 0 1px, transparent 1.3px),
     radial-gradient(circle at 42% 76%, rgba(105, 159, 255, 0.42) 0 1px, transparent 1.3px),
+    linear-gradient(
+      125deg,
+      rgba(34, 211, 238, 0.12) 0 18%,
+      transparent 18% 42%,
+      rgba(255, 217, 102, 0.1) 42% 56%,
+      transparent 56% 78%,
+      rgba(244, 114, 182, 0.11) 78% 100%
+    ),
     linear-gradient(135deg, #05060b 0%, #0d1220 44%, #060711 100%);
   background-attachment: fixed;
   background-size:
     76px 76px,
     118px 118px,
     154px 154px,
+    auto,
     auto;
   color: var(--admin-galaxy-text);
 }
@@ -2911,7 +2925,9 @@
 .admin-header,
 .admin-panel,
 .admin-login-card {
-  background: rgba(34, 37, 44, 0.94);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.05), rgba(244, 114, 182, 0.04)),
+    rgba(34, 37, 44, 0.94);
 }
 
 .admin-login-card > div:first-child,
@@ -3000,8 +3016,10 @@
 .admin-modal-close,
 .admin-pool-toolbar button,
 .admin-pool-editor__actions button {
-  border-color: #46505d;
-  background: #111827;
+  border-color: rgba(130, 174, 244, 0.45);
+  background:
+    linear-gradient(135deg, rgba(130, 174, 244, 0.18), rgba(34, 211, 238, 0.1)),
+    #111827;
   color: #f8fbff;
   box-shadow: none;
 }
@@ -3012,7 +3030,9 @@
 .admin-sidebar__mobile-toggle,
 .admin-management-nav a {
   border-color: var(--admin-galaxy-line);
-  background: #242932;
+  background:
+    linear-gradient(135deg, rgba(130, 174, 244, 0.09), rgba(130, 201, 147, 0.05)),
+    #242932;
   color: var(--admin-galaxy-text);
 }
 
@@ -3042,9 +3062,13 @@
 }
 
 .admin-management-nav a.is-active {
-  border-color: #82aef4;
-  background: rgba(130, 174, 244, 0.14);
-  box-shadow: inset 0 0 0 1px rgba(130, 174, 244, 0.42);
+  border-color: var(--admin-accent-cyan);
+  background:
+    linear-gradient(135deg, rgba(34, 211, 238, 0.18), rgba(255, 217, 102, 0.1)),
+    rgba(130, 174, 244, 0.12);
+  box-shadow:
+    inset 0 0 0 1px rgba(34, 211, 238, 0.38),
+    0 10px 24px rgba(34, 211, 238, 0.1);
 }
 
 .admin-management-nav__icon,
@@ -3052,15 +3076,40 @@
   color: #9bbcff;
 }
 
+.admin-management-nav a:nth-child(2n) .admin-management-nav__icon {
+  color: var(--admin-accent-gold);
+}
+
+.admin-management-nav a:nth-child(3n) .admin-management-nav__icon {
+  color: var(--admin-accent-green);
+}
+
+.admin-management-nav a:nth-child(4n) .admin-management-nav__icon {
+  color: var(--admin-accent-pink);
+}
+
 .admin-management-nav strong {
-  background: #343b48;
+  background:
+    linear-gradient(135deg, rgba(255, 217, 102, 0.18), rgba(34, 211, 238, 0.12)),
+    #343b48;
   color: var(--admin-galaxy-text);
+}
+
+.admin-management-nav a.is-active strong {
+  background: var(--admin-accent-cyan);
+  color: #06121c;
 }
 
 .admin-table th,
 .admin-table td,
 .admin-time-chart__bars {
   border-color: var(--admin-galaxy-line);
+}
+
+.admin-table th {
+  background:
+    linear-gradient(90deg, rgba(34, 211, 238, 0.12), rgba(255, 217, 102, 0.08));
+  color: #b7d4ff;
 }
 
 .admin-table-wrap,
@@ -3109,6 +3158,7 @@
   border-bottom: 0;
   border-radius: 6px 6px 0 0;
   background: rgba(36, 38, 44, 0.96);
+  box-shadow: inset 0 1px 0 rgba(34, 211, 238, 0.16);
   padding: 20px 18px 16px;
 }
 
@@ -3153,7 +3203,7 @@
   min-height: 34px;
   border: 1px solid #82aef4;
   border-radius: 4px;
-  background: #82aef4;
+  background: linear-gradient(135deg, var(--admin-accent-blue), var(--admin-accent-cyan));
   color: #07111f;
   cursor: pointer;
   font: inherit;
@@ -3164,8 +3214,8 @@
 
 .admin-gift-pool-create-button:hover,
 .admin-gift-pool-add-panel button:hover {
-  border-color: #a8c6ff;
-  background: #a8c6ff;
+  border-color: #d1f7ff;
+  background: linear-gradient(135deg, #a8c6ff, #67e8f9);
 }
 
 .admin-gift-pool-table-wrap {
@@ -3189,9 +3239,9 @@
   align-items: center;
   width: fit-content;
   min-height: 20px;
-  border: 1px solid #5173a8;
+  border: 1px solid rgba(130, 174, 244, 0.58);
   border-radius: 4px;
-  background: rgba(130, 174, 244, 0.16);
+  background: linear-gradient(135deg, rgba(130, 174, 244, 0.2), rgba(34, 211, 238, 0.08));
   color: #9fc1ff;
   font-size: 11px;
   font-weight: 1000;
@@ -3233,15 +3283,19 @@
 }
 
 .admin-panel.admin-gift-pool-modal {
-  width: min(520px, calc(100vw - 32px));
-  max-height: calc(100vh - 64px);
+  width: min(640px, calc(100vw - 48px)) !important;
+  max-width: calc(100vw - 48px) !important;
+  max-height: calc(100vh - 48px);
   overflow-y: auto;
 }
 
 .admin-panel.admin-gift-pool-detail-modal {
-  width: min(1040px, calc(100vw - 32px));
-  max-height: calc(100vh - 64px);
+  width: min(1240px, calc(100vw - 48px)) !important;
+  max-width: calc(100vw - 48px) !important;
+  min-height: min(760px, calc(100vh - 48px));
+  max-height: calc(100vh - 48px);
   overflow-y: auto;
+  padding: 18px;
 }
 
 .admin-gift-pool-form-grid {
@@ -3274,11 +3328,17 @@
   font-size: 12px;
   font-weight: 1000;
   padding: 5px 10px;
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .admin-gift-pool-add-panel {
   display: grid;
-  grid-template-columns: minmax(120px, 0.65fr) auto minmax(220px, 1.35fr) auto;
+  grid-template-columns:
+    minmax(130px, 0.65fr)
+    minmax(190px, 0.75fr)
+    minmax(300px, 1.35fr)
+    minmax(150px, 0.6fr);
   gap: 10px;
   align-items: end;
   border: 1px solid var(--admin-galaxy-line);
@@ -3304,7 +3364,8 @@
 
 .admin-gift-pool-add-panel button {
   min-height: 36px;
-  white-space: nowrap;
+  min-width: 0;
+  white-space: normal;
 }
 
 .admin-gift-pool-add-panel button:disabled {
@@ -3314,13 +3375,47 @@
 }
 
 .admin-gift-pool-account-wrap {
-  max-height: min(52vh, 560px);
+  max-height: min(58vh, 620px);
   overflow: auto;
 }
 
-.admin-gift-pool-account-table td:first-child {
-  display: grid;
-  gap: 4px;
+.admin-gift-pool-account-table {
+  min-width: 940px;
+  table-layout: fixed;
+}
+
+.admin-gift-pool-account-table th:nth-child(1),
+.admin-gift-pool-account-table td:nth-child(1) {
+  width: 25%;
+}
+
+.admin-gift-pool-account-table th:nth-child(2),
+.admin-gift-pool-account-table td:nth-child(2) {
+  width: 23%;
+}
+
+.admin-gift-pool-account-table th:nth-child(3),
+.admin-gift-pool-account-table td:nth-child(3) {
+  width: 14%;
+}
+
+.admin-gift-pool-account-table th:nth-child(4),
+.admin-gift-pool-account-table td:nth-child(4),
+.admin-gift-pool-account-table th:nth-child(5),
+.admin-gift-pool-account-table td:nth-child(5),
+.admin-gift-pool-account-table th:nth-child(6),
+.admin-gift-pool-account-table td:nth-child(6) {
+  width: 12%;
+}
+
+.admin-gift-pool-account-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.admin-gift-pool-account-table td:first-child strong,
+.admin-gift-pool-account-table td:first-child small {
+  display: block;
 }
 
 .admin-gift-pool-account-table td:first-child small {
