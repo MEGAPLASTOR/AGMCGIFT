@@ -810,7 +810,7 @@ export function AdminDataCrudPanel({
     setRecordModalOpen(false);
     setDeleteModalOpen(false);
     setResetModalOpen(false);
-    setMessage("ÄÃ£ khÃ´i phá»¥c dá»¯ liá»‡u.");
+    setMessage("Đã khôi phục dữ liệu.");
   };
 
   const deleteSelected = async () => {
@@ -860,6 +860,10 @@ export function AdminDataCrudPanel({
               ? "Đã xóa mapping sản phẩm - trứng."
               : "Đã xóa bản ghi."
       );
+      if (isGiftAccountsTable) {
+        setRecordModalOpen(false);
+        setDeleteModalOpen(false);
+      }
     } catch (error) {
       setMessage(error.message || "Không thể xóa bản ghi.");
     } finally {
@@ -976,7 +980,7 @@ export function AdminDataCrudPanel({
           <h2>{panelTitle}</h2>
           <span>{panelDescription}</span>
         </div>
-        <button type="button" className="admin-light-button" onClick={onResetTables}>
+        <button type="button" className="admin-light-button" onClick={handleResetTablesClick}>
           <FaRotateLeft aria-hidden="true" />
           Khôi phục dữ liệu
         </button>
@@ -998,7 +1002,11 @@ export function AdminDataCrudPanel({
         </button>
       </div>
 
-      <div className="admin-crud-grid">
+      <div
+        className={`admin-crud-grid${
+          isGiftAccountsTable ? " admin-crud-grid--table-only" : ""
+        }`}
+      >
         <div className="admin-dnd-wrap">
           {isGiftAccountsTable && onImportGiftAccounts ? (
             <AdminAccountImportPanel
@@ -1167,8 +1175,12 @@ export function AdminDataCrudPanel({
               )}
             </tbody>
           </table>
+          {isGiftAccountsTable && message && !isRecordModalOpen ? (
+            <p className="admin-crud-message">{message}</p>
+          ) : null}
         </div>
 
+        {!isGiftAccountsTable ? (
         <div className="admin-record-editor">
           <div className="admin-record-editor__head">
             <div>
@@ -1214,7 +1226,7 @@ export function AdminDataCrudPanel({
             <button
               type="button"
               className="admin-danger-button"
-              onClick={deleteSelected}
+              onClick={requestDeleteSelected}
               disabled={!selectedRecordId || isSaving}
             >
               <FaTrashCan aria-hidden="true" />
@@ -1230,7 +1242,176 @@ export function AdminDataCrudPanel({
             </button>
           </div>
         </div>
+        ) : null}
       </div>
+
+      {isGiftAccountsTable && isRecordModalOpen ? (
+        <div className="admin-modal-backdrop">
+          <section
+            className="admin-panel admin-modal admin-record-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-account-record-title"
+          >
+            <div className="admin-record-editor admin-record-editor--modal">
+              <div className="admin-record-editor__head">
+                <div>
+                  <strong id="admin-account-record-title">
+                    Thông tin tài khoản
+                  </strong>
+                  <span>{recordTitle}</span>
+                </div>
+                <div className="admin-modal-head-actions">
+                  <button type="button" className="admin-light-button" onClick={startAdd}>
+                    <FaPlus aria-hidden="true" />
+                    Tạo mới
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-modal-close"
+                    aria-label="Đóng modal tài khoản"
+                    onClick={() => setRecordModalOpen(false)}
+                  >
+                    <FaXmark aria-hidden="true" />
+                    Đóng
+                  </button>
+                </div>
+              </div>
+
+              {hasActiveForm ? (
+                <div className="admin-form-grid">
+                  {visibleFields.map((field) => (
+                    <AdminFormField
+                      key={field.key}
+                      field={field}
+                      value={formValues[field.key]}
+                      onChange={updateField}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="admin-form-placeholder">
+                  Chọn một dòng để sửa hoặc bấm Tạo mới để thêm tài khoản.
+                </div>
+              )}
+
+              {message ? <p>{message}</p> : null}
+
+              <div className="admin-crud-actions">
+                <button
+                  type="button"
+                  onClick={saveForm}
+                  disabled={!hasActiveForm || isSaving}
+                >
+                  <FaFloppyDisk aria-hidden="true" />
+                  {isSaving ? "Đang lưu..." : "Lưu thay đổi"}
+                </button>
+                <button
+                  type="button"
+                  className="admin-danger-button"
+                  onClick={requestDeleteSelected}
+                  disabled={!selectedRecordId || isSaving}
+                >
+                  <FaTrashCan aria-hidden="true" />
+                  Xóa tài khoản
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {isDeleteModalOpen ? (
+        <div className="admin-modal-backdrop">
+          <section
+            className="admin-panel admin-modal admin-confirm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-delete-account-title"
+          >
+            <div className="admin-panel__head">
+              <div>
+                <h2 id="admin-delete-account-title">Xóa tài khoản?</h2>
+                <span>{recordTitle}</span>
+              </div>
+              <button
+                type="button"
+                className="admin-modal-close"
+                aria-label="Đóng xác nhận xóa"
+                onClick={() => setDeleteModalOpen(false)}
+              >
+                <FaXmark aria-hidden="true" />
+                Đóng
+              </button>
+            </div>
+            <p className="admin-confirm-copy">
+              Tài khoản sẽ bị xóa khỏi kho và đồng bộ với backend nếu API cho phép.
+            </p>
+            <div className="admin-crud-actions">
+              <button
+                type="button"
+                className="admin-danger-button"
+                disabled={isSaving}
+                onClick={deleteSelected}
+              >
+                <FaTrashCan aria-hidden="true" />
+                {isSaving ? "Đang xóa..." : "Xóa tài khoản"}
+              </button>
+              <button
+                type="button"
+                className="admin-light-button"
+                disabled={isSaving}
+                onClick={() => setDeleteModalOpen(false)}
+              >
+                Hủy
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {isResetModalOpen ? (
+        <div className="admin-modal-backdrop">
+          <section
+            className="admin-panel admin-modal admin-confirm-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-reset-table-title"
+          >
+            <div className="admin-panel__head">
+              <div>
+                <h2 id="admin-reset-table-title">Khôi phục dữ liệu?</h2>
+                <span>{panelTitle}</span>
+              </div>
+              <button
+                type="button"
+                className="admin-modal-close"
+                aria-label="Đóng xác nhận khôi phục"
+                onClick={() => setResetModalOpen(false)}
+              >
+                <FaXmark aria-hidden="true" />
+                Đóng
+              </button>
+            </div>
+            <p className="admin-confirm-copy">
+              Màn hiện tại sẽ tải lại dữ liệu nguồn và bỏ các chỉnh sửa chưa lưu trong form.
+            </p>
+            <div className="admin-crud-actions">
+              <button type="button" onClick={confirmResetTables}>
+                <FaRotateLeft aria-hidden="true" />
+                Khôi phục
+              </button>
+              <button
+                type="button"
+                className="admin-light-button"
+                onClick={() => setResetModalOpen(false)}
+              >
+                Hủy
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

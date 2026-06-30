@@ -515,6 +515,10 @@
   align-items: start;
 }
 
+.admin-crud-grid--table-only {
+  grid-template-columns: 1fr;
+}
+
 .admin-crud-table {
   min-width: 680px;
 }
@@ -536,6 +540,20 @@
 .admin-account-table__actions {
   display: flex;
   gap: 8px;
+}
+
+.admin-account-table__row {
+  cursor: pointer;
+}
+
+.admin-account-table__row:hover td,
+.admin-account-table__row:focus-visible td {
+  background: #eff6ff;
+}
+
+.admin-account-table__row:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
 }
 
 .admin-account-table .admin-inline-status {
@@ -564,6 +582,43 @@
   font-size: 12px;
   font-weight: 800;
   padding: 3px 6px;
+}
+
+.admin-crud-message,
+.admin-confirm-copy {
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  border-radius: 8px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.4;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+}
+
+.admin-panel.admin-record-modal {
+  width: min(720px, calc(100vw - 32px));
+  max-width: 720px;
+  min-height: auto;
+}
+
+.admin-panel.admin-confirm-modal {
+  width: min(480px, calc(100vw - 32px));
+  max-width: 480px;
+  min-height: auto;
+}
+
+.admin-record-editor--modal {
+  border-left: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.admin-record-editor--modal .admin-modal-head-actions {
+  align-items: center;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .admin-account-import {
