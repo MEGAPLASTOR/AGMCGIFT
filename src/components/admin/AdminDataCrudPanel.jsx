@@ -998,11 +998,144 @@ export function AdminDataCrudPanel({
     resetTableState(nextTableKey);
   }, [tableKey, visibleTables]);
 
+  useEffect(() => {
+    if (!isGiftAccountsTable) {
+      return;
+    }
+
+    const accountIds = new Set(rows.map((row) => getRecordId(row, "giftAccounts")));
+
+    setSelectedAccountIds((currentIds) => {
+      const nextIds = new Set(
+        [...currentIds].filter((accountId) => accountIds.has(accountId))
+      );
+
+      return nextIds.size === currentIds.size ? currentIds : nextIds;
+    });
+  }, [isGiftAccountsTable, rows]);
+
   const updateField = (fieldKey, value) => {
     setFormValues((currentValues) => ({
       ...currentValues,
       [fieldKey]: value,
     }));
+  };
+
+  const toggleAccountSelection = (accountId, isSelected) => {
+    setSelectedAccountIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      if (isSelected) {
+        nextIds.add(accountId);
+      } else {
+        nextIds.delete(accountId);
+      }
+
+      return nextIds;
+    });
+  };
+
+  const toggleAllAccountSelection = (isSelected) => {
+    setSelectedAccountIds((currentIds) => {
+      const nextIds = new Set(currentIds);
+
+      accountRows.forEach((row) => {
+        const accountId = getRecordId(row, "giftAccounts");
+
+        if (isSelected) {
+          nextIds.add(accountId);
+        } else {
+          nextIds.delete(accountId);
+        }
+      });
+
+      return nextIds;
+    });
+  };
+
+  const importAccountFile = async (file) => {
+    setImportingAccounts(true);
+
+    try {
+      if (onUploadGiftAccounts) {
+        const payload = await onUploadGiftAccounts(file);
+        const importedCount =
+          payload?.accountsImported ??
+          payload?.imported ??
+          payload?.successCount ??
+          payload?.count;
+
+        setMessage(
+          payload?.message ||
+            (Number.isFinite(Number(importedCount))
+              ? `Đã upload và nhập ${importedCount} account thành công.`
+              : "Đã upload file Excel thành công.")
+        );
+        return;
+      }
+
+      const payload = await parseAccountImportFile(file);
+      const result = onImportGiftAccounts?.(payload);
+      const mappingMessage = result?.mappingsImported
+        ? ` và ${result.mappingsImported} liên kết kho`
+        : "";
+
+      setMessage(
+        `Đã nhập ${result?.accountsImported || 0} account${mappingMessage}.`
+      );
+    } catch (error) {
+      setMessage(error.message || "Không thể nhập file account.");
+    } finally {
+      setImportingAccounts(false);
+    }
+  };
+
+  const handleAccountFileChange = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      await importAccountFile(file);
+    }
+
+    event.target.value = "";
+  };
+
+  const deleteGiftAccountsByIds = async (accountIds) => {
+    const ids = [...accountIds].filter(Boolean);
+
+    if (!ids.length || isSaving) {
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      for (const accountId of ids) {
+        if (onDeleteGiftAccount) {
+          await onDeleteGiftAccount(accountId);
+        }
+
+        onDeleteRecord("giftAccounts", accountId);
+      }
+
+      setSelectedAccountIds((currentIds) => {
+        const nextIds = new Set(currentIds);
+        ids.forEach((accountId) => nextIds.delete(accountId));
+        return nextIds;
+      });
+
+      if (ids.includes(selectedRecordId)) {
+        setSelectedRecordId("");
+        setFormValues({});
+        setRecordModalOpen(false);
+      }
+
+      setMessage(`Đã xóa ${ids.length} tài khoản.`);
+    } catch (error) {
+      setMessage(error.message || "Không thể xóa tài khoản.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const startAdd = () => {
@@ -1337,7 +1470,12 @@ export function AdminDataCrudPanel({
   }
 
   return (
-    <section className="admin-panel admin-crud-panel">
+    <section
+      className={`admin-panel admin-crud-panel${
+        isGiftAccountsTable ? " admin-account-manager-panel" : ""
+      }`}
+    >
+      {!isGiftAccountsTable ? (
       <div className="admin-panel__head">
         <div>
           <h2>{panelTitle}</h2>
@@ -1348,7 +1486,75 @@ export function AdminDataCrudPanel({
           Khôi phục dữ liệu
         </button>
       </div>
+      ) : null}
 
+      {isGiftAccountsTable ? (
+        <>
+          <AccountExcelGuide onDownloadTemplate={downloadAccountTemplate} />
+          <div className="admin-account-toolbar">
+            <label className="admin-account-search">
+              <span>Tìm kiếm</span>
+              <input
+                type="search"
+                placeholder="Tìm theo username, platform, tier..."
+                value={keyword}
+                onChange={(event) => setKeyword(event.target.value)}
+              />
+            </label>
+            <div className="admin-account-toolbar__actions">
+              <select
+                aria-label="Lọc trạng thái tài khoản"
+                value={accountStatusFilter}
+                onChange={(event) => setAccountStatusFilter(event.target.value)}
+              >
+                <option value="">Mọi trạng thái</option>
+                {accountStatusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <button type="button" onClick={startAdd}>
+                <FaPlus aria-hidden="true" />
+                Thêm tài khoản
+              </button>
+              <button
+                type="button"
+                className="admin-light-button"
+                disabled={isImportingAccounts}
+                onClick={() => accountImportInputRef.current?.click()}
+              >
+                <FaFileExcel aria-hidden="true" />
+                {isImportingAccounts ? "Đang import" : "Import Excel"}
+              </button>
+              <input
+                ref={accountImportInputRef}
+                type="file"
+                accept=".xlsx,.csv,.tsv"
+                hidden
+                onChange={handleAccountFileChange}
+              />
+              <button
+                type="button"
+                className="admin-danger-button"
+                disabled={!selectedAccountIds.size || isSaving}
+                onClick={() => deleteGiftAccountsByIds(selectedAccountIds)}
+              >
+                <FaTrashCan aria-hidden="true" />
+                Xóa hàng loạt
+              </button>
+              <button
+                type="button"
+                className="admin-light-button admin-account-refresh-button"
+                aria-label="Khôi phục dữ liệu"
+                onClick={handleResetTablesClick}
+              >
+                <FaRotateRight aria-hidden="true" />
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
       <div className="admin-crud-toolbar">
         <label>
           Tìm kiếm
@@ -1363,28 +1569,24 @@ export function AdminDataCrudPanel({
           {addButtonLabel}
         </button>
       </div>
+      )}
 
       <div
         className="admin-crud-grid admin-crud-grid--table-only"
       >
         <div className="admin-dnd-wrap">
-          {isGiftAccountsTable && onImportGiftAccounts ? (
-            <AdminAccountImportPanel
-              onImportGiftAccounts={onImportGiftAccounts}
-              onUploadGiftAccounts={onUploadGiftAccounts}
-              onImported={setMessage}
-            />
-          ) : null}
-
           {isGiftAccountsTable ? (
             <AdminGiftAccountTable
-              fields={fields}
               isSaving={isSaving}
-              rows={filteredRows}
-              savingStatusRecordId={savingStatusRecordId}
+              rows={accountRows}
+              selectedAccountIds={selectedAccountIds}
               selectedRecordId={selectedRecordId}
+              toggleAccountSelection={toggleAccountSelection}
+              toggleAllAccountSelection={toggleAllAccountSelection}
+              onDelete={(row) =>
+                deleteGiftAccountsByIds([getRecordId(row, "giftAccounts")])
+              }
               onEdit={startEdit}
-              onStatusChange={updateGiftAccountStatus}
             />
           ) : shouldUseBoard ? (
           <div className="admin-dnd-board">
@@ -1622,7 +1824,11 @@ export function AdminDataCrudPanel({
               <div className="admin-record-editor__head">
                 <div>
                   <strong id="admin-account-record-title">
-                    {recordModalTitle}
+                    {isGiftAccountsTable
+                      ? selectedRecordId
+                        ? "Cập Nhật Tài Khoản Quà"
+                        : "Thêm Tài Khoản Quà"
+                      : recordModalTitle}
                     <span hidden>
                     Thông tin tài khoản
                     </span>
@@ -1661,7 +1867,31 @@ export function AdminDataCrudPanel({
 
               {message ? <p>{message}</p> : null}
 
-              <div className="admin-crud-actions">
+              {isGiftAccountsTable ? (
+                <div className="admin-crud-actions admin-account-modal-actions">
+                  <button
+                    type="button"
+                    className="admin-light-button"
+                    disabled={isSaving}
+                    onClick={() => setRecordModalOpen(false)}
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="button"
+                    onClick={saveForm}
+                    disabled={!hasActiveForm || isSaving}
+                  >
+                    {isSaving
+                      ? "Đang lưu..."
+                      : selectedRecordId
+                        ? "Cập nhật"
+                        : "Thêm tài khoản"}
+                  </button>
+                </div>
+              ) : null}
+
+              <div className="admin-crud-actions" hidden={isGiftAccountsTable}>
                 <button
                   type="button"
                   onClick={saveForm}
