@@ -1,14 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FaBoxOpen,
+  FaCircleInfo,
+  FaDownload,
+  FaFileExcel,
   FaFloppyDisk,
   FaGripVertical,
   FaPen,
+  FaPlus,
   FaRotateLeft,
+  FaRotateRight,
   FaTrashCan,
   FaXmark,
 } from "react-icons/fa6";
-import { AdminAccountImportPanel } from "./AdminAccountImportPanel";
 import {
   ADMIN_TABLES,
   buildRecordFromForm,
@@ -19,6 +23,7 @@ import {
   normalizeRecordForForm,
   searchTableRows,
 } from "../../services/adminCrudService";
+import { parseAccountImportFile } from "../../services/accountImportService";
 import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
 
 const EMPTY_ROWS = [];
@@ -47,12 +52,20 @@ const PRIORITY_COLUMNS_BY_TABLE = {
 const ACCOUNT_TABLE_COLUMNS = [
   "username",
   "password",
-  "tier",
   "platform",
+  "tier",
   "status",
   "token",
-  "created_at",
   "assigned_at",
+];
+
+const ACCOUNT_FORM_FIELD_ORDER = [
+  "username",
+  "password",
+  "platform",
+  "tier",
+  "status",
+  "token",
 ];
 
 const BOARD_CONFIG_BY_TABLE = {
@@ -282,7 +295,229 @@ function formatAccountTableValue(value) {
   return String(value);
 }
 
+function formatAccountDate(value) {
+  if (!value) {
+    return "-";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return formatAccountTableValue(value);
+  }
+
+  return date.toLocaleString("vi-VN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getAccountStatusClassName(status) {
+  const normalizedStatus = normalizeBoardValue(status).toLowerCase();
+
+  return `admin-account-status-badge is-${normalizedStatus || "empty"}`;
+}
+
+function getAccountStatusLabel(status) {
+  return normalizeBoardValue(status || "UNKNOWN").toUpperCase();
+}
+
+function downloadAccountTemplate() {
+  if (typeof document === "undefined") {
+    return;
+  }
+
+  const rows = [
+    ["Username", "Password", "Platform", "Tier", "Status", "Token"],
+    ["ACC001", "password01", "ROBLOX", "A", "available", "token-or-email"],
+  ];
+  const csvText = rows
+    .map((row) =>
+      row
+        .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
+        .join(",")
+    )
+    .join("\n");
+  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = "gift-account-template.csv";
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function AccountExcelGuide({ onDownloadTemplate }) {
+  return (
+    <section className="admin-account-guide">
+      <strong>
+        <FaCircleInfo aria-hidden="true" />
+        Hướng dẫn tải lên dữ liệu tài khoản từ Excel
+      </strong>
+      <ul>
+        <li>
+          File tải lên bắt buộc phải đúng cấu trúc các cột:
+          <b> Username, Password, Platform, Tier </b>
+          (A, B, C, D, E,...), và <b>Token</b> (nếu có).
+        </li>
+        <li>Chỉ hỗ trợ định dạng Excel 2007 trở lên (mở rộng .xlsx).</li>
+        <li>
+          Sau khi chuẩn bị dữ liệu, nhấn nút <b>Import Excel</b> bên dưới để
+          thực hiện tải danh sách tài khoản vào kho quà.
+        </li>
+      </ul>
+      <button type="button" className="admin-light-button" onClick={onDownloadTemplate}>
+        <FaDownload aria-hidden="true" />
+        Tải file Excel mẫu
+      </button>
+    </section>
+  );
+}
+
 function AdminGiftAccountTable({
+  isSaving,
+  onDelete,
+  onEdit,
+  rows,
+  selectedAccountIds,
+  selectedRecordId,
+  toggleAccountSelection,
+  toggleAllAccountSelection,
+}) {
+  const allVisibleSelected =
+    rows.length > 0 &&
+    rows.every((row) => selectedAccountIds.has(getRecordId(row, "giftAccounts")));
+
+  return (
+    <div className="admin-table-wrap admin-account-table-wrap">
+      <table className="admin-table admin-account-table">
+        <thead>
+          <tr>
+            <th className="admin-account-table__check">
+              <input
+                type="checkbox"
+                aria-label="Chọn tất cả tài khoản"
+                checked={allVisibleSelected}
+                onChange={(event) => toggleAllAccountSelection(event.target.checked)}
+              />
+            </th>
+            <th>Username / Account</th>
+            <th>Password</th>
+            <th>Nền tảng</th>
+            <th>Tier</th>
+            <th>Trạng Thái</th>
+            <th>Token</th>
+            <th>Ngày Gán</th>
+            <th>Hành Động</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length ? (
+            rows.map((row) => {
+              const recordId = getRecordId(row, "giftAccounts");
+              const isChecked = selectedAccountIds.has(recordId);
+
+              return (
+                <tr
+                  key={recordId}
+                  className={
+                    recordId === selectedRecordId
+                      ? "admin-row-selected admin-account-table__row"
+                      : "admin-account-table__row"
+                  }
+                  tabIndex={0}
+                  onClick={() => onEdit(row)}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    onEdit(row);
+                  }}
+                >
+                  <td>
+                    <input
+                      type="checkbox"
+                      aria-label={`Chọn ${row.username || recordId}`}
+                      checked={isChecked}
+                      onClick={(event) => event.stopPropagation()}
+                      onChange={(event) =>
+                        toggleAccountSelection(recordId, event.target.checked)
+                      }
+                    />
+                  </td>
+                  <td>
+                    <strong className="admin-account-name">
+                      {formatAccountTableValue(row.username)}
+                    </strong>
+                  </td>
+                  <td>{formatAccountTableValue(row.password)}</td>
+                  <td>{formatAccountTableValue(row.platform)}</td>
+                  <td>
+                    <span className="admin-account-tier-badge">
+                      {formatAccountTableValue(row.tier)}
+                    </span>
+                  </td>
+                  <td>
+                    <span className={getAccountStatusClassName(row.status)}>
+                      {getAccountStatusLabel(row.status)}
+                    </span>
+                  </td>
+                  <td>
+                    <code className="admin-account-token">
+                      {formatAccountTableValue(row.token)}
+                    </code>
+                  </td>
+                  <td>{formatAccountDate(row.assigned_at)}</td>
+                  <td>
+                    <div className="admin-account-table__actions">
+                      <button
+                        type="button"
+                        className="admin-mini-button"
+                        aria-label={`Sửa ${row.username || recordId}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onEdit(row);
+                        }}
+                      >
+                        <FaPen aria-hidden="true" />
+                      </button>
+                      <button
+                        type="button"
+                        className="admin-mini-button admin-danger-button"
+                        aria-label={`Xóa ${row.username || recordId}`}
+                        disabled={isSaving}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onDelete(row);
+                        }}
+                      >
+                        <FaTrashCan aria-hidden="true" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={ACCOUNT_TABLE_COLUMNS.length + 2}>
+                Không tìm thấy tài khoản phù hợp.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function LegacyAdminGiftAccountTable({
   fields,
   isSaving,
   onEdit,
@@ -610,6 +845,10 @@ export function AdminDataCrudPanel({
   const [savingStatusRecordId, setSavingStatusRecordId] = useState("");
   const [draggingRecordId, setDraggingRecordId] = useState("");
   const [dragOverValue, setDragOverValue] = useState("");
+  const [accountStatusFilter, setAccountStatusFilter] = useState("");
+  const [selectedAccountIds, setSelectedAccountIds] = useState(() => new Set());
+  const [isImportingAccounts, setImportingAccounts] = useState(false);
+  const accountImportInputRef = useRef(null);
 
   const rows = tables[tableKey] || EMPTY_ROWS;
   const allowedTableKeySet = useMemo(
@@ -639,13 +878,52 @@ export function AdminDataCrudPanel({
     isPoolMappingsTable ||
     isProductMappingsTable;
   const visibleFields = useMemo(
-    () =>
-      fields.filter((field) => !(isServiceManagedIdTable && field.key === "id")),
-    [fields, isServiceManagedIdTable]
+    () => {
+      const filteredFields = fields.filter((field) => {
+        if (isServiceManagedIdTable && field.key === "id") {
+          return false;
+        }
+
+        if (
+          isGiftAccountsTable &&
+          (field.key === "created_at" || field.key === "assigned_at")
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+
+      if (!isGiftAccountsTable) {
+        return filteredFields;
+      }
+
+      return [...filteredFields].sort(
+        (first, second) =>
+          ACCOUNT_FORM_FIELD_ORDER.indexOf(first.key) -
+          ACCOUNT_FORM_FIELD_ORDER.indexOf(second.key)
+      );
+    },
+    [fields, isGiftAccountsTable, isServiceManagedIdTable]
   );
   const filteredRows = useMemo(
     () => searchTableRows(rows, keyword),
     [keyword, rows]
+  );
+  const accountRows = useMemo(() => {
+    if (!isGiftAccountsTable || !accountStatusFilter) {
+      return filteredRows;
+    }
+
+    return filteredRows.filter(
+      (row) =>
+        normalizeBoardValue(row.status).toLowerCase() ===
+        normalizeBoardValue(accountStatusFilter).toLowerCase()
+    );
+  }, [accountStatusFilter, filteredRows, isGiftAccountsTable]);
+  const accountStatusOptions = useMemo(
+    () => getFieldOptions(fields, "status"),
+    [fields]
   );
   const visibleColumns = useMemo(
     () =>
@@ -692,6 +970,8 @@ export function AdminDataCrudPanel({
   const resetTableState = (nextTableKey) => {
     setTableKey(nextTableKey);
     setKeyword("");
+    setAccountStatusFilter("");
+    setSelectedAccountIds(new Set());
     setSelectedRecordId("");
     setFormValues({});
     setMessage("");
