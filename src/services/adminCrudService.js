@@ -37,7 +37,8 @@ const poolTierOptions = [
 ];
 
 const accountStatusOptions = [
-  { value: "available", label: "available" },
+  { value: "available", label: "AVAILABLE" },
+  { value: "assigned", label: "ASSIGNED" },
   { value: "reserved", label: "reserved" },
   { value: "used", label: "used" },
 ];

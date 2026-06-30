@@ -44,11 +44,22 @@ const PRIORITY_COLUMNS_BY_TABLE = {
   products: ["kvProductId", "name", "basePrice", "lastSyncedAt"],
 };
 
+const ACCOUNT_TABLE_COLUMNS = [
+  "username",
+  "password",
+  "tier",
+  "platform",
+  "status",
+  "token",
+  "created_at",
+  "assigned_at",
+];
+
 const BOARD_CONFIG_BY_TABLE = {
   giftAccounts: {
     field: "status",
     fallbackValue: "available",
-    values: ["available", "reserved", "used"],
+    values: ["available", "assigned", "reserved", "used"],
   },
   customers: {
     field: "status",
@@ -235,6 +246,155 @@ function getPriorityColumns(tableKey, rows, fields) {
 
 function getColumnLabel(fields, column) {
   return fields.find((field) => field.key === column)?.label || column;
+}
+
+function getFieldOptions(fields, fieldKey) {
+  return fields.find((field) => field.key === fieldKey)?.options || [];
+}
+
+function getRowStatusOptions(fields, status) {
+  const options = getFieldOptions(fields, "status");
+  const normalizedStatus = normalizeBoardValue(status);
+
+  if (
+    !normalizedStatus ||
+    options.some(
+      (option) => normalizeBoardValue(option.value) === normalizedStatus
+    )
+  ) {
+    return options;
+  }
+
+  return [
+    ...options,
+    {
+      value: status,
+      label: status,
+    },
+  ];
+}
+
+function formatAccountTableValue(value) {
+  if (value === undefined || value === null || value === "") {
+    return "-";
+  }
+
+  return String(value);
+}
+
+function AdminGiftAccountTable({
+  fields,
+  isSaving,
+  onEdit,
+  onStatusChange,
+  rows,
+  savingStatusRecordId,
+  selectedRecordId,
+}) {
+  const tableColumns = ACCOUNT_TABLE_COLUMNS.filter(
+    (column) =>
+      fields.some((field) => field.key === column) ||
+      rows.some((row) => row[column] !== undefined)
+  );
+
+  return (
+    <div className="admin-table-wrap admin-account-table-wrap">
+      <table className="admin-table admin-account-table">
+        <thead>
+          <tr>
+            <th>Thao tác</th>
+            {tableColumns.map((column) => (
+              <th key={column}>{getColumnLabel(fields, column)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length ? (
+            rows.map((row) => {
+              const recordId = getRecordId(row, "giftAccounts");
+              const statusOptions = getRowStatusOptions(fields, row.status);
+              const isRowSaving =
+                normalizeBoardValue(savingStatusRecordId) ===
+                normalizeBoardValue(recordId);
+
+              return (
+                <tr
+                  key={recordId}
+                  className={
+                    recordId === selectedRecordId ? "admin-row-selected" : ""
+                  }
+                >
+                  <td>
+                    <div className="admin-account-table__actions">
+                      <button
+                        type="button"
+                        className="admin-mini-button"
+                        onClick={() => onEdit(row)}
+                      >
+                        <FaPen aria-hidden="true" />
+                        Sửa
+                      </button>
+                    </div>
+                  </td>
+                  {tableColumns.map((column) => {
+                    if (column === "status") {
+                      return (
+                        <td key={column}>
+                          <select
+                            className="admin-inline-status"
+                            value={row.status || ""}
+                            disabled={isSaving}
+                            aria-label={`Đổi trạng thái ${row.username || recordId}`}
+                            onChange={(event) =>
+                              onStatusChange(row, event.target.value)
+                            }
+                          >
+                            {!row.status ? (
+                              <option value="">Chọn status</option>
+                            ) : null}
+                            {statusOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          {isRowSaving ? (
+                            <small className="admin-account-table__saving">
+                              Đang lưu...
+                            </small>
+                          ) : null}
+                        </td>
+                      );
+                    }
+
+                    if (column === "password" || column === "token") {
+                      return (
+                        <td key={column}>
+                          <code className="admin-table-code">
+                            {formatAccountTableValue(row[column])}
+                          </code>
+                        </td>
+                      );
+                    }
+
+                    return (
+                      <td key={column}>{formatAccountTableValue(row[column])}</td>
+                    );
+                  })}
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={tableColumns.length + 1}>
+                Không tìm thấy tài khoản phù hợp.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 function getRecordTitle(tableKey, formValues, selectedRecordId) {
