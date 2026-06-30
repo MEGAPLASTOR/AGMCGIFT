@@ -395,7 +395,8 @@ export function AdminProductTablePanel({
                         <div className="admin-product-mapping-list">
                           {productMappings.map((mapping) => (
                             <span key={getMappingId(mapping)}>
-                              {getEggTypeLabel(mapping.egg_type)} ->{" "}
+                              {getEggTypeLabel(mapping.egg_type)}
+                              {" -> "}
                               {getMappingPoolLabel(mapping, poolById)}
                               <button
                                 type="button"
