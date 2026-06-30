@@ -27,6 +27,7 @@ import { parseAccountImportFile } from "../../services/accountImportService";
 import { AdminEggTablePanel } from "./AdminEggTablePanel";
 import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
 import { AdminGiftPoolTablePanel } from "./AdminGiftPoolTablePanel";
+import { AdminProductTablePanel } from "./AdminProductTablePanel";
 
 const EMPTY_ROWS = [];
 const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
@@ -834,7 +835,9 @@ export function AdminDataCrudPanel({
   onImportGiftAccounts,
   onUploadGiftAccounts,
   isRefreshing,
+  isSyncingProducts,
   onRefresh,
+  onSyncProducts,
   onResetTables,
 }) {
   const [tableKey, setTableKey] = useState(activeTableKey);
@@ -875,6 +878,7 @@ export function AdminDataCrudPanel({
   const isGiftAccountsTable = tableKey === "giftAccounts";
   const isGiftPoolsTable = tableKey === "giftPools";
   const isPoolMappingsTable = tableKey === "poolAccountMappings";
+  const isProductsTable = tableKey === "products";
   const isProductMappingsTable = tableKey === "productEggMappings";
   const shouldUseBoard = isPoolMappingsTable;
   const isServiceManagedIdTable =
@@ -1479,6 +1483,22 @@ export function AdminDataCrudPanel({
         isRefreshing={isRefreshing}
         tables={tables}
         onRefresh={onRefresh}
+      />
+    );
+  }
+
+  if (isProductsTable) {
+    return (
+      <AdminProductTablePanel
+        isRefreshing={isRefreshing}
+        isSyncingProducts={isSyncingProducts}
+        tables={tables}
+        onDeleteProductEggMapping={onDeleteProductEggMapping}
+        onDeleteRecord={onDeleteRecord}
+        onRefresh={onRefresh}
+        onSaveProductEggMapping={onSaveProductEggMapping}
+        onSaveRecord={onSaveRecord}
+        onSyncProducts={onSyncProducts}
       />
     );
   }

@@ -724,7 +724,9 @@ export default function AdminDashboardPage() {
               onImportGiftAccounts={adminTables.importGiftAccounts}
               onUploadGiftAccounts={handleUploadGiftAccounts}
               isRefreshing={adminTables.isLoadingRawData}
+              isSyncingProducts={isSyncingProducts}
               onRefresh={handleReloadRawData}
+              onSyncProducts={handleSyncProducts}
               onResetTables={adminTables.resetTables}
             />
           )}
