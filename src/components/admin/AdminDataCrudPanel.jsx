@@ -4,7 +4,6 @@ import {
   FaFloppyDisk,
   FaGripVertical,
   FaPen,
-  FaPlus,
   FaRotateLeft,
   FaTrashCan,
   FaXmark,
@@ -1081,7 +1080,6 @@ export function AdminDataCrudPanel({
           />
         </label>
         <button type="button" onClick={startAdd}>
-          <FaPlus aria-hidden="true" />
           {addButtonLabel}
         </button>
       </div>
@@ -1280,15 +1278,6 @@ export function AdminDataCrudPanel({
               </strong>
               <span>{recordTitle}</span>
             </div>
-            <button
-              type="button"
-              className="admin-light-button admin-icon-only-button"
-              aria-label="Thêm bản ghi"
-              title="Thêm bản ghi"
-              onClick={startAdd}
-            >
-              <FaPlus aria-hidden="true" />
-            </button>
           </div>
 
           {hasActiveForm ? (
@@ -1361,15 +1350,6 @@ export function AdminDataCrudPanel({
                   <span>{recordTitle}</span>
                 </div>
                 <div className="admin-modal-head-actions">
-                  <button
-                    type="button"
-                    className="admin-light-button admin-icon-only-button"
-                    aria-label="Thêm bản ghi"
-                    title="Thêm bản ghi"
-                    onClick={startAdd}
-                  >
-                    <FaPlus aria-hidden="true" />
-                  </button>
                   <button
                     type="button"
                     className="admin-modal-close"
