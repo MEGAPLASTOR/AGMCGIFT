@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { FaBolt, FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
+import { saveFastHatchOverride } from "../../utils/eggFastHatchOverride";
 
 const EMPTY_ROWS = [];
 const FAST_HATCH_MINUTES = 3;
@@ -324,6 +325,7 @@ export function AdminEggTablePanel({
     };
 
     onSaveRecord?.("eggs", nextEgg);
+    saveFastHatchOverride(getEggId(egg), hatchAt);
     setMessage(`Đã duyệt mở nhanh sau ${FAST_HATCH_MINUTES} phút.`);
   };
 
