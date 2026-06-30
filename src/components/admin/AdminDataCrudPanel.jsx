@@ -7,6 +7,7 @@ import {
   FaPlus,
   FaRotateLeft,
   FaTrashCan,
+  FaXmark,
 } from "react-icons/fa6";
 import { AdminAccountImportPanel } from "./AdminAccountImportPanel";
 import {
@@ -321,15 +322,30 @@ function AdminGiftAccountTable({
                 <tr
                   key={recordId}
                   className={
-                    recordId === selectedRecordId ? "admin-row-selected" : ""
+                    recordId === selectedRecordId
+                      ? "admin-row-selected admin-account-table__row"
+                      : "admin-account-table__row"
                   }
+                  tabIndex={0}
+                  onClick={() => onEdit(row)}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    onEdit(row);
+                  }}
                 >
                   <td>
                     <div className="admin-account-table__actions">
                       <button
                         type="button"
                         className="admin-mini-button"
-                        onClick={() => onEdit(row)}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onEdit(row);
+                        }}
                       >
                         <FaPen aria-hidden="true" />
                         Sửa
@@ -345,9 +361,12 @@ function AdminGiftAccountTable({
                             value={row.status || ""}
                             disabled={isSaving}
                             aria-label={`Đổi trạng thái ${row.username || recordId}`}
-                            onChange={(event) =>
-                              onStatusChange(row, event.target.value)
-                            }
+                            onClick={(event) => event.stopPropagation()}
+                            onKeyDown={(event) => event.stopPropagation()}
+                            onChange={(event) => {
+                              event.stopPropagation();
+                              onStatusChange(row, event.target.value);
+                            }}
                           >
                             {!row.status ? (
                               <option value="">Chọn status</option>
@@ -493,6 +512,9 @@ export function AdminDataCrudPanel({
   const [formValues, setFormValues] = useState({});
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isRecordModalOpen, setRecordModalOpen] = useState(false);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [isResetModalOpen, setResetModalOpen] = useState(false);
   const [savingStatusRecordId, setSavingStatusRecordId] = useState("");
   const [draggingRecordId, setDraggingRecordId] = useState("");
   const [dragOverValue, setDragOverValue] = useState("");
@@ -577,6 +599,9 @@ export function AdminDataCrudPanel({
     setSelectedRecordId("");
     setFormValues({});
     setMessage("");
+    setRecordModalOpen(false);
+    setDeleteModalOpen(false);
+    setResetModalOpen(false);
   };
 
   useEffect(() => {
@@ -608,12 +633,20 @@ export function AdminDataCrudPanel({
     const record = createEmptyRecord(tableKey, rows);
     setSelectedRecordId("");
     setFormValues(normalizeRecordForForm(record, tableKey));
+    setDeleteModalOpen(false);
+    if (isGiftAccountsTable) {
+      setRecordModalOpen(true);
+    }
     setMessage("Đang tạo bản ghi mới.");
   };
 
   const startEdit = (record) => {
     setSelectedRecordId(getRecordId(record, tableKey));
     setFormValues(normalizeRecordForForm(record, tableKey));
+    setDeleteModalOpen(false);
+    if (isGiftAccountsTable) {
+      setRecordModalOpen(true);
+    }
     setMessage("Đang chỉnh sửa bản ghi đã chọn.");
   };
 
@@ -747,11 +780,37 @@ export function AdminDataCrudPanel({
                   ? "Đã đồng bộ mapping sản phẩm - trứng."
                   : "Đã lưu thay đổi."
       );
+      if (isGiftAccountsTable) {
+        setRecordModalOpen(false);
+      }
     } catch (error) {
       setMessage(error.message || "Dữ liệu bản ghi không hợp lệ.");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const requestDeleteSelected = () => {
+    if (isGiftAccountsTable) {
+      setDeleteModalOpen(true);
+      return;
+    }
+
+    deleteSelected();
+  };
+
+  const handleResetTablesClick = () => {
+    setResetModalOpen(true);
+  };
+
+  const confirmResetTables = () => {
+    onResetTables?.();
+    setSelectedRecordId("");
+    setFormValues({});
+    setRecordModalOpen(false);
+    setDeleteModalOpen(false);
+    setResetModalOpen(false);
+    setMessage("ÄÃ£ khÃ´i phá»¥c dá»¯ liá»‡u.");
   };
 
   const deleteSelected = async () => {
