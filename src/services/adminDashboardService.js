@@ -674,14 +674,25 @@ export function buildAdminDashboard(tables) {
       createdAt: formatDateTime(customer.createdAt),
       updatedAt: formatDateTime(customer.updatedAt),
     })),
-    latestOrders: orders.slice(0, 10).map((order) => {
+    latestOrders: [...orders]
+      .sort((first, second) => {
+        const firstDate = getValidDate(first.created_at, first.updated_at);
+        const secondDate = getValidDate(second.created_at, second.updated_at);
+
+        return (secondDate?.getTime() || 0) - (firstDate?.getTime() || 0);
+      })
+      .slice(0, 10)
+      .map((order) => {
       const item = orderItemMap.get(order.id);
+
       return {
         code: order.order_code,
+        customer: order.customer_code || "-",
         product: item?.product_name || "-",
         status: order.status,
         fulfillment: order.fulfillment_status,
         total: formatCurrency(order.total_price),
+        createdAt: formatDateTime(order.created_at),
         updatedAt: formatDateTime(order.updated_at),
       };
     }),

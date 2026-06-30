@@ -20,15 +20,11 @@ import {
 import { AdminAnalyticsPanel } from "../../components/admin/AdminAnalyticsPanel";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
-import { AdminMetricCard } from "../../components/admin/AdminMetricCard";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
 import { giftCatalogData } from "../../config/giftCatalogData";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { useAdminDataTables } from "../../hooks/useAdminDataTables";
-import {
-  buildAdminDashboard,
-  formatCurrency,
-} from "../../services/adminDashboardService";
+import { buildAdminDashboard } from "../../services/adminDashboardService";
 import { updateAdminCredentials } from "../../services/adminAuthService";
 import { updateAdminCustomerStatus } from "../../services/adminCustomerService";
 import {
@@ -170,10 +166,6 @@ function AdminManagementNav({ activeSlug, onNavigate, tableCounts }) {
       })}
     </nav>
   );
-}
-
-function hasMetricValue(value) {
-  return Number(value) > 0;
 }
 
 function normalizeComparable(value) {
