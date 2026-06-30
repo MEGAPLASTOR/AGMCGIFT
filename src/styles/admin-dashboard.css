@@ -519,6 +519,53 @@
   min-width: 680px;
 }
 
+.admin-account-table-wrap {
+  max-height: min(68vh, 720px);
+  overflow: auto;
+}
+
+.admin-account-table {
+  min-width: 980px;
+}
+
+.admin-account-table th:first-child,
+.admin-account-table td:first-child {
+  width: 108px;
+}
+
+.admin-account-table__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.admin-account-table .admin-inline-status {
+  min-height: 38px;
+  width: min(180px, 100%);
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+.admin-account-table__saving {
+  display: block;
+  color: #2563eb;
+  font-size: 11px;
+  font-weight: 1000;
+  margin-top: 5px;
+}
+
+.admin-table-code {
+  display: inline-block;
+  max-width: 220px;
+  overflow-wrap: anywhere;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #17202a;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 3px 6px;
+}
+
 .admin-account-import {
   display: flex;
   align-items: center;

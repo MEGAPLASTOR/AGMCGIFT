@@ -493,6 +493,7 @@ export function AdminDataCrudPanel({
   const [formValues, setFormValues] = useState({});
   const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [savingStatusRecordId, setSavingStatusRecordId] = useState("");
   const [draggingRecordId, setDraggingRecordId] = useState("");
   const [dragOverValue, setDragOverValue] = useState("");
 
@@ -614,6 +615,50 @@ export function AdminDataCrudPanel({
     setSelectedRecordId(getRecordId(record, tableKey));
     setFormValues(normalizeRecordForForm(record, tableKey));
     setMessage("Đang chỉnh sửa bản ghi đã chọn.");
+  };
+
+  const updateGiftAccountStatus = async (record, nextStatus) => {
+    if (isSaving) {
+      return;
+    }
+
+    const recordId = getRecordId(record, "giftAccounts");
+
+    if (!recordId) {
+      setMessage("Không tìm thấy ID tài khoản để đổi trạng thái.");
+      return;
+    }
+
+    if (normalizeBoardValue(record.status) === normalizeBoardValue(nextStatus)) {
+      return;
+    }
+
+    const nextRecord = {
+      ...record,
+      status: nextStatus,
+    };
+
+    setIsSaving(true);
+    setSavingStatusRecordId(recordId);
+
+    try {
+      const savedRecord = onUpdateGiftAccount
+        ? await onUpdateGiftAccount(nextRecord, recordId)
+        : nextRecord;
+
+      onSaveRecord("giftAccounts", savedRecord);
+
+      if (normalizeBoardValue(selectedRecordId) === normalizeBoardValue(recordId)) {
+        setFormValues(normalizeRecordForForm(savedRecord, "giftAccounts"));
+      }
+
+      setMessage("Đã cập nhật trạng thái tài khoản.");
+    } catch (error) {
+      setMessage(error.message || "Không thể cập nhật trạng thái tài khoản.");
+    } finally {
+      setIsSaving(false);
+      setSavingStatusRecordId("");
+    }
   };
 
   const saveForm = async () => {
@@ -904,6 +949,17 @@ export function AdminDataCrudPanel({
             />
           ) : null}
 
+          {isGiftAccountsTable ? (
+            <AdminGiftAccountTable
+              fields={fields}
+              isSaving={isSaving}
+              rows={filteredRows}
+              savingStatusRecordId={savingStatusRecordId}
+              selectedRecordId={selectedRecordId}
+              onEdit={startEdit}
+              onStatusChange={updateGiftAccountStatus}
+            />
+          ) : (
           <div className="admin-dnd-board">
             {boardValues.map((value) => {
               const valueKey = normalizeBoardValue(value);
@@ -1005,6 +1061,7 @@ export function AdminDataCrudPanel({
               );
             })}
           </div>
+          )}
 
           <table className="admin-table admin-crud-table" hidden>
             <thead>
