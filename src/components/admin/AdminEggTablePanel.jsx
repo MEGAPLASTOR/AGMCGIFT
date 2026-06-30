@@ -39,6 +39,21 @@ function getAccountName(account) {
   return normalizeText(account?.username || account?.account || account?.name);
 }
 
+function getAccountMeta(account) {
+  const platform = normalizeText(account?.platform || account?.game || account?.type);
+  const tier = normalizeText(account?.tier || account?.egg_tier).toUpperCase();
+
+  if (platform && tier) {
+    return `${platform.toUpperCase()} (${tier})`;
+  }
+
+  if (platform) {
+    return platform.toUpperCase();
+  }
+
+  return tier ? `TIER ${tier}` : "";
+}
+
 function getValidDate(...values) {
   for (const value of values) {
     if (!value) {
@@ -258,6 +273,7 @@ export function AdminEggTablePanel({
           getPoolName(pool),
           pool?.tier,
           getAccountName(account),
+          getAccountMeta(account),
           egg.account_id,
         ]
           .map(normalizeKey)
@@ -350,6 +366,7 @@ export function AdminEggTablePanel({
                 const account = getEggAccount(egg, accountById);
                 const poolName = getPoolName(pool);
                 const accountName = getAccountName(account);
+                const accountMeta = getAccountMeta(account);
 
                 return (
                   <tr key={getEggId(egg)}>
@@ -379,7 +396,16 @@ export function AdminEggTablePanel({
                         egg.gift_pool_id || "-"
                       )}
                     </td>
-                    <td>{accountName || egg.account_id || "-"}</td>
+                    <td>
+                      {accountName || egg.account_id ? (
+                        <span className="admin-egg-account">
+                          <strong>{accountName || egg.account_id}</strong>
+                          {accountMeta ? <small>{accountMeta}</small> : null}
+                        </span>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
                     <td>{formatDateTime(egg.hatch_at)}</td>
                     <td>{formatDateTime(egg.created_at)}</td>
                   </tr>

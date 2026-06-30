@@ -3571,6 +3571,27 @@
   font-weight: 1000;
 }
 
+.admin-egg-account {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.1;
+}
+
+.admin-egg-table .admin-egg-account strong {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 1000;
+}
+
+.admin-egg-account small {
+  color: #9fb0c7;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
 .admin-egg-type,
 .admin-egg-status {
   display: inline-flex;
