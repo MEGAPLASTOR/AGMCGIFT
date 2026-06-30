@@ -25,6 +25,7 @@ import {
 } from "../../services/adminCrudService";
 import { parseAccountImportFile } from "../../services/accountImportService";
 import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
+import { AdminGiftPoolTablePanel } from "./AdminGiftPoolTablePanel";
 
 const EMPTY_ROWS = [];
 const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
@@ -871,7 +872,7 @@ export function AdminDataCrudPanel({
   const isGiftPoolsTable = tableKey === "giftPools";
   const isPoolMappingsTable = tableKey === "poolAccountMappings";
   const isProductMappingsTable = tableKey === "productEggMappings";
-  const shouldUseBoard = isGiftPoolsTable || isPoolMappingsTable;
+  const shouldUseBoard = isPoolMappingsTable;
   const isServiceManagedIdTable =
     isGiftAccountsTable ||
     isGiftPoolsTable ||
@@ -1450,6 +1451,23 @@ export function AdminDataCrudPanel({
 
     persistDraggedRecord(recordId, value);
   };
+
+  if (isGiftPoolsTable) {
+    return (
+      <AdminGiftPoolTablePanel
+        panelTitle={panelTitle}
+        panelDescription={panelDescription}
+        tables={tables}
+        onSaveRecord={onSaveRecord}
+        onDeleteRecord={onDeleteRecord}
+        onCreateGiftPool={onCreateGiftPool}
+        onUpdateGiftPool={onUpdateGiftPool}
+        onDeleteGiftPool={onDeleteGiftPool}
+        onAddPoolAccount={onAddPoolAccount}
+        onRemovePoolAccount={onRemovePoolAccount}
+      />
+    );
+  }
 
   if (shouldUseBoard) {
     return (

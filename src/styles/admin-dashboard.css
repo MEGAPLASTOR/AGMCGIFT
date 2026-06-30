@@ -3094,6 +3094,263 @@
   background: rgba(130, 174, 244, 0.12);
 }
 
+.admin-gift-pool-manager-panel {
+  display: grid;
+  gap: 0;
+  padding: 20px 18px;
+}
+
+.admin-gift-pool-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border: 1px solid var(--admin-galaxy-line);
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: rgba(36, 38, 44, 0.96);
+  padding: 20px 18px 16px;
+}
+
+.admin-gift-pool-search {
+  position: relative;
+  width: min(280px, 100%);
+}
+
+.admin-gift-pool-search svg {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  width: 14px;
+  height: 14px;
+  color: #9bbcff;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.admin-gift-pool-search span {
+  position: absolute;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.admin-gift-pool-search input {
+  min-height: 34px;
+  border-radius: 4px;
+  padding: 7px 12px 7px 36px;
+}
+
+.admin-gift-pool-create-button,
+.admin-gift-pool-add-panel button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 34px;
+  border: 1px solid #82aef4;
+  border-radius: 4px;
+  background: #82aef4;
+  color: #07111f;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 1000;
+  padding: 8px 14px;
+}
+
+.admin-gift-pool-create-button:hover,
+.admin-gift-pool-add-panel button:hover {
+  border-color: #a8c6ff;
+  background: #a8c6ff;
+}
+
+.admin-gift-pool-table-wrap {
+  border-radius: 0 0 6px 6px;
+}
+
+.admin-gift-pool-table th,
+.admin-gift-pool-table td {
+  height: 52px;
+}
+
+.admin-gift-pool-id {
+  color: #b6c2d4;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.admin-gift-pool-tier-pill,
+.admin-gift-pool-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 20px;
+  border: 1px solid #5173a8;
+  border-radius: 4px;
+  background: rgba(130, 174, 244, 0.16);
+  color: #9fc1ff;
+  font-size: 11px;
+  font-weight: 1000;
+  line-height: 1;
+  padding: 4px 8px;
+  text-transform: uppercase;
+}
+
+.admin-gift-pool-status.is-available {
+  border-color: rgba(130, 201, 147, 0.42);
+  background: rgba(130, 201, 147, 0.16);
+  color: #93e2a8;
+}
+
+.admin-gift-pool-status.is-assigned {
+  border-color: rgba(255, 217, 102, 0.42);
+  background: rgba(255, 217, 102, 0.14);
+  color: #ffe08a;
+}
+
+.admin-gift-pool-status.is-muted {
+  border-color: var(--admin-galaxy-line);
+  background: rgba(154, 164, 178, 0.14);
+  color: #c4ccd8;
+}
+
+.admin-gift-pool-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-gift-pool-actions .admin-mini-button,
+.admin-gift-pool-account-table .admin-mini-button {
+  min-height: 28px;
+  border-radius: 4px;
+  font-size: 12px;
+  padding: 5px 10px;
+}
+
+.admin-panel.admin-gift-pool-modal {
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.admin-panel.admin-gift-pool-detail-modal {
+  width: min(1040px, calc(100vw - 32px));
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+}
+
+.admin-gift-pool-form-grid {
+  grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.6fr);
+}
+
+.admin-gift-pool-modal-actions {
+  justify-content: flex-end;
+}
+
+.admin-gift-pool-detail {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-gift-pool-detail-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-gift-pool-detail-summary span {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  border: 1px solid var(--admin-galaxy-line);
+  border-radius: 999px;
+  background: rgba(130, 174, 244, 0.12);
+  color: #dbe7ff;
+  font-size: 12px;
+  font-weight: 1000;
+  padding: 5px 10px;
+}
+
+.admin-gift-pool-add-panel {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.65fr) auto minmax(220px, 1.35fr) auto;
+  gap: 10px;
+  align-items: end;
+  border: 1px solid var(--admin-galaxy-line);
+  border-radius: 6px;
+  background: #202329;
+  padding: 12px;
+}
+
+.admin-gift-pool-add-panel label {
+  display: grid;
+  gap: 6px;
+  color: #9bbcff;
+  font-size: 12px;
+  font-weight: 1000;
+  text-transform: uppercase;
+}
+
+.admin-gift-pool-add-panel select {
+  min-height: 36px;
+  border-radius: 4px;
+  padding: 7px 10px;
+}
+
+.admin-gift-pool-add-panel button {
+  min-height: 36px;
+  white-space: nowrap;
+}
+
+.admin-gift-pool-add-panel button:disabled {
+  border-color: var(--admin-galaxy-line);
+  background: #242932;
+  color: #7f8a9b;
+}
+
+.admin-gift-pool-account-wrap {
+  max-height: min(52vh, 560px);
+  overflow: auto;
+}
+
+.admin-gift-pool-account-table td:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-gift-pool-account-table td:first-child small {
+  color: #8e9aab;
+  font-size: 11px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .admin-gift-pool-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-gift-pool-search,
+  .admin-gift-pool-create-button {
+    width: 100%;
+  }
+
+  .admin-gift-pool-form-grid,
+  .admin-gift-pool-add-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-gift-pool-add-panel button {
+    width: 100%;
+  }
+}
+
 .admin-modal-backdrop {
   background: rgba(4, 6, 13, 0.78);
 }
