@@ -4323,3 +4323,179 @@
     width: 100%;
   }
 }
+
+/* ponytail: final dark typography override, cheaper than untangling old stacked rules. */
+.admin-page {
+  --admin-galaxy-bg: #111318;
+  --admin-galaxy-panel: #24262b;
+  --admin-galaxy-panel-soft: #1f2228;
+  --admin-galaxy-line: #343943;
+  --admin-galaxy-text: #ffffff;
+  --admin-galaxy-muted: #aab7c8;
+  --admin-accent-blue: #82aef4;
+  --admin-accent-cyan: #6ea8ff;
+  color: var(--admin-galaxy-text);
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.35;
+}
+
+.admin-header,
+.admin-panel,
+.admin-login-card,
+.admin-table-wrap,
+.admin-account-toolbar,
+.admin-product-toolbar,
+.admin-gift-pool-toolbar,
+.admin-egg-toolbar,
+.admin-dark-panel,
+.admin-dark-stat {
+  border-color: var(--admin-galaxy-line);
+  background: rgba(36, 38, 43, 0.96);
+}
+
+.admin-header h1,
+.admin-panel h2,
+.admin-dark-analytics__titlebar h2 {
+  color: #ffffff;
+  font-size: clamp(18px, 1.35vw, 22px);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.admin-eyebrow,
+.admin-panel__head span,
+.admin-header span,
+.admin-login-card p,
+.admin-dark-stat span,
+.admin-dark-stat small,
+.admin-dark-panel h3 {
+  color: var(--admin-galaxy-muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.admin-management-nav a,
+.admin-sidebar__toggle,
+.admin-sidebar__mobile-toggle {
+  color: #c7d3e3;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.admin-management-nav a.is-active {
+  color: #82b4ff;
+}
+
+.admin-management-nav__icon,
+.admin-management-nav a.is-active .admin-management-nav__icon {
+  color: #82b4ff;
+}
+
+.admin-management-nav strong {
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-management-nav a.is-active strong {
+  background: #82b4ff;
+  color: #07111f;
+}
+
+.admin-page input,
+.admin-page select {
+  background: #1b1e24;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-page input::placeholder {
+  color: #8996a8;
+}
+
+.admin-page button,
+.admin-product-link-button,
+.admin-gift-pool-actions .admin-mini-button,
+.admin-egg-toolbar__actions button,
+.admin-dark-orders__toolbar button {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-table th,
+.admin-dark-orders-table th {
+  background: #2b2e34;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.admin-table td,
+.admin-table td strong,
+.admin-dark-orders-table td,
+.admin-dark-orders-table td strong {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-table td {
+  border-color: var(--admin-galaxy-line);
+}
+
+.admin-product-table td,
+.admin-gift-pool-table td,
+.admin-egg-table td,
+.admin-account-table td {
+  color: #ffffff;
+}
+
+.admin-product-table td strong,
+.admin-gift-pool-table td strong,
+.admin-account-name {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.admin-product-no-mapping,
+.admin-gift-pool-account-table td:first-child small,
+.admin-egg-id,
+.admin-account-token,
+.admin-table-code {
+  color: #aab7c8 !important;
+  font-weight: 600;
+}
+
+.admin-product-mapping-list > span,
+.admin-gift-pool-tier-pill,
+.admin-egg-type,
+.admin-egg-status,
+.admin-account-tier-badge,
+.admin-account-status-badge,
+.admin-dark-status {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-product-toolbar__actions button:first-child,
+.admin-gift-pool-create-button,
+.admin-gift-pool-add-panel button {
+  background: #82b4ff;
+  color: #07111f;
+}
+
+.admin-product-link-button,
+.admin-light-button,
+.admin-mini-button,
+.admin-modal-close {
+  color: #82b4ff;
+}
