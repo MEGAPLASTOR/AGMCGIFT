@@ -1496,6 +1496,7 @@ export function AdminDataCrudPanel({
         isRefreshing={isRefreshing}
         tables={tables}
         onRefresh={onRefresh}
+        onSaveRecord={onSaveRecord}
       />
     );
   }
