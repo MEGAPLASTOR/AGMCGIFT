@@ -327,52 +327,52 @@ function getPoolAvailableCount(poolAccountMappings, availableAccountIds) {
 }
 
 function buildTierInventory(giftPools, giftAccounts, poolAccountMappings) {
-  const accountById = new Map(giftAccounts.map((account) => [account.id, account]));
   const tierRows = new Map();
+  const mappedAccountIds = new Set(
+    poolAccountMappings
+      .map((mapping) => String(mapping.account_id || "").trim())
+      .filter(Boolean)
+  );
+
+  const ensureTierRow = (tierValue) => {
+    const tier = String(tierValue || "Unknown").trim().toUpperCase() || "UNKNOWN";
+
+    if (!tierRows.has(tier)) {
+      tierRows.set(tier, {
+        tier,
+        pools: 0,
+        totalAccounts: 0,
+        availableAccounts: 0,
+        assignedAccounts: 0,
+        mappedAccounts: 0,
+        usedAccounts: 0,
+      });
+    }
+
+    return tierRows.get(tier);
+  };
 
   giftPools.forEach((pool) => {
-    const tier = String(pool.tier || "Unknown").toUpperCase();
-
-    if (!tierRows.has(tier)) {
-      tierRows.set(tier, {
-        tier,
-        pools: 0,
-        totalAccounts: 0,
-        availableAccounts: 0,
-        usedAccounts: 0,
-      });
-    }
-
-    tierRows.get(tier).pools += 1;
+    ensureTierRow(pool.tier).pools += 1;
   });
 
-  poolAccountMappings.forEach((mapping) => {
-    const account = accountById.get(mapping.account_id);
+  giftAccounts.forEach((account) => {
+    const row = ensureTierRow(account.tier);
+    const accountId = String(account.id || "").trim();
+    const status = normalizeStatus(account.status);
 
-    if (!account) {
-      return;
-    }
-
-    const tier = String(account.tier || "Unknown").toUpperCase();
-
-    if (!tierRows.has(tier)) {
-      tierRows.set(tier, {
-        tier,
-        pools: 0,
-        totalAccounts: 0,
-        availableAccounts: 0,
-        usedAccounts: 0,
-      });
-    }
-
-    const row = tierRows.get(tier);
     row.totalAccounts += 1;
 
-    if (normalizeStatus(account.status) === "available") {
+    if (mappedAccountIds.has(accountId)) {
+      row.mappedAccounts += 1;
+    }
+
+    if (status === "available") {
       row.availableAccounts += 1;
       return;
     }
 
+    row.assignedAccounts += 1;
     row.usedAccounts += 1;
   });
 

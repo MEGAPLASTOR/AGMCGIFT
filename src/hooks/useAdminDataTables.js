@@ -166,8 +166,13 @@ export function useAdminDataTables(sourceTables) {
   };
 
   const loadRawTables = useCallback(
-    async (authHeader) => {
-      setIsLoadingRawData(true);
+    async (authHeader, options = {}) => {
+      const { silent = false } = options;
+
+      if (!silent) {
+        setIsLoadingRawData(true);
+      }
+
       setRawDataError("");
 
       try {
@@ -193,7 +198,9 @@ export function useAdminDataTables(sourceTables) {
         );
         throw error;
       } finally {
-        setIsLoadingRawData(false);
+        if (!silent) {
+          setIsLoadingRawData(false);
+        }
       }
     },
     [sourceTables]

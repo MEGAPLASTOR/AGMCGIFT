@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaBars,
@@ -50,6 +50,7 @@ import {
 import { syncAllAdminProducts } from "../../services/adminProductService";
 
 const ADMIN_BASE_PATH = "/agmcmyadmin";
+const ADMIN_OVERVIEW_REFRESH_INTERVAL_MS = 10000;
 
 const MANAGEMENT_PAGES = [
   {
@@ -219,6 +220,7 @@ export default function AdminDashboardPage() {
   const [isNavCollapsed, setNavCollapsed] = useState(shouldCollapseAdminNav);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
   const [isSyncingProducts, setIsSyncingProducts] = useState(false);
+  const isAutoRefreshingRawData = useRef(false);
   const dashboard = buildAdminDashboard(adminTables.tables);
   const activeSlug = getActiveSlug(location.pathname);
   const activeManagementPage = MANAGEMENT_PAGES.find(
@@ -317,6 +319,43 @@ export default function AdminDashboardPage() {
     });
   }, [admin?.authHeader, handleAuthError, loadRawTables]);
 
+  useEffect(() => {
+    if (!admin?.authHeader || !isOverviewPage) {
+      return undefined;
+    }
+
+    const refreshOverviewData = () => {
+      if (adminTables.isLoadingRawData || isAutoRefreshingRawData.current) {
+        return;
+      }
+
+      isAutoRefreshingRawData.current = true;
+      loadRawTables(admin.authHeader, { silent: true })
+        .then(handleAuthError)
+        .catch((loadError) => {
+          handleAuthError(loadError);
+        })
+        .finally(() => {
+          isAutoRefreshingRawData.current = false;
+        });
+    };
+
+    const intervalId = window.setInterval(
+      refreshOverviewData,
+      ADMIN_OVERVIEW_REFRESH_INTERVAL_MS
+    );
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [
+    admin?.authHeader,
+    adminTables.isLoadingRawData,
+    handleAuthError,
+    isOverviewPage,
+    loadRawTables,
+  ]);
+
   const handleToggleAdminNav = () => {
     setNavCollapsed((currentValue) => !currentValue);
   };
@@ -332,7 +371,11 @@ export default function AdminDashboardPage() {
   };
 
   const handleReloadRawData = () => {
-    if (!admin?.authHeader || adminTables.isLoadingRawData) {
+    if (
+      !admin?.authHeader ||
+      adminTables.isLoadingRawData ||
+      isAutoRefreshingRawData.current
+    ) {
       return;
     }
 

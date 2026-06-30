@@ -188,13 +188,29 @@ function getTierRows(inventoryByTier = []) {
     const row = rowByTier.get(tier) || {};
     const available = Number(row.availableAccounts || 0);
     const total = Number(row.totalAccounts || 0);
+    const assigned =
+      "assignedAccounts" in row
+        ? Number(row.assignedAccounts || 0)
+        : Math.max(0, total - available);
 
     return {
       tier,
       available,
-      assigned: Math.max(0, total - available),
+      assigned,
     };
   });
+}
+
+function getTierAxisTicks(maxValue) {
+  const max = Math.max(1, Math.ceil(Number(maxValue || 0)));
+
+  if (max <= 6) {
+    return Array.from({ length: max + 1 }, (_, index) => max - index);
+  }
+
+  return [1, 0.75, 0.5, 0.25, 0].map((ratio) =>
+    Math.round(max * ratio)
+  );
 }
 
 function DashboardStat({ label, value, note }) {
@@ -287,6 +303,8 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
     1,
     ...tierRows.flatMap((row) => [row.available, row.assigned])
   );
+  const tierAxisTicks = getTierAxisTicks(maxTierValue);
+  const tierChartMaxValue = Math.max(1, tierAxisTicks[0] || maxTierValue);
   const filteredOrders = normalizedOrderSearch
     ? latestOrders.filter((order) =>
         [
@@ -375,11 +393,16 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
           <div className="admin-dark-chart-hover" tabIndex={0}>
             <div
               className="admin-dark-tier-chart"
-              style={{ "--tier-max": String(maxTierValue) }}
+              style={{ "--tier-max": String(tierChartMaxValue) }}
             >
-              <div className="admin-dark-tier-axis">
-                {[1, 0.75, 0.5, 0.25, 0].map((ratio) => (
-                  <span key={ratio}>{Math.round(maxTierValue * ratio)}</span>
+              <div
+                className="admin-dark-tier-axis"
+                style={{
+                  gridTemplateRows: `repeat(${tierAxisTicks.length}, 1fr)`,
+                }}
+              >
+                {tierAxisTicks.map((tick) => (
+                  <span key={tick}>{formatNumber(tick)}</span>
                 ))}
               </div>
               <div className="admin-dark-tier-bars">
@@ -391,7 +414,7 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
                         style={{
                           height: `${Math.max(
                             row.available ? 6 : 0,
-                            Math.round((row.available / maxTierValue) * 100)
+                            Math.round((row.available / tierChartMaxValue) * 100)
                           )}%`,
                         }}
                         title={`Có sẵn: ${formatNumber(row.available)}`}
@@ -401,7 +424,7 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
                         style={{
                           height: `${Math.max(
                             row.assigned ? 6 : 0,
-                            Math.round((row.assigned / maxTierValue) * 100)
+                            Math.round((row.assigned / tierChartMaxValue) * 100)
                           )}%`,
                         }}
                         title={`Đã gán: ${formatNumber(row.assigned)}`}
