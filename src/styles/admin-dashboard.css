@@ -962,6 +962,13 @@
   margin-bottom: 14px;
 }
 
+.admin-pool-toolbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
 .admin-pool-toolbar label,
 .admin-pool-editor label {
   display: grid;
@@ -994,6 +1001,12 @@
     background 160ms ease;
 }
 
+.admin-pool-toolbar button:disabled,
+.admin-pool-editor__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .admin-pool-toolbar button:hover,
 .admin-pool-editor__actions button:hover {
   background: #233042;
@@ -1003,7 +1016,7 @@
 
 .admin-pool-summary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 12px;
 }
@@ -1016,6 +1029,11 @@
   border-radius: 8px;
   background: #f8fafc;
   padding: 12px;
+}
+
+.admin-pool-summary article.is-pending {
+  border-color: rgba(202, 138, 4, 0.38);
+  background: #fffbeb;
 }
 
 .admin-pool-summary span,
@@ -1053,6 +1071,223 @@
   grid-template-columns: minmax(220px, 280px) minmax(0, 1fr) minmax(280px, 340px);
   gap: 14px;
   align-items: start;
+}
+
+.admin-pool-layout--table {
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+}
+
+.admin-pool-source-table,
+.admin-pool-table-panel {
+  min-width: 0;
+  border: 1px solid rgba(23, 32, 42, 0.12);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.admin-pool-source-table {
+  position: sticky;
+  top: 14px;
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  background: #fffdf0;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+.admin-pool-source-table.is-drag-over,
+.admin-pool-table__row.is-drag-over td {
+  border-color: #16a34a;
+  background: #ecfdf5;
+  box-shadow: inset 0 0 0 2px rgba(22, 163, 74, 0.18);
+}
+
+.admin-pool-table-wrap {
+  max-height: min(70vh, 760px);
+  overflow: auto;
+}
+
+.admin-pool-table {
+  min-width: 980px;
+}
+
+.admin-pool-table th:nth-child(3),
+.admin-pool-table td:nth-child(3) {
+  width: 44%;
+}
+
+.admin-pool-table__row td {
+  transition:
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.admin-pool-table__row.is-selected td {
+  background: #eff6ff;
+}
+
+.admin-pool-table__row.is-pending td {
+  background: #fffbeb;
+}
+
+.admin-pool-table__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  border: 0;
+  background: transparent;
+  color: #17202a;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 1000;
+  padding: 0;
+  text-align: left;
+}
+
+.admin-pool-table__title span {
+  overflow-wrap: anywhere;
+}
+
+.admin-pool-table__id {
+  display: block;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  margin-top: 5px;
+}
+
+.admin-pool-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-pool-table__actions .admin-mini-button {
+  flex: 1 1 72px;
+}
+
+.admin-pool-tier-pill,
+.admin-pool-draft-badge,
+.admin-pool-saved-badge,
+.admin-pool-status-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 1000;
+  line-height: 1;
+  padding: 7px 9px;
+  white-space: nowrap;
+}
+
+.admin-pool-tier-pill {
+  background: #e8f5ff;
+  color: #17202a;
+}
+
+.admin-pool-status-pill {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.admin-pool-draft-badge {
+  border: 1px solid rgba(202, 138, 4, 0.36);
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.admin-pool-saved-badge {
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.admin-pool-account-table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+  border: 1px solid rgba(23, 32, 42, 0.1);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.admin-pool-account-table-wrap--compact {
+  max-height: 260px;
+  overflow: auto;
+}
+
+.admin-pool-account-table {
+  min-width: 620px;
+}
+
+.admin-pool-account-table--compact {
+  min-width: 540px;
+}
+
+.admin-pool-account-table th,
+.admin-pool-account-table td {
+  border-bottom-width: 1px;
+  padding: 8px;
+}
+
+.admin-pool-account-table--compact td {
+  background: #ffffff;
+}
+
+.admin-pool-account-row {
+  cursor: grab;
+  transition:
+    background 160ms ease,
+    opacity 160ms ease;
+}
+
+.admin-pool-account-row:active {
+  cursor: grabbing;
+}
+
+.admin-pool-account-row:hover td {
+  background: #eff6ff;
+}
+
+.admin-pool-account-row.is-pending td {
+  background: #fff7d6;
+}
+
+.admin-pool-account-row.is-dragging {
+  opacity: 0.5;
+}
+
+.admin-pool-account-row__drag {
+  width: 32px;
+  color: #94a3b8;
+}
+
+.admin-pool-account-row strong,
+.admin-pool-account-row span {
+  display: block;
+}
+
+.admin-pool-account-row span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  margin-top: 3px;
+}
+
+.admin-panel.admin-pool-editor-modal {
+  width: min(460px, calc(100vw - 32px));
+  max-width: 460px;
+  min-height: auto;
+}
+
+.admin-pool-editor--modal {
+  position: static;
+  border: 0;
+  background: transparent;
+  padding: 0;
 }
 
 .admin-pool-board {

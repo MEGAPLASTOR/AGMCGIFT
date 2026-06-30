@@ -1,14 +1,13 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FaBoxOpen,
-  FaChevronDown,
-  FaCirclePlus,
   FaFloppyDisk,
   FaGripVertical,
   FaLayerGroup,
   FaPen,
   FaRotateLeft,
   FaTrashCan,
+  FaXmark,
 } from "react-icons/fa6";
 
 const EMPTY_ROWS = [];
@@ -129,28 +128,91 @@ function parseDragAccountId(event) {
   return normalizeText(event.dataTransfer.getData("text/plain"));
 }
 
-function PoolAccountCard({ account, isDragging, onDragEnd, onDragStart }) {
-  const accountId = getAccountId(account);
-  const tier = normalizeText(account.tier || "-");
-  const status = normalizeText(account.status || "-");
+function PoolAccountTable({
+  accounts,
+  compact = false,
+  draggingAccountId,
+  emptyMessage,
+  onDragEnd,
+  onDragStart,
+  pendingAccountIds,
+}) {
+  const tableClassName = compact
+    ? "admin-table admin-pool-account-table admin-pool-account-table--compact"
+    : "admin-table admin-pool-account-table";
 
   return (
-    <article
-      className={`admin-pool-account-card${isDragging ? " is-dragging" : ""}`}
-      draggable
-      role="listitem"
-      tabIndex={0}
-      onDragEnd={onDragEnd}
-      onDragStart={(event) => onDragStart(event, accountId)}
+    <div
+      className={`admin-pool-account-table-wrap${
+        compact ? " admin-pool-account-table-wrap--compact" : ""
+      }`}
     >
-      <FaGripVertical aria-hidden="true" />
-      <div>
-        <strong>{getAccountName(account)}</strong>
-        <span>{accountId || "no-id"}</span>
-      </div>
-      <em>{tier}</em>
-      <small>{status}</small>
-    </article>
+      <table className={tableClassName}>
+        {!compact ? (
+          <thead>
+            <tr>
+              <th aria-label="Kéo thả" />
+              <th>Account</th>
+              <th>Tier</th>
+              <th>Trạng thái</th>
+              <th>Lưu</th>
+            </tr>
+          </thead>
+        ) : null}
+        <tbody>
+          {accounts.length ? (
+            accounts.map((account) => {
+              const accountId = getAccountId(account);
+              const status = normalizeText(account.status || "-");
+              const isPending = pendingAccountIds.has(accountId);
+              const isDragging = draggingAccountId === accountId;
+
+              return (
+                <tr
+                  className={`admin-pool-account-row${
+                    isPending ? " is-pending" : ""
+                  }${isDragging ? " is-dragging" : ""}`}
+                  draggable
+                  key={accountId}
+                  onDragEnd={onDragEnd}
+                  onDragStart={(event) => onDragStart(event, accountId)}
+                >
+                  <td className="admin-pool-account-row__drag">
+                    <FaGripVertical aria-hidden="true" />
+                  </td>
+                  <td>
+                    <strong>{getAccountName(account)}</strong>
+                    <span>{accountId || "no-id"}</span>
+                  </td>
+                  <td>
+                    <em>{normalizeText(account.tier || "-")}</em>
+                  </td>
+                  <td>
+                    <small className="admin-pool-status-pill">{status}</small>
+                  </td>
+                  <td>
+                    {isPending ? (
+                      <small className="admin-pool-draft-badge">Chưa lưu</small>
+                    ) : (
+                      <small className="admin-pool-saved-badge">Đã lưu</small>
+                    )}
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={5}>
+                <div className="admin-pool-empty-drop">
+                  <FaBoxOpen aria-hidden="true" />
+                  <span>{emptyMessage}</span>
+                </div>
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -174,7 +236,8 @@ export function AdminGiftPoolDragPanel({
   const [isSaving, setIsSaving] = useState(false);
   const [draggingAccountId, setDraggingAccountId] = useState("");
   const [dragOverPoolId, setDragOverPoolId] = useState("");
-  const [expandedPoolIds, setExpandedPoolIds] = useState(() => new Set());
+  const [isPoolModalOpen, setPoolModalOpen] = useState(false);
+  const [draftMoves, setDraftMoves] = useState(() => new Map());
 
   const pools = tables.giftPools || EMPTY_ROWS;
   const accounts = tables.giftAccounts || EMPTY_ROWS;
@@ -183,6 +246,10 @@ export function AdminGiftPoolDragPanel({
   const poolIdSet = useMemo(
     () => new Set(pools.map(getPoolId).filter(Boolean)),
     [pools]
+  );
+  const accountIdSet = useMemo(
+    () => new Set(accounts.map(getAccountId).filter(Boolean)),
+    [accounts]
   );
   const mappingByAccountId = useMemo(() => {
     const map = new Map();
@@ -198,6 +265,49 @@ export function AdminGiftPoolDragPanel({
 
     return map;
   }, [mappings]);
+  const persistedPoolByAccountId = useMemo(() => {
+    const map = new Map();
+
+    mappingByAccountId.forEach((mapping, accountId) => {
+      const poolId = getMappingPoolId(mapping);
+
+      if (poolId && poolIdSet.has(poolId)) {
+        map.set(accountId, poolId);
+      }
+    });
+
+    return map;
+  }, [mappingByAccountId, poolIdSet]);
+  const pendingMoves = useMemo(
+    () =>
+      [...draftMoves.entries()]
+        .map(([accountId, nextPoolId]) => ({
+          accountId,
+          currentPoolId: persistedPoolByAccountId.get(accountId) || "",
+          nextPoolId,
+        }))
+        .filter((move) => move.currentPoolId !== move.nextPoolId),
+    [draftMoves, persistedPoolByAccountId]
+  );
+  const pendingAccountIds = useMemo(
+    () => new Set(pendingMoves.map((move) => move.accountId)),
+    [pendingMoves]
+  );
+  const pendingPoolIds = useMemo(() => {
+    const set = new Set();
+
+    pendingMoves.forEach((move) => {
+      if (move.currentPoolId) {
+        set.add(move.currentPoolId);
+      }
+
+      if (move.nextPoolId) {
+        set.add(move.nextPoolId);
+      }
+    });
+
+    return set;
+  }, [pendingMoves]);
   const accountsByPoolId = useMemo(() => {
     const map = new Map([[UNASSIGNED_POOL_ID, []]]);
 
@@ -207,10 +317,14 @@ export function AdminGiftPoolDragPanel({
 
     accounts.forEach((account) => {
       const accountId = getAccountId(account);
-      const mapping = mappingByAccountId.get(accountId);
-      const poolId = getMappingPoolId(mapping);
+      const persistedPoolId = persistedPoolByAccountId.get(accountId) || "";
+      const effectivePoolId = draftMoves.has(accountId)
+        ? draftMoves.get(accountId)
+        : persistedPoolId;
       const targetPoolId =
-        poolId && poolIdSet.has(poolId) ? poolId : UNASSIGNED_POOL_ID;
+        effectivePoolId && poolIdSet.has(effectivePoolId)
+          ? effectivePoolId
+          : UNASSIGNED_POOL_ID;
 
       if (!map.has(targetPoolId)) {
         map.set(targetPoolId, []);
@@ -224,7 +338,7 @@ export function AdminGiftPoolDragPanel({
     });
 
     return map;
-  }, [accounts, mappingByAccountId, poolIdSet, pools]);
+  }, [accounts, draftMoves, persistedPoolByAccountId, poolIdSet, pools]);
   const filteredPools = useMemo(
     () =>
       [...pools]
@@ -233,7 +347,9 @@ export function AdminGiftPoolDragPanel({
             normalizeText(second.tier)
           );
 
-          return tierCompare || getPoolName(first).localeCompare(getPoolName(second));
+          return (
+            tierCompare || getPoolName(first).localeCompare(getPoolName(second))
+          );
         })
         .filter((pool) => {
           if (poolMatchesKeyword(pool, normalizedKeyword)) {
@@ -253,40 +369,46 @@ export function AdminGiftPoolDragPanel({
       ),
     [accountsByPoolId, normalizedKeyword]
   );
-  const assignedAccountCount = accounts.length - (accountsByPoolId.get(UNASSIGNED_POOL_ID) || []).length;
+  const assignedAccountCount =
+    accounts.length - (accountsByPoolId.get(UNASSIGNED_POOL_ID) || []).length;
   const availableAccountCount = accounts.filter(
     (account) => normalizeSearch(account.status) === "available"
   ).length;
 
-  const expandPool = (poolId) => {
-    setExpandedPoolIds((currentIds) => {
-      if (currentIds.has(poolId)) {
-        return currentIds;
-      }
+  useEffect(() => {
+    setDraftMoves((currentMoves) => {
+      let hasChanged = false;
+      const nextMoves = new Map();
 
-      const nextIds = new Set(currentIds);
-      nextIds.add(poolId);
-      return nextIds;
+      currentMoves.forEach((nextPoolId, accountId) => {
+        const currentPoolId = persistedPoolByAccountId.get(accountId) || "";
+
+        if (!accountIdSet.has(accountId)) {
+          hasChanged = true;
+          return;
+        }
+
+        if (nextPoolId && !poolIdSet.has(nextPoolId)) {
+          hasChanged = true;
+          return;
+        }
+
+        if (currentPoolId === nextPoolId) {
+          hasChanged = true;
+          return;
+        }
+
+        nextMoves.set(accountId, nextPoolId);
+      });
+
+      return hasChanged ? nextMoves : currentMoves;
     });
-  };
-
-  const togglePoolExpanded = (poolId) => {
-    setExpandedPoolIds((currentIds) => {
-      const nextIds = new Set(currentIds);
-
-      if (nextIds.has(poolId)) {
-        nextIds.delete(poolId);
-      } else {
-        nextIds.add(poolId);
-      }
-
-      return nextIds;
-    });
-  };
+  }, [accountIdSet, persistedPoolByAccountId, poolIdSet]);
 
   const startCreatePool = () => {
     setSelectedPoolId("");
     setPoolForm(createEmptyPoolForm());
+    setPoolModalOpen(true);
     setMessage("Đang tạo bể quà mới.");
   };
 
@@ -295,8 +417,16 @@ export function AdminGiftPoolDragPanel({
 
     setSelectedPoolId(poolId);
     setPoolForm(createPoolForm(pool));
-    expandPool(poolId);
+    setPoolModalOpen(true);
     setMessage("Đang chỉnh sửa bể quà đã chọn.");
+  };
+
+  const closePoolModal = () => {
+    if (isSaving) {
+      return;
+    }
+
+    setPoolModalOpen(false);
   };
 
   const updatePoolField = (fieldKey, value) => {
@@ -340,8 +470,8 @@ export function AdminGiftPoolDragPanel({
 
       onSaveRecord("giftPools", nextPool);
       setSelectedPoolId(nextPoolId);
-      expandPool(nextPoolId);
       setPoolForm(createPoolForm(nextPool));
+      setPoolModalOpen(false);
       setMessage(
         selectedPoolId ? "Đã cập nhật bể quà." : "Đã tạo bể quà mới."
       );
@@ -371,13 +501,8 @@ export function AdminGiftPoolDragPanel({
       if (selectedPoolId === poolId) {
         setSelectedPoolId("");
         setPoolForm(createEmptyPoolForm());
+        setPoolModalOpen(false);
       }
-
-      setExpandedPoolIds((currentIds) => {
-        const nextIds = new Set(currentIds);
-        nextIds.delete(poolId);
-        return nextIds;
-      });
 
       setMessage("Đã xóa bể quà.");
     } catch (error) {
@@ -387,58 +512,94 @@ export function AdminGiftPoolDragPanel({
     }
   };
 
-  const moveAccountToPool = async (accountId, targetPoolId) => {
-    const currentMapping = mappingByAccountId.get(accountId);
-    const currentPoolId = getMappingPoolId(currentMapping);
+  const stageAccountMove = (accountId, targetPoolId) => {
     const nextPoolId = targetPoolId === UNASSIGNED_POOL_ID ? "" : targetPoolId;
+    const currentPoolId = persistedPoolByAccountId.get(accountId) || "";
 
-    if (!accountId || currentPoolId === nextPoolId || isSaving) {
+    if (!accountId || isSaving) {
       return;
     }
+
+    setDraftMoves((currentMoves) => {
+      const nextMoves = new Map(currentMoves);
+
+      if (currentPoolId === nextPoolId) {
+        nextMoves.delete(accountId);
+      } else {
+        nextMoves.set(accountId, nextPoolId);
+      }
+
+      return nextMoves;
+    });
+    setMessage(
+      nextPoolId
+        ? "Account đã được đưa vào hàng chờ lưu. Bấm Lưu thay đổi account để đồng bộ CSDL."
+        : "Account đã được đưa về nguồn ở hàng chờ lưu. Bấm Lưu thay đổi account để đồng bộ CSDL."
+    );
+  };
+
+  const saveDraftMoves = async () => {
+    if (!pendingMoves.length || isSaving) {
+      return;
+    }
+
+    const movesToSave = pendingMoves;
 
     setIsSaving(true);
 
     try {
-      if (currentPoolId) {
-        const removedMappings = await onRemovePoolAccount({
-          pool_id: currentPoolId,
-          account_id: accountId,
-        });
-        const records = Array.isArray(removedMappings)
-          ? removedMappings
-          : [currentMapping || removedMappings];
+      for (const move of movesToSave) {
+        const currentMapping = mappingByAccountId.get(move.accountId);
 
-        records.filter(Boolean).forEach((mapping) => {
-          onDeleteRecord("poolAccountMappings", getMappingId(mapping));
-        });
+        if (move.currentPoolId) {
+          const removedMappings = await onRemovePoolAccount({
+            pool_id: move.currentPoolId,
+            account_id: move.accountId,
+          });
+          const records = Array.isArray(removedMappings)
+            ? removedMappings
+            : [currentMapping || removedMappings];
+
+          records.filter(Boolean).forEach((mapping) => {
+            onDeleteRecord("poolAccountMappings", getMappingId(mapping));
+          });
+        }
+
+        if (move.nextPoolId) {
+          const addedMappings = await onAddPoolAccount({
+            pool_id: move.nextPoolId,
+            account_id: move.accountId,
+          });
+          const records = Array.isArray(addedMappings)
+            ? addedMappings
+            : [addedMappings];
+
+          records.filter(Boolean).forEach((mapping) => {
+            onSaveRecord("poolAccountMappings", mapping);
+          });
+        }
       }
 
-      if (nextPoolId) {
-        const addedMappings = await onAddPoolAccount({
-          pool_id: nextPoolId,
-          account_id: accountId,
-        });
-        const records = Array.isArray(addedMappings)
-          ? addedMappings
-          : [addedMappings];
-
-        records.filter(Boolean).forEach((mapping) => {
-          onSaveRecord("poolAccountMappings", mapping);
-        });
-      }
-
-      setMessage(
-        nextPoolId
-          ? "Đã gán account vào bể quà."
-          : "Đã gỡ account khỏi bể quà."
-      );
+      setDraftMoves(new Map());
+      setMessage(`Đã lưu ${movesToSave.length} thay đổi account vào CSDL.`);
     } catch (error) {
-      setMessage(error.message || "Không thể cập nhật account trong bể quà.");
+      setMessage(
+        error.message || "Không thể lưu thay đổi account vào bể quà."
+      );
     } finally {
       setIsSaving(false);
       setDraggingAccountId("");
       setDragOverPoolId("");
     }
+  };
+
+  const discardDraftMoves = () => {
+    if (isSaving || !pendingMoves.length) {
+      return;
+    }
+
+    setDraftMoves(new Map());
+    setMessage("Đã hủy các thay đổi account chưa lưu.");
   };
 
   const handleDragStart = (event, accountId) => {
@@ -454,9 +615,6 @@ export function AdminGiftPoolDragPanel({
   const handleDragOver = (event, poolId) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
-    if (poolId !== UNASSIGNED_POOL_ID) {
-      expandPool(poolId);
-    }
     setDragOverPoolId(poolId);
   };
 
@@ -464,35 +622,14 @@ export function AdminGiftPoolDragPanel({
     event.preventDefault();
     const accountId = parseDragAccountId(event);
 
-    moveAccountToPool(accountId, poolId);
+    stageAccountMove(accountId, poolId);
+    setDraggingAccountId("");
+    setDragOverPoolId("");
   };
 
-  const renderAccountList = (poolAccounts) => {
-    if (!poolAccounts.length) {
-      return (
-        <div className="admin-pool-empty-drop">
-          <FaBoxOpen aria-hidden="true" />
-          <span>Trống</span>
-        </div>
-      );
-    }
-
-    return poolAccounts.map((account) => {
-      const accountId = getAccountId(account);
-
-      return (
-        <PoolAccountCard
-          account={account}
-          isDragging={draggingAccountId === accountId}
-          key={accountId}
-          onDragEnd={() => {
-            setDraggingAccountId("");
-            setDragOverPoolId("");
-          }}
-          onDragStart={handleDragStart}
-        />
-      );
-    });
+  const handleDragEnd = () => {
+    setDraggingAccountId("");
+    setDragOverPoolId("");
   };
 
   return (
@@ -518,10 +655,32 @@ export function AdminGiftPoolDragPanel({
             onChange={(event) => setKeyword(event.target.value)}
           />
         </label>
-        <button type="button" onClick={startCreatePool}>
-          <FaCirclePlus aria-hidden="true" />
-          Thêm bể
-        </button>
+        <div className="admin-pool-toolbar__actions">
+          <button type="button" onClick={startCreatePool}>
+            Thêm bể
+          </button>
+          <button
+            type="button"
+            className="admin-pool-save-draft-button"
+            disabled={!pendingMoves.length || isSaving}
+            onClick={saveDraftMoves}
+          >
+            <FaFloppyDisk aria-hidden="true" />
+            {pendingMoves.length
+              ? `Lưu ${pendingMoves.length} thay đổi`
+              : "Đã lưu account"}
+          </button>
+          {pendingMoves.length ? (
+            <button
+              type="button"
+              className="admin-light-button"
+              disabled={isSaving}
+              onClick={discardDraftMoves}
+            >
+              Hoàn tác
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <div className="admin-pool-summary" aria-label="Tổng quan bể quà">
@@ -541,13 +700,17 @@ export function AdminGiftPoolDragPanel({
           <span>Available</span>
           <strong>{availableAccountCount}</strong>
         </article>
+        <article className={pendingMoves.length ? "is-pending" : ""}>
+          <span>Chưa lưu</span>
+          <strong>{pendingMoves.length}</strong>
+        </article>
       </div>
 
       {message ? <p className="admin-pool-message">{message}</p> : null}
 
-      <div className="admin-pool-layout">
+      <div className="admin-pool-layout admin-pool-layout--table">
         <section
-          className={`admin-pool-column admin-pool-column--source${
+          className={`admin-pool-source-table${
             dragOverPoolId === UNASSIGNED_POOL_ID ? " is-drag-over" : ""
           }`}
           onDragLeave={() => setDragOverPoolId("")}
@@ -561,154 +724,211 @@ export function AdminGiftPoolDragPanel({
             </div>
             <em>{unassignedAccounts.length}</em>
           </div>
-          <div className="admin-pool-card-list" role="list">
-            {renderAccountList(unassignedAccounts)}
-          </div>
+          <PoolAccountTable
+            accounts={unassignedAccounts}
+            draggingAccountId={draggingAccountId}
+            emptyMessage="Trống"
+            onDragEnd={handleDragEnd}
+            onDragStart={handleDragStart}
+            pendingAccountIds={pendingAccountIds}
+          />
         </section>
 
-        <div className="admin-pool-board" aria-label="Danh sách bể quà">
-          {filteredPools.length ? (
-            filteredPools.map((pool) => {
-              const poolId = getPoolId(pool);
-              const poolAccounts = (accountsByPoolId.get(poolId) || []).filter(
-                (account) =>
-                  poolMatchesKeyword(pool, normalizedKeyword) ||
-                  accountMatchesKeyword(account, normalizedKeyword)
-              );
-              const isExpanded = expandedPoolIds.has(poolId);
+        <section className="admin-pool-table-panel" aria-label="Danh sách bể quà">
+          <div className="admin-table-wrap admin-pool-table-wrap">
+            <table className="admin-table admin-pool-table">
+              <thead>
+                <tr>
+                  <th>Tier</th>
+                  <th>Bể quà</th>
+                  <th>Account kéo thả</th>
+                  <th>Chưa lưu</th>
+                  <th>Thao tác</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredPools.length ? (
+                  filteredPools.map((pool) => {
+                    const poolId = getPoolId(pool);
+                    const poolAccounts = (
+                      accountsByPoolId.get(poolId) || []
+                    ).filter(
+                      (account) =>
+                        poolMatchesKeyword(pool, normalizedKeyword) ||
+                        accountMatchesKeyword(account, normalizedKeyword)
+                    );
+                    const pendingInPool = pendingMoves.filter(
+                      (move) =>
+                        move.currentPoolId === poolId ||
+                        move.nextPoolId === poolId
+                    ).length;
+                    const isDragOver = dragOverPoolId === poolId;
+                    const isSelected = selectedPoolId === poolId;
+                    const isPending = pendingPoolIds.has(poolId);
 
-              return (
-                <section
-                  className={`admin-pool-column admin-pool-column--compact${
-                    isExpanded ? " is-expanded" : " is-collapsed"
-                  }${
-                    selectedPoolId === poolId ? " is-selected" : ""
-                  }${dragOverPoolId === poolId ? " is-drag-over" : ""}`}
-                  key={poolId}
-                  onDragLeave={() => setDragOverPoolId("")}
-                  onDragOver={(event) => handleDragOver(event, poolId)}
-                  onDrop={(event) => handleDrop(event, poolId)}
-                >
-                  <div className="admin-pool-column__head">
-                    <button
-                      type="button"
-                      className="admin-pool-column__title"
-                      onClick={() => startEditPool(pool)}
-                    >
-                      <FaLayerGroup aria-hidden="true" />
-                      <div>
-                        <span>Tier {normalizeText(pool.tier || "-")}</span>
-                        <strong>{getPoolName(pool) || "Bể chưa đặt tên"}</strong>
-                      </div>
-                    </button>
-                    <div className="admin-pool-column__head-actions">
-                      <em>{poolAccounts.length}</em>
-                      <button
-                        type="button"
-                        className="admin-pool-column__toggle"
-                        aria-expanded={isExpanded}
-                        aria-controls={`pool-accounts-${poolId}`}
-                        title={isExpanded ? "Thu gọn" : "Xổ xuống"}
-                        onClick={() => togglePoolExpanded(poolId)}
+                    return (
+                      <tr
+                        className={`admin-pool-table__row${
+                          isDragOver ? " is-drag-over" : ""
+                        }${isSelected ? " is-selected" : ""}${
+                          isPending ? " is-pending" : ""
+                        }`}
+                        key={poolId}
+                        onDragLeave={() => setDragOverPoolId("")}
+                        onDragOver={(event) => handleDragOver(event, poolId)}
+                        onDrop={(event) => handleDrop(event, poolId)}
                       >
-                        <FaChevronDown aria-hidden="true" />
-                      </button>
-                    </div>
-                  </div>
-                  {isExpanded ? (
-                    <div
-                      className="admin-pool-column__body"
-                      id={`pool-accounts-${poolId}`}
-                    >
-                      <div className="admin-pool-column__actions">
-                        <button
-                          type="button"
-                          className="admin-mini-button"
-                          onClick={() => startEditPool(pool)}
-                        >
-                          <FaPen aria-hidden="true" />
-                          Sửa
-                        </button>
-                        <button
-                          type="button"
-                          className="admin-mini-button admin-danger-button"
-                          disabled={isSaving}
-                          onClick={() => deletePool(poolId)}
-                        >
-                          <FaTrashCan aria-hidden="true" />
-                          Xóa
-                        </button>
+                        <td>
+                          <span className="admin-pool-tier-pill">
+                            Tier {normalizeText(pool.tier || "-")}
+                          </span>
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            className="admin-pool-table__title"
+                            onClick={() => startEditPool(pool)}
+                          >
+                            <FaLayerGroup aria-hidden="true" />
+                            <span>{getPoolName(pool) || "Bể chưa đặt tên"}</span>
+                          </button>
+                          <small className="admin-pool-table__id">
+                            {poolId || "no-id"}
+                          </small>
+                        </td>
+                        <td>
+                          <PoolAccountTable
+                            compact
+                            accounts={poolAccounts}
+                            draggingAccountId={draggingAccountId}
+                            emptyMessage="Thả account vào hàng này"
+                            onDragEnd={handleDragEnd}
+                            onDragStart={handleDragStart}
+                            pendingAccountIds={pendingAccountIds}
+                          />
+                        </td>
+                        <td>
+                          {pendingInPool ? (
+                            <span className="admin-pool-draft-badge">
+                              {pendingInPool} chưa lưu
+                            </span>
+                          ) : (
+                            <span className="admin-pool-saved-badge">Đã lưu</span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="admin-pool-table__actions">
+                            <button
+                              type="button"
+                              className="admin-mini-button"
+                              onClick={() => startEditPool(pool)}
+                            >
+                              <FaPen aria-hidden="true" />
+                              Sửa
+                            </button>
+                            <button
+                              type="button"
+                              className="admin-mini-button admin-danger-button"
+                              disabled={isSaving}
+                              onClick={() => deletePool(poolId)}
+                            >
+                              <FaTrashCan aria-hidden="true" />
+                              Xóa
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={5}>
+                      <div className="admin-pool-empty-board">
+                        <FaBoxOpen aria-hidden="true" />
+                        <strong>Chưa có bể phù hợp</strong>
                       </div>
-                      <div className="admin-pool-card-list" role="list">
-                        {renderAccountList(poolAccounts)}
-                      </div>
-                    </div>
-                  ) : null}
-                </section>
-              );
-            })
-          ) : (
-            <div className="admin-pool-empty-board">
-              <FaBoxOpen aria-hidden="true" />
-              <strong>Chưa có bể phù hợp</strong>
-            </div>
-          )}
-        </div>
-
-        <aside className="admin-pool-editor">
-          <div className="admin-pool-editor__head">
-            <div>
-              <strong>{selectedPoolId ? "Sửa bể quà" : "Tạo bể quà"}</strong>
-              <span>{selectedPoolId || "Bể mới"}</span>
-            </div>
-            <button type="button" className="admin-light-button" onClick={startCreatePool}>
-              <FaCirclePlus aria-hidden="true" />
-              Mới
-            </button>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
-
-          <form onSubmit={savePoolForm}>
-            <label>
-              Tên bể
-              <input
-                type="text"
-                value={poolForm.pool_name}
-                onChange={(event) => updatePoolField("pool_name", event.target.value)}
-                required
-              />
-            </label>
-            <label>
-              Tier
-              <select
-                value={poolForm.tier}
-                onChange={(event) => updatePoolField("tier", event.target.value)}
-              >
-                {POOL_TIER_OPTIONS.map((tier) => (
-                  <option key={tier} value={tier}>
-                    {tier}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <div className="admin-pool-editor__actions">
-              <button type="submit" disabled={isSaving}>
-                <FaFloppyDisk aria-hidden="true" />
-                {isSaving ? "Đang lưu..." : "Lưu bể"}
-              </button>
-              <button
-                type="button"
-                className="admin-danger-button"
-                disabled={!selectedPoolId || isSaving}
-                onClick={() => deletePool(selectedPoolId)}
-              >
-                <FaTrashCan aria-hidden="true" />
-                Xóa bể
-              </button>
-            </div>
-          </form>
-        </aside>
+        </section>
       </div>
+
+      {isPoolModalOpen ? (
+        <div className="admin-modal-backdrop">
+          <section
+            className="admin-panel admin-modal admin-pool-editor-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-pool-editor-title"
+          >
+            <div className="admin-pool-editor admin-pool-editor--modal">
+              <div className="admin-pool-editor__head">
+                <div>
+                  <strong id="admin-pool-editor-title">
+                    {selectedPoolId ? "Sửa bể quà" : "Tạo bể quà"}
+                  </strong>
+                  <span>{selectedPoolId || "Bể mới"}</span>
+                </div>
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  aria-label="Đóng modal bể quà"
+                  onClick={closePoolModal}
+                >
+                  <FaXmark aria-hidden="true" />
+                  Đóng
+                </button>
+              </div>
+
+              <form onSubmit={savePoolForm}>
+                <label>
+                  Tên bể
+                  <input
+                    type="text"
+                    value={poolForm.pool_name}
+                    onChange={(event) =>
+                      updatePoolField("pool_name", event.target.value)
+                    }
+                    required
+                  />
+                </label>
+                <label>
+                  Tier
+                  <select
+                    value={poolForm.tier}
+                    onChange={(event) => updatePoolField("tier", event.target.value)}
+                  >
+                    {POOL_TIER_OPTIONS.map((tier) => (
+                      <option key={tier} value={tier}>
+                        {tier}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div className="admin-pool-editor__actions">
+                  <button type="submit" disabled={isSaving}>
+                    <FaFloppyDisk aria-hidden="true" />
+                    {isSaving ? "Đang lưu..." : "Lưu bể"}
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-danger-button"
+                    disabled={!selectedPoolId || isSaving}
+                    onClick={() => deletePool(selectedPoolId)}
+                  >
+                    <FaTrashCan aria-hidden="true" />
+                    Xóa bể
+                  </button>
+                </div>
+              </form>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }
