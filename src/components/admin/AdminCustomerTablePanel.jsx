@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   FaMagnifyingGlass,
   FaPen,
@@ -124,6 +124,16 @@ export function AdminCustomerTablePanel({
       ),
     [customers, normalizedKeyword, statusFilter]
   );
+
+  useEffect(() => {
+    if (!message) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setMessage(""), 2800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [message]);
 
   const openEditModal = (customer) => {
     setEditingCustomer(customer);
@@ -278,7 +288,9 @@ export function AdminCustomerTablePanel({
         </table>
       </div>
 
-      {message ? <p className="admin-crud-message">{message}</p> : null}
+      {message ? (
+        <p className="admin-crud-message admin-fade-message">{message}</p>
+      ) : null}
 
       {editingCustomer && formValues ? (
         <div className="admin-modal-backdrop">

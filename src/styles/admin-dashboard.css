@@ -4787,6 +4787,23 @@
   color: #07111f;
 }
 
+.admin-fade-message {
+  animation: admin-fade-out-message 2800ms ease forwards;
+}
+
+@keyframes admin-fade-out-message {
+  0%,
+  70% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
 @media (max-width: 900px) {
   .admin-customer-toolbar {
     align-items: stretch;
