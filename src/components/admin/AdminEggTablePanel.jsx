@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
-import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
+import { useEffect, useMemo, useState } from "react";
+import { FaBolt, FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
 
 const EMPTY_ROWS = [];
+const FAST_HATCH_MINUTES = 3;
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -138,6 +139,26 @@ function getStatusClass(status) {
   return "is-pending";
 }
 
+function canFastApproveEgg(egg) {
+  const status = normalizeKey(egg?.status);
+
+  return (
+    getEggTypeValue(egg) === 2 &&
+    getEggId(egg) &&
+    ![
+      "ready",
+      "claimed",
+      "hatched",
+      "opened",
+      "cancelled",
+      "canceled",
+      "invalidated",
+    ].includes(
+      status
+    )
+  );
+}
+
 function buildOptionRows(values, getLabel) {
   return [...new Set(values.map(normalizeText).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right, "vi"))
@@ -161,12 +182,14 @@ function getEggAccount(egg, accountById) {
 
 export function AdminEggTablePanel({
   isRefreshing = false,
+  onSaveRecord,
   onRefresh,
   tables,
 }) {
   const [keyword, setKeyword] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [message, setMessage] = useState("");
 
   const eggs = tables.eggs || EMPTY_ROWS;
   const orders = tables.adminOrders || EMPTY_ROWS;
@@ -281,6 +304,29 @@ export function AdminEggTablePanel({
     typeFilter,
   ]);
 
+  useEffect(() => {
+    if (!message) {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => setMessage(""), 2800);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [message]);
+
+  const approveFastHatch = (egg) => {
+    const hatchAt = new Date(Date.now() + FAST_HATCH_MINUTES * 60 * 1000).toISOString();
+    const nextEgg = {
+      ...egg,
+      hatch_at: hatchAt,
+      status: "incubating",
+      updated_at: new Date().toISOString(),
+    };
+
+    onSaveRecord?.("eggs", nextEgg);
+    setMessage(`Đã duyệt mở nhanh sau ${FAST_HATCH_MINUTES} phút.`);
+  };
+
   return (
     <section className="admin-panel admin-egg-manager-panel">
       <div className="admin-egg-toolbar">
@@ -339,6 +385,7 @@ export function AdminEggTablePanel({
               <th>Tài Khoản Nhận</th>
               <th>Ngày Nở Dự Kiến</th>
               <th>Ngày Tạo</th>
+              <th>Hành Động</th>
             </tr>
           </thead>
           <tbody>
@@ -382,6 +429,17 @@ export function AdminEggTablePanel({
                     <td>{accountName || egg.account_id || "-"}</td>
                     <td>{formatDateTime(egg.hatch_at)}</td>
                     <td>{formatDateTime(egg.created_at)}</td>
+                    <td>
+                      <button
+                        type="button"
+                        className="admin-mini-button admin-egg-fast-button"
+                        disabled={!canFastApproveEgg(egg)}
+                        onClick={() => approveFastHatch(egg)}
+                      >
+                        <FaBolt aria-hidden="true" />
+                        Duyệt 3 phút
+                      </button>
+                    </td>
                   </tr>
                 );
               })
@@ -393,6 +451,7 @@ export function AdminEggTablePanel({
           </tbody>
         </table>
       </div>
+      {message ? <p className="admin-crud-message admin-fade-message">{message}</p> : null}
     </section>
   );
 }
