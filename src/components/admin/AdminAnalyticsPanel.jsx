@@ -19,6 +19,14 @@ function formatNumber(value) {
   return new Intl.NumberFormat("vi-VN").format(Number(value || 0));
 }
 
+function formatPercent(value, total) {
+  if (!total) {
+    return "0%";
+  }
+
+  return `${Math.round((Number(value || 0) / total) * 100)}%`;
+}
+
 function normalizeText(value) {
   return String(value || "").trim();
 }
@@ -124,14 +132,13 @@ function getOrderStatusRows(counts = {}, summary = {}) {
 }
 
 function getEggStatusRows(counts = {}, summary = {}) {
-  const claimed =
-    countMatching(
-      counts,
-      (status) =>
-        status.includes("claimed") ||
-        status.includes("opened") ||
-        status.includes("hatched")
-    ) || Number(summary.readyEggs || 0);
+  const claimed = countMatching(
+    counts,
+    (status) =>
+      status.includes("claimed") ||
+      status.includes("opened") ||
+      status.includes("hatched")
+  );
   const cancelled = countMatching(
     counts,
     (status) =>
@@ -213,6 +220,25 @@ function ChartLegend({ items }) {
   );
 }
 
+function ChartTooltip({ items, title }) {
+  return (
+    <div className="admin-dark-chart-tooltip" role="tooltip">
+      <strong>{title}</strong>
+      <ul>
+        {items.map((item) => (
+          <li key={item.key}>
+            <span>
+              <i style={{ background: item.color }} />
+              {item.label}
+            </span>
+            <b>{item.detail}</b>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh }) {
   const [orderSearch, setOrderSearch] = useState("");
   const analytics = dashboard?.analytics;
@@ -223,6 +249,40 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
   const orderStatusRows = getOrderStatusRows(counts.orderStatus, summary);
   const eggStatusRows = getEggStatusRows(counts.eggStatus, summary);
   const tierRows = getTierRows(analytics?.inventoryByTier || []);
+  const orderStatusTotal = orderStatusRows.reduce(
+    (total, item) => total + Number(item.value || 0),
+    0
+  );
+  const eggStatusTotal = eggStatusRows.reduce(
+    (total, item) => total + Number(item.value || 0),
+    0
+  );
+  const orderTooltipItems = orderStatusRows.map((item) => ({
+    ...item,
+    detail: `${formatNumber(item.value)} (${formatPercent(
+      item.value,
+      orderStatusTotal
+    )})`,
+  }));
+  const eggTooltipItems = eggStatusRows.map((item) => ({
+    ...item,
+    detail: `${formatNumber(item.value)} (${formatPercent(
+      item.value,
+      eggStatusTotal
+    )})`,
+  }));
+  const tierTooltipItems = tierRows.map((row) => {
+    const total = row.available + row.assigned;
+
+    return {
+      key: row.tier,
+      label: `Tier ${row.tier}`,
+      color: "#82c993",
+      detail: `Có sẵn ${formatNumber(row.available)} / Đã gán ${formatNumber(
+        row.assigned
+      )} / Tổng ${formatNumber(total)}`,
+    };
+  });
   const maxTierValue = Math.max(
     1,
     ...tierRows.flatMap((row) => [row.available, row.assigned])
@@ -280,64 +340,82 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
       <div className="admin-dark-chart-grid">
         <section className="admin-dark-panel admin-dark-chart-card">
           <h3>Trạng thái đơn hàng</h3>
-          <div
-            className="admin-dark-donut"
-            style={{ "--chart-gradient": buildConicGradient(orderStatusRows) }}
-          >
-            <span />
+          <div className="admin-dark-chart-hover" tabIndex={0}>
+            <div
+              className="admin-dark-donut"
+              style={{ "--chart-gradient": buildConicGradient(orderStatusRows) }}
+            >
+              <span />
+            </div>
+            <ChartTooltip
+              items={orderTooltipItems}
+              title={`Tổng ${formatNumber(orderStatusTotal)} đơn`}
+            />
           </div>
           <ChartLegend items={orderStatusRows} />
         </section>
 
         <section className="admin-dark-panel admin-dark-chart-card">
           <h3>Tình trạng ấp trứng</h3>
-          <div
-            className="admin-dark-pie"
-            style={{ "--chart-gradient": buildConicGradient(eggStatusRows) }}
-          />
+          <div className="admin-dark-chart-hover" tabIndex={0}>
+            <div
+              className="admin-dark-pie"
+              style={{ "--chart-gradient": buildConicGradient(eggStatusRows) }}
+            />
+            <ChartTooltip
+              items={eggTooltipItems}
+              title={`Tổng ${formatNumber(eggStatusTotal)} trứng`}
+            />
+          </div>
           <ChartLegend items={eggStatusRows} />
         </section>
 
         <section className="admin-dark-panel admin-dark-tier-card">
           <h3>Kho quà theo tier</h3>
-          <div
-            className="admin-dark-tier-chart"
-            style={{ "--tier-max": String(maxTierValue) }}
-          >
-            <div className="admin-dark-tier-axis">
-              {[1, 0.75, 0.5, 0.25, 0].map((ratio) => (
-                <span key={ratio}>{Math.round(maxTierValue * ratio)}</span>
-              ))}
+          <div className="admin-dark-chart-hover" tabIndex={0}>
+            <div
+              className="admin-dark-tier-chart"
+              style={{ "--tier-max": String(maxTierValue) }}
+            >
+              <div className="admin-dark-tier-axis">
+                {[1, 0.75, 0.5, 0.25, 0].map((ratio) => (
+                  <span key={ratio}>{Math.round(maxTierValue * ratio)}</span>
+                ))}
+              </div>
+              <div className="admin-dark-tier-bars">
+                {tierRows.map((row) => (
+                  <article key={row.tier}>
+                    <div>
+                      <span
+                        className="is-available"
+                        style={{
+                          height: `${Math.max(
+                            row.available ? 6 : 0,
+                            Math.round((row.available / maxTierValue) * 100)
+                          )}%`,
+                        }}
+                        title={`Có sẵn: ${formatNumber(row.available)}`}
+                      />
+                      <span
+                        className="is-assigned"
+                        style={{
+                          height: `${Math.max(
+                            row.assigned ? 6 : 0,
+                            Math.round((row.assigned / maxTierValue) * 100)
+                          )}%`,
+                        }}
+                        title={`Đã gán: ${formatNumber(row.assigned)}`}
+                      />
+                    </div>
+                    <strong>Tier {row.tier}</strong>
+                  </article>
+                ))}
+              </div>
             </div>
-            <div className="admin-dark-tier-bars">
-              {tierRows.map((row) => (
-                <article key={row.tier}>
-                  <div>
-                    <span
-                      className="is-available"
-                      style={{
-                        height: `${Math.max(
-                          row.available ? 6 : 0,
-                          Math.round((row.available / maxTierValue) * 100)
-                        )}%`,
-                      }}
-                      title={`Có sẵn: ${formatNumber(row.available)}`}
-                    />
-                    <span
-                      className="is-assigned"
-                      style={{
-                        height: `${Math.max(
-                          row.assigned ? 6 : 0,
-                          Math.round((row.assigned / maxTierValue) * 100)
-                        )}%`,
-                      }}
-                      title={`Đã gán: ${formatNumber(row.assigned)}`}
-                    />
-                  </div>
-                  <strong>Tier {row.tier}</strong>
-                </article>
-              ))}
-            </div>
+            <ChartTooltip
+              items={tierTooltipItems}
+              title="Tất cả thông số kho tier"
+            />
           </div>
           <div className="admin-dark-chart-legend">
             <span>
