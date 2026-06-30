@@ -517,7 +517,7 @@ function AdminGiftAccountTable({
   );
 }
 
-function LegacyAdminGiftAccountTable({
+function _LegacyAdminGiftAccountTable({
   fields,
   isSaving,
   onEdit,
@@ -842,7 +842,7 @@ export function AdminDataCrudPanel({
   const [isRecordModalOpen, setRecordModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
   const [isResetModalOpen, setResetModalOpen] = useState(false);
-  const [savingStatusRecordId, setSavingStatusRecordId] = useState("");
+  const [_savingStatusRecordId, setSavingStatusRecordId] = useState("");
   const [draggingRecordId, setDraggingRecordId] = useState("");
   const [dragOverValue, setDragOverValue] = useState("");
   const [accountStatusFilter, setAccountStatusFilter] = useState("");
@@ -1155,7 +1155,7 @@ export function AdminDataCrudPanel({
     setMessage("Đang chỉnh sửa bản ghi đã chọn.");
   };
 
-  const updateGiftAccountStatus = async (record, nextStatus) => {
+  const _updateGiftAccountStatus = async (record, nextStatus) => {
     if (isSaving) {
       return;
     }
