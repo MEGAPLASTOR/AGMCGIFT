@@ -109,7 +109,7 @@ const MANAGEMENT_PAGES = [
     title: "Quản lý đơn hàng",
     description: "Kiểm tra đơn hàng gift code, trạng thái thanh toán, giao hàng và điều kiện nhận quà.",
   },
-];
+].filter((page) => page.slug !== "egg-mappings");
 
 const MANAGEMENT_TABLE_KEYS = MANAGEMENT_PAGES.map((page) => page.tableKey);
 
