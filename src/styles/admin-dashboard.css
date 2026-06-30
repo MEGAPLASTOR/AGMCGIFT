@@ -532,8 +532,14 @@
   min-width: 980px;
 }
 
+.admin-record-table {
+  min-width: 920px;
+}
+
 .admin-account-table th:first-child,
-.admin-account-table td:first-child {
+.admin-account-table td:first-child,
+.admin-record-table th:first-child,
+.admin-record-table td:first-child {
   width: 108px;
 }
 
@@ -542,16 +548,20 @@
   gap: 8px;
 }
 
-.admin-account-table__row {
+.admin-account-table__row,
+.admin-record-table__row {
   cursor: pointer;
 }
 
 .admin-account-table__row:hover td,
-.admin-account-table__row:focus-visible td {
+.admin-account-table__row:focus-visible td,
+.admin-record-table__row:hover td,
+.admin-record-table__row:focus-visible td {
   background: #eff6ff;
 }
 
-.admin-account-table__row:focus-visible {
+.admin-account-table__row:focus-visible,
+.admin-record-table__row:focus-visible {
   outline: 2px solid #2563eb;
   outline-offset: -2px;
 }
@@ -607,6 +617,21 @@
   width: min(480px, calc(100vw - 32px));
   max-width: 480px;
   min-height: auto;
+}
+
+#admin-delete-account-title,
+.admin-confirm-modal .admin-confirm-copy + .admin-confirm-copy {
+  display: none;
+}
+
+.admin-record-modal .admin-danger-button,
+.admin-confirm-modal .admin-danger-button {
+  font-size: 0;
+}
+
+.admin-record-modal .admin-danger-button span,
+.admin-confirm-modal .admin-danger-button span {
+  font-size: 13px;
 }
 
 .admin-record-editor--modal {

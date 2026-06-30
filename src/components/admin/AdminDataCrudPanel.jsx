@@ -1348,7 +1348,10 @@ export function AdminDataCrudPanel({
               <div className="admin-record-editor__head">
                 <div>
                   <strong id="admin-account-record-title">
+                    {recordModalTitle}
+                    <span hidden>
                     Thông tin tài khoản
+                    </span>
                   </strong>
                   <span>{recordTitle}</span>
                 </div>
@@ -1404,6 +1407,7 @@ export function AdminDataCrudPanel({
                   disabled={!selectedRecordId || isSaving}
                 >
                   <FaTrashCan aria-hidden="true" />
+                  <span>{deleteButtonLabel}</span>
                   Xóa tài khoản
                 </button>
               </div>
@@ -1418,10 +1422,11 @@ export function AdminDataCrudPanel({
             className="admin-panel admin-modal admin-confirm-modal"
             role="dialog"
             aria-modal="true"
-            aria-labelledby="admin-delete-account-title"
+            aria-labelledby="admin-delete-record-title"
           >
             <div className="admin-panel__head">
               <div>
+                <h2 id="admin-delete-record-title">{deleteButtonLabel}?</h2>
                 <h2 id="admin-delete-account-title">Xóa tài khoản?</h2>
                 <span>{recordTitle}</span>
               </div>
@@ -1436,6 +1441,9 @@ export function AdminDataCrudPanel({
               </button>
             </div>
             <p className="admin-confirm-copy">
+              {deleteButtonLabel} khỏi danh sách và đồng bộ với backend nếu API cho phép.
+            </p>
+            <p className="admin-confirm-copy">
               Tài khoản sẽ bị xóa khỏi kho và đồng bộ với backend nếu API cho phép.
             </p>
             <div className="admin-crud-actions">
@@ -1446,6 +1454,7 @@ export function AdminDataCrudPanel({
                 onClick={deleteSelected}
               >
                 <FaTrashCan aria-hidden="true" />
+                <span>{isSaving ? "Đang xóa..." : deleteButtonLabel}</span>
                 {isSaving ? "Đang xóa..." : "Xóa tài khoản"}
               </button>
               <button
