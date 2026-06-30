@@ -12,11 +12,13 @@ const EMPTY_ROWS = [];
 const EGG_TYPES = [
   {
     value: 1,
-    label: "Trứng Loại 1 (Nhận ngay tài khoản cấp 1)",
+    label: "T1 (Nhận ngay)",
+    optionLabel: "T1 (Nhận ngay) - Trứng thưởng",
   },
   {
     value: 2,
-    label: "Trứng Loại 2 (Cần ấp đếm ngược nhận tài khoản cấp cao)",
+    label: "T2 (Cần ấp)",
+    optionLabel: "T2 (Cần ấp) - Trứng kim cương",
   },
 ];
 
@@ -55,6 +57,19 @@ function getMappingId(mapping) {
   return normalizeText(mapping?.id) || `${getMappingProductId(mapping)}:${mapping?.egg_type}`;
 }
 
+function getEggTypeValue(value) {
+  const eggType = Number(value);
+
+  return EGG_TYPES.some((type) => type.value === eggType) ? eggType : 0;
+}
+
+function getEggTypeOrder(value) {
+  const eggType = getEggTypeValue(value);
+  const order = EGG_TYPES.findIndex((type) => type.value === eggType);
+
+  return order >= 0 ? order : Number.MAX_SAFE_INTEGER;
+}
+
 function getPoolId(pool) {
   return normalizeText(pool?.id || pool?.gift_pool_id || pool?.poolId);
 }
@@ -68,7 +83,7 @@ function formatCurrency(value) {
 }
 
 function getEggTypeLabel(value) {
-  const matchedType = EGG_TYPES.find((type) => Number(type.value) === Number(value));
+  const matchedType = EGG_TYPES.find((type) => type.value === getEggTypeValue(value));
 
   return matchedType?.label || `Trứng Loại ${value}`;
 }
@@ -102,6 +117,20 @@ function buildMappingRecord(product, eggType, poolId) {
     pool_id: poolId,
     gift_pool_id: poolId,
   };
+}
+
+function sortMappingsByEggType(mappings) {
+  return [...mappings].sort((left, right) => {
+    const eggTypeDiff =
+      getEggTypeOrder(left.egg_type || left.eggType) -
+      getEggTypeOrder(right.egg_type || right.eggType);
+
+    if (eggTypeDiff !== 0) {
+      return eggTypeDiff;
+    }
+
+    return getMappingId(left).localeCompare(getMappingId(right), "vi");
+  });
 }
 
 export function AdminProductTablePanel({
@@ -173,12 +202,7 @@ export function AdminProductTablePanel({
     });
 
     map.forEach((productMappings, productId) => {
-      map.set(
-        productId,
-        [...productMappings].sort(
-          (left, right) => Number(left.egg_type || 0) - Number(right.egg_type || 0)
-        )
-      );
+      map.set(productId, sortMappingsByEggType(productMappings));
     });
 
     return map;
@@ -227,24 +251,20 @@ export function AdminProductTablePanel({
   );
 
   useEffect(() => {
-    if (!selectedPoolId && pools.length) {
-      setSelectedPoolId(getPoolId(pools[0]));
+    if (!selectedProduct) {
+      return;
     }
-  }, [pools, selectedPoolId]);
 
-  useEffect(() => {
-    if (selectedExistingMapping?.gift_pool_id) {
-      setSelectedPoolId(selectedExistingMapping.gift_pool_id);
-    }
-  }, [selectedExistingMapping]);
+    setSelectedPoolId(selectedExistingMapping?.gift_pool_id || "");
+  }, [selectedExistingMapping, selectedProduct]);
 
   const openMappingModal = (product, mapping) => {
     const productId = getProductId(product);
-    const eggType = Number(mapping?.egg_type || 1);
+    const eggType = getEggTypeValue(mapping?.egg_type) || EGG_TYPES[0].value;
 
     setSelectedProductId(productId);
     setSelectedEggType(eggType);
-    setSelectedPoolId(mapping?.gift_pool_id || getPoolId(pools[0]) || "");
+    setSelectedPoolId(mapping?.gift_pool_id || "");
     setMessage("");
   };
 
@@ -479,7 +499,7 @@ export function AdminProductTablePanel({
                   >
                     {EGG_TYPES.map((type) => (
                       <option key={type.value} value={type.value}>
-                        {type.label}
+                        {type.optionLabel}
                       </option>
                     ))}
                   </select>

@@ -17,8 +17,8 @@ const orderStatusOptions = [
 ];
 
 const eggTypeOptions = [
-  { value: 1, label: "Trứng vàng" },
-  { value: 2, label: "Trứng kim cương" },
+  { value: 1, label: "T1 (Nhận ngay)" },
+  { value: 2, label: "T2 (Cần ấp)" },
 ];
 
 const eggStatusOptions = [

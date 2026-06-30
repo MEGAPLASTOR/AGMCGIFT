@@ -254,16 +254,29 @@ function normalizeOrderItems(orders) {
 
 function normalizeProductEggMappings(products) {
   return products.flatMap((product) =>
-    (product.mappings || []).map((mapping) => ({
-      id: mapping.id,
-      kv_product_id: String(product.kvProductId || ""),
-      kv_variant_id: "",
-      egg_type: Number(mapping.eggType || 0),
-      gift_pool_id: mapping.giftPool?.id || "",
-      egg_tier: mapping.eggTier || mapping.giftPool?.tier || "",
-      created_at: normalizeDate(mapping.createdAt),
-      updated_at: normalizeDate(mapping.updatedAt),
-    }))
+    (product.mappings || []).map((mapping) => {
+      const giftPool = mapping.giftPool || mapping.gift_pool || {};
+      const eggType = Number(mapping.eggType ?? mapping.egg_type ?? 0);
+      const productId =
+        product.kvProductId || product.kv_product_id || product.productId || "";
+
+      return {
+        id: mapping.id || `${productId}:${eggType}`,
+        kv_product_id: String(productId),
+        kv_variant_id: mapping.kvVariantId || mapping.kv_variant_id || "",
+        egg_type: eggType,
+        gift_pool_id:
+          mapping.poolId ||
+          mapping.pool_id ||
+          mapping.giftPoolId ||
+          mapping.gift_pool_id ||
+          giftPool.id ||
+          "",
+        egg_tier: mapping.eggTier || mapping.egg_tier || giftPool.tier || "",
+        created_at: normalizeDate(mapping.createdAt || mapping.created_at),
+        updated_at: normalizeDate(mapping.updatedAt || mapping.updated_at),
+      };
+    })
   );
 }
 
