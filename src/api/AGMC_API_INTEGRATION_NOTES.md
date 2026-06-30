@@ -1,6 +1,6 @@
-# Ghi Chú Cho Backend AGMC Gift Code
+# Ghi Chú Tích Hợp API AGMC Gift Code
 
-Frontend hiện lấy dữ liệu từ API backend AGMC Gift Code, không đọc dữ liệu mẫu JSON.
+Web hiện lấy dữ liệu từ các endpoint AGMC Gift Code, không đọc dữ liệu mẫu JSON.
 
 ## API Admin Đang Dùng
 
@@ -35,7 +35,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc4MjU1O
 - `DELETE /api/admin/product-egg-mappings/{id}`
 - `POST /api/admin/product-egg-mappings/batch-delete`
 
-## Shape Dữ Liệu Frontend Chuẩn Hóa
+## Shape Dữ Liệu Web Chuẩn Hóa
 
 - `adminOrders`: danh sách đơn hàng gift code.
 - `adminOrderItems`: dòng sản phẩm trong đơn hàng.
@@ -47,12 +47,12 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTc4MjU1O
 
 ## Luồng Khách Nhập Mã
 
-- Frontend gọi `POST /api/eggs/sync`.
-- Backend kiểm tra mã đơn hàng gift code, trạng thái khách, trạng thái giao hàng và trả danh sách trứng hợp lệ.
-- Khi khách mở trứng, frontend gọi `POST /api/eggs/claim`.
+- Web gọi `POST /api/eggs/sync`.
+- Dịch vụ dữ liệu kiểm tra mã đơn hàng gift code, trạng thái khách, trạng thái giao hàng và trả danh sách trứng hợp lệ.
+- Khi khách mở trứng, web gọi `POST /api/eggs/claim`.
 
 ## Admin Dashboard
 
 - Route admin: `/agmcmyadmin`.
-- Sau khi đăng nhập JWT, frontend tải các API admin raw ở trên.
+- Sau khi đăng nhập JWT, web tải các dữ liệu admin ở trên.
 - Dashboard chỉ hiện metric/bảng có dữ liệu thật.

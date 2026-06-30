@@ -289,9 +289,7 @@ export function formatCurrency(value) {
   }).format(value);
 }
 
-// BACKEND_ADMIN_DANG_NHAP:
-// Đây là đăng nhập raw ở frontend, chỉ đọc admins.json để demo.
-// Backend cần thay bằng API đăng nhập thật, hash mật khẩu, token/session và kiểm tra role.
+// Fallback đăng nhập bằng dữ liệu local khi chưa có phiên từ dịch vụ.
 export function authenticateAdmin(tables, username, password) {
   const normalizedUsername = username.trim().toLowerCase();
 
@@ -487,9 +485,7 @@ function buildOperationalAlerts({
   ];
 }
 
-// BACKEND_ADMIN_THONG_KE:
-// Frontend đang tự tính analytics từ các bảng JSON.
-// Backend nên tạo API, ví dụ /admin/analytics, trả về cùng shape dữ liệu để thay thế hàm này.
+// Tính analytics từ dữ liệu đã tải để dashboard có số liệu ngay.
 export function buildAdminDashboard(tables) {
   const customers = tables.customers || [];
   const orders = tables.adminOrders || [];
@@ -639,12 +635,12 @@ export function buildAdminDashboard(tables) {
       {
         title: "Đồng bộ đơn hàng",
         value: orders.length,
-        note: "orders raw",
+        note: "đơn hàng đã tải",
       },
       {
         title: "Khách hàng",
         value: customers.length,
-        note: "customers raw",
+        note: "khách hàng đã tải",
       },
       {
         title: "Khách nhập mã",

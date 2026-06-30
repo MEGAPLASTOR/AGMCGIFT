@@ -73,7 +73,7 @@ async function fetchAdminRawEndpoint(key, endpoint, authHeader) {
       },
     });
   } catch (error) {
-    throw new ApiRequestError("Không kết nối được API raw database.", {
+    throw new ApiRequestError("Không kết nối được dữ liệu quản trị.", {
       status: 0,
       payload: { message: error.message },
       endpoint,
@@ -384,7 +384,7 @@ export async function fetchAdminRawTables(authHeader) {
       endpoint,
       status: result.reason?.status || 0,
       payload: result.reason?.payload || null,
-      message: result.reason?.message || "Không tải được API raw.",
+      message: result.reason?.message || "Không tải được dữ liệu.",
     });
   });
 
@@ -392,7 +392,7 @@ export async function fetchAdminRawTables(authHeader) {
     const firstError = errors[0];
 
     throw new ApiRequestError(
-      firstError?.message || "Không tải được dữ liệu raw database.",
+      firstError?.message || "Không tải được dữ liệu quản trị.",
       {
         status: firstError?.status || 0,
         payload: firstError?.payload || null,

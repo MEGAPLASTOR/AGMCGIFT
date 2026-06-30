@@ -236,7 +236,7 @@ export default function AdminDashboardPage() {
     {
       label: "Tổng đơn gift code",
       value: dashboard.summary.totalOrders,
-      note: "orders raw",
+      note: "đơn đã tải",
       tone: "blue",
     },
     {
@@ -261,7 +261,7 @@ export default function AdminDashboardPage() {
     {
       label: "Sản phẩm",
       value: dashboard.summary.totalProducts,
-      note: "products raw",
+      note: "sản phẩm đã tải",
       tone: "blue",
     },
     {
@@ -593,10 +593,10 @@ export default function AdminDashboardPage() {
         <section className="admin-panel">
           <div className="admin-panel__head">
             <div>
-              <h2>Dữ liệu raw database</h2>
+              <h2>Trạng thái dữ liệu</h2>
               <span>
                 {adminTables.isLoadingRawData
-                  ? "Đang tải từ API raw"
+                  ? "Đang tải dữ liệu hệ thống"
                   : adminTables.rawDataError}
               </span>
             </div>

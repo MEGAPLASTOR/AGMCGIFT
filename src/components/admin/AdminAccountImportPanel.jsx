@@ -13,10 +13,10 @@ function getUploadSuccessMessage(payload) {
   }
 
   if (Number.isFinite(Number(importedCount))) {
-    return `Đã upload và nhập ${importedCount} account lên backend.`;
+    return `Đã upload và nhập ${importedCount} account thành công.`;
   }
 
-  return "Đã upload file Excel lên backend.";
+  return "Đã upload file Excel thành công.";
 }
 
 export function AdminAccountImportPanel({

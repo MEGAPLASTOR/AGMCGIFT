@@ -135,7 +135,7 @@ export async function uploadAdminGiftAccounts(file, authHeader) {
       body: formData,
     });
   } catch (error) {
-    throw new ApiRequestError("Không kết nối được backend API.", {
+    throw new ApiRequestError("Không kết nối được dịch vụ dữ liệu.", {
       status: 0,
       payload: { message: error.message },
       endpoint,

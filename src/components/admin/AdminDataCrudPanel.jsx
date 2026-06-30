@@ -573,13 +573,13 @@ function AdminFormField({ field, value, onChange }) {
   );
 }
 
-// BACKEND_ADMIN_CRUD_GIAO_DIEN:
-// Giao diện quản trị dữ liệu hiện thao tác trên state frontend.
-// Backend thay các handler thêm/sửa/xóa bằng endpoint CRUD thật khi nối database.
+// ADMIN_CRUD_PANEL:
+// Giao diện quản trị thao tác với dữ liệu đã tải trong ứng dụng.
+// Các handler truyền vào chịu trách nhiệm lưu thay đổi qua dịch vụ dữ liệu khi có.
 export function AdminDataCrudPanel({
   activeTableKey = DEFAULT_TABLE_KEY,
   panelTitle = "Quản lý kho account",
-  panelDescription = "Tạo account, upload Excel và kiểm tra dữ liệu raw từ API",
+  panelDescription = "Tạo account, upload Excel và kiểm tra dữ liệu mới nhất",
   allowedTableKeys = [],
   tables,
   onSaveRecord,
@@ -634,15 +634,15 @@ export function AdminDataCrudPanel({
   const isPoolMappingsTable = tableKey === "poolAccountMappings";
   const isProductMappingsTable = tableKey === "productEggMappings";
   const shouldUseBoard = isGiftPoolsTable || isPoolMappingsTable;
-  const isBackendManagedIdTable =
+  const isServiceManagedIdTable =
     isGiftAccountsTable ||
     isGiftPoolsTable ||
     isPoolMappingsTable ||
     isProductMappingsTable;
   const visibleFields = useMemo(
     () =>
-      fields.filter((field) => !(isBackendManagedIdTable && field.key === "id")),
-    [fields, isBackendManagedIdTable]
+      fields.filter((field) => !(isServiceManagedIdTable && field.key === "id")),
+    [fields, isServiceManagedIdTable]
   );
   const filteredRows = useMemo(
     () => searchTableRows(rows, keyword),
@@ -860,11 +860,11 @@ export function AdminDataCrudPanel({
       setSelectedRecordId(getRecordId(primaryRecord, tableKey));
       setMessage(
         isGiftAccountsTable && isCreating && onCreateGiftAccount
-          ? "Đã thêm tài khoản lên backend."
+          ? "Đã thêm tài khoản thành công."
           : isGiftAccountsTable && !isCreating && onUpdateGiftAccount
-            ? "Đã cập nhật tài khoản trên backend."
+            ? "Đã cập nhật tài khoản thành công."
           : isGiftPoolsTable
-            ? "Đã đồng bộ bể quà lên backend."
+            ? "Đã đồng bộ bể quà thành công."
             : isPoolMappingsTable
               ? "Đã đồng bộ liên kết tài khoản."
               : isCustomersTable && !isCreating && onUpdateCustomerStatus
@@ -939,7 +939,7 @@ export function AdminDataCrudPanel({
         isGiftPoolsTable
           ? "Đã xóa bể quà."
           : isGiftAccountsTable && onDeleteGiftAccount
-            ? "Đã xóa tài khoản trên backend."
+            ? "Đã xóa tài khoản thành công."
           : isPoolMappingsTable
             ? "Đã gỡ liên kết tài khoản."
             : isProductMappingsTable && onDeleteProductEggMapping
@@ -1437,7 +1437,6 @@ export function AdminDataCrudPanel({
             <div className="admin-panel__head">
               <div>
                 <h2 id="admin-delete-record-title">{deleteButtonLabel}?</h2>
-                <h2 id="admin-delete-account-title">Xóa tài khoản?</h2>
                 <span>{recordTitle}</span>
               </div>
               <button
@@ -1451,10 +1450,7 @@ export function AdminDataCrudPanel({
               </button>
             </div>
             <p className="admin-confirm-copy">
-              {deleteButtonLabel} khỏi danh sách và đồng bộ với backend nếu API cho phép.
-            </p>
-            <p className="admin-confirm-copy">
-              Tài khoản sẽ bị xóa khỏi kho và đồng bộ với backend nếu API cho phép.
+              Hành động này sẽ xóa bản ghi khỏi danh sách và cập nhật dữ liệu nếu được phép.
             </p>
             <div className="admin-crud-actions">
               <button
@@ -1465,7 +1461,6 @@ export function AdminDataCrudPanel({
               >
                 <FaTrashCan aria-hidden="true" />
                 <span>{isSaving ? "Đang xóa..." : deleteButtonLabel}</span>
-                {isSaving ? "Đang xóa..." : "Xóa tài khoản"}
               </button>
               <button
                 type="button"

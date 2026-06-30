@@ -5,10 +5,8 @@ import {
 } from "../services/adminCrudService";
 import { fetchAdminRawTables } from "../services/adminRawDataService";
 
-// BACKEND_ADMIN_CRUD_DU_LIEU:
-// Module CRUD hiện chỉ thao tác trên state trong trình duyệt, dữ liệu ban đầu lấy từ JSON.
-// Backend cần thay các action này bằng API thật:
-// GET danh sách, POST thêm, PUT/PATCH sửa, DELETE xóa theo từng bảng.
+// Admin CRUD state manager.
+// Các thao tác lưu/xóa được nối với service tương ứng ở trang admin.
 export function useAdminDataTables(sourceTables) {
   const [tables, setTables] = useState(() => createAdminTableState(sourceTables));
   const [isLoadingRawData, setIsLoadingRawData] = useState(false);
@@ -57,9 +55,7 @@ export function useAdminDataTables(sourceTables) {
     }));
   };
 
-  // BACKEND_ADMIN_IMPORT_ACCOUNT_EXCEL:
-  // Frontend đang import gift_accounts và pool_account_mappings vào state tạm.
-  // Backend cần thay bằng transaction: upload file -> validate -> insert accounts -> insert mappings.
+  // Nhập account từ file và merge vào bảng đang hiển thị.
   const importGiftAccounts = ({ accounts, mappings }) => {
     const existingAccountIds = new Set(
       (tables.giftAccounts || []).map((account) => account.id)
@@ -139,9 +135,7 @@ export function useAdminDataTables(sourceTables) {
     };
   };
 
-  // BACKEND_ADMIN_DOI_MAT_KHAU:
-  // Frontend đang so mật khẩu hiện tại với admins.password_hash trong state tạm.
-  // Backend cần verify bằng hash thật, cập nhật password_hash và ghi audit log nếu cần.
+  // Fallback đổi mật khẩu khi dùng dữ liệu local.
   const changeAdminPassword = ({ adminId, currentPassword, newPassword }) => {
     const matchedAdmin = (tables.admins || []).find((admin) => admin.id === adminId);
 
@@ -184,7 +178,7 @@ export function useAdminDataTables(sourceTables) {
 
         if (rawErrors.length) {
           setRawDataError(
-            `Một số API raw chưa tải được: ${rawErrors
+            `Một số dữ liệu chưa tải được: ${rawErrors
               .map((error) => `${error.endpoint}${error.status ? ` (${error.status})` : ""}`)
               .join(", ")}`
           );
@@ -195,7 +189,7 @@ export function useAdminDataTables(sourceTables) {
         const statusText = error.status ? ` (${error.status})` : "";
         const endpointText = error.endpoint ? ` tại ${error.endpoint}` : "";
         setRawDataError(
-          `${error.message || "Không tải được dữ liệu raw database."}${statusText}${endpointText}`
+          `${error.message || "Không tải được dữ liệu quản trị."}${statusText}${endpointText}`
         );
         throw error;
       } finally {

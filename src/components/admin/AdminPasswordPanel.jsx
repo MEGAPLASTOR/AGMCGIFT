@@ -1,8 +1,6 @@
 import { useState } from "react";
 
-// BACKEND_ADMIN_DOI_MAT_KHAU:
-// Frontend hiện đổi password_hash trong state tạm để demo.
-// Backend cần thay bằng API verify mật khẩu cũ, hash mật khẩu mới và cập nhật admins.updated_at.
+// Fallback đổi thông tin đăng nhập khi dùng dữ liệu local.
 export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newUsername, setNewUsername] = useState(admin.username || "");

@@ -2,9 +2,9 @@ import { ADMIN_ENDPOINTS } from "../endpoints/adminEndpoints";
 import { EGG_ENDPOINTS } from "../endpoints/eggEndpoints";
 
 export const API_CONNECTION_ERROR_MESSAGE =
-  "Không kết nối được backend API. Kiểm tra server backend hoặc VITE_API_BASE_URL.";
+  "Không kết nối được dịch vụ dữ liệu. Vui lòng kiểm tra VITE_API_BASE_URL.";
 
-const ADMIN_RAW_ENDPOINTS = [
+const ADMIN_DATA_ENDPOINTS = [
   ADMIN_ENDPOINTS.customers,
   ADMIN_ENDPOINTS.eggs,
   ADMIN_ENDPOINTS.giftAccounts,
@@ -45,12 +45,12 @@ export function getDefaultApiErrorMessage(status, endpoint) {
     return "Phiên đăng nhập admin hết hạn hoặc không đủ quyền.";
   }
 
-  if (ADMIN_RAW_ENDPOINTS.includes(endpoint) && (status === 401 || status === 403)) {
-    return "Phiên đăng nhập admin hết hạn hoặc không đủ quyền tải dữ liệu raw.";
+  if (ADMIN_DATA_ENDPOINTS.includes(endpoint) && (status === 401 || status === 403)) {
+    return "Phiên đăng nhập admin hết hạn hoặc không đủ quyền tải dữ liệu.";
   }
 
-  if (ADMIN_RAW_ENDPOINTS.includes(endpoint) && status >= 500) {
-    return "API raw database đang lỗi phía backend.";
+  if (ADMIN_DATA_ENDPOINTS.includes(endpoint) && status >= 500) {
+    return "Dữ liệu quản trị đang tạm thời gián đoạn.";
   }
 
   if (
@@ -62,19 +62,19 @@ export function getDefaultApiErrorMessage(status, endpoint) {
   }
 
   if (isAdminGiftPoolEndpoint(endpoint) && (status === 401 || status === 403)) {
-    return "PhiÃªn Ä‘Äƒng nháº­p admin háº¿t háº¡n hoáº·c khÃ´ng Ä‘á»§ quyá»n quáº£n lÃ½ bá»ƒ quÃ .";
+    return "Phiên đăng nhập admin hết hạn hoặc không đủ quyền quản lý bể quà.";
   }
 
   if (isAdminGiftPoolEndpoint(endpoint) && status === 400) {
-    return "Dá»¯ liá»‡u bá»ƒ quÃ  khÃ´ng há»£p lá»‡ hoáº·c bá»ƒ quÃ  Ä‘ang chá»©a trá»©ng liÃªn káº¿t.";
+    return "Dữ liệu bể quà không hợp lệ hoặc bể quà đang chứa trứng liên kết.";
   }
 
   if (isAdminGiftPoolEndpoint(endpoint) && status === 404) {
-    return "KhÃ´ng tÃ¬m tháº¥y bá»ƒ quÃ  hoáº·c tÃ i khoáº£n.";
+    return "Không tìm thấy bể quà hoặc tài khoản.";
   }
 
   if (isAdminGiftPoolEndpoint(endpoint) && status >= 500) {
-    return "API bá»ƒ quÃ  Ä‘ang lá»—i phÃ­a backend.";
+    return "Dữ liệu bể quà đang tạm thời gián đoạn.";
   }
 
   if (endpoint === EGG_ENDPOINTS.sync && status === 400) {
@@ -85,5 +85,5 @@ export function getDefaultApiErrorMessage(status, endpoint) {
     return "Trứng chưa hết 15 ngày, đơn chưa an toàn, hết quà, hoặc trứng đã mở.";
   }
 
-  return "API trả về lỗi.";
+  return "Hệ thống dữ liệu trả về lỗi.";
 }

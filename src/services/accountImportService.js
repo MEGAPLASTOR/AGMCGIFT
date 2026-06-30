@@ -317,10 +317,7 @@ export function mapAccountImportRows(rows) {
   return { accounts, mappings };
 }
 
-// BACKEND_ADMIN_IMPORT_ACCOUNT_EXCEL:
-// Frontend hiện đọc file Excel/CSV tại trình duyệt và đưa vào state tạm.
-// Backend cần thay bằng endpoint upload file, validate, insert gift_accounts,
-// sau đó insert pool_account_mappings nếu file có cột pool_id.
+// Đọc file Excel/CSV và chuẩn hóa thành gift_accounts cùng pool_account_mappings.
 export async function parseAccountImportFile(file) {
   const extension = file.name.split(".").pop()?.toLowerCase();
 

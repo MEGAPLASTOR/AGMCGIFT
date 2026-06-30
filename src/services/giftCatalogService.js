@@ -6,8 +6,8 @@ function normalizeCode(value) {
     .toUpperCase();
 }
 
-// BACKEND_CHUAN_HOA_TRANG_THAI:
-// Backend nên map trạng thái đơn hàng về đúng 3 giá trị: Pending, Paid, Cancel.
+// ORDER_STATUS_NORMALIZATION:
+// Trạng thái đơn hàng được chuẩn hóa về Pending, Paid hoặc Cancel.
 function normalizeStatus(value) {
   return String(value || "")
     .trim()
@@ -92,8 +92,8 @@ function normalizeAccount(account, tier, productId, pool) {
   };
 }
 
-// BACKEND_DANH_SACH_DON:
-// Frontend đọc dữ liệu đơn hàng qua API backend.
+// ORDER_DATA:
+// Đọc dữ liệu đơn hàng đã chuẩn hóa từ nguồn runtime.
 // Field cần có: order_code, status, kv_product_id.
 export function getCustomerOrders(catalogData) {
   if (catalogData.customerOrders?.length || catalogData.orders?.length) {
@@ -120,14 +120,14 @@ export function getCustomerOrders(catalogData) {
   });
 }
 
-// BACKEND_CHAN_DON_CHUA_HOP_LE:
+// ORDER_ELIGIBILITY:
 // Chỉ đơn Paid mới được đi tiếp vào bước chọn trứng.
 // Pending/Cancel vẫn tìm được đơn nhưng bị chặn trong hook useGiftCode.
 export function isPaidOrder(order) {
   return normalizeStatus(order?.trangThai || order?.status) === "PAID";
 }
 
-// BACKEND_CHECK_MA_DON:
+// ORDER_CODE_LOOKUP:
 // Người dùng nhập mã đơn hàng gift code.
 // Hàm này join theo luồng: order -> order_item -> product.
 export function findCodeInCatalog(catalogData, inputCode) {
@@ -157,10 +157,9 @@ export function findCodeInCatalog(catalogData, inputCode) {
   };
 }
 
-// BACKEND_LOGIC_KHO_ACC:
-// Frontend đang join dữ liệu giống database:
+// ACCOUNT_POOL_LOOKUP:
+// Join dữ liệu kho quà theo các bảng đã tải:
 // product_egg_mappings -> gift_pools -> pool_account_mappings -> gift_accounts.
-// Backend nên chuyển đoạn này thành query/service thật và khóa acc bằng transaction để tránh trùng.
 export function getAccountsByTier(catalogData, orderItem, tier) {
   if (catalogData.accounts?.length) {
     return catalogData.accounts.filter((account) => {

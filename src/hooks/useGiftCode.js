@@ -88,10 +88,7 @@ export function useGiftCode(catalogData) {
     setRedemptionInfo(null);
 
     try {
-      // BACKEND_API_NHAP_MA_DON:
-      // Frontend POST code lên /api/eggs/sync.
-      // Backend kiểm tra đơn KiotViet/SAPO, trạng thái khách, trạng thái giao hàng
-      // rồi trả về danh sách trứng hợp lệ để khách chọn.
+      // Kiểm tra mã đơn qua /api/eggs/sync và nhận danh sách trứng hợp lệ.
       const payload = await syncEggsByOrderCode(trimmedCode);
       const matchedEntry = normalizeSyncEggResponse(payload, trimmedCode);
       
@@ -147,10 +144,7 @@ export function useGiftCode(catalogData) {
       setErrorMsg("");
 
       try {
-        // BACKEND_API_MO_TRUNG:
-        // Frontend chỉ gửi eggId lên /api/eggs/claim.
-        // Backend chịu trách nhiệm chống spam, kiểm tra trứng sẵn sàng,
-        // random account và khóa account bằng transaction.
+        // Mở trứng qua /api/eggs/claim bằng eggId đã chọn.
         const claimPayload = await claimEggById(selectedEgg.eggId);
         const reward = normalizeClaimEggResponse(claimPayload);
         const newRedemption = {
