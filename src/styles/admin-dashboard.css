@@ -3618,34 +3618,6 @@
   color: #ffc9c5;
 }
 
-.admin-egg-fast-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-height: 30px;
-  border-color: rgba(255, 217, 102, 0.54);
-  border-radius: 4px;
-  background: rgba(255, 217, 102, 0.12);
-  color: #ffd966;
-  font-size: 12px;
-  font-weight: 900;
-  padding: 6px 10px;
-  white-space: nowrap;
-}
-
-.admin-egg-fast-button:hover {
-  border-color: #ffe08a;
-  background: rgba(255, 217, 102, 0.18);
-  color: #ffe08a;
-}
-
-.admin-egg-fast-button:disabled {
-  border-color: var(--admin-galaxy-line);
-  background: #242932;
-  color: #7f8a9b;
-}
-
 @media (max-width: 900px) {
   .admin-egg-toolbar {
     align-items: stretch;

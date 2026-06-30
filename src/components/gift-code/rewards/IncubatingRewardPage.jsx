@@ -1,7 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
-import { getEffectiveHatchAt } from "../../../utils/eggFastHatchOverride";
-import { getRewardInfoFromTargetDate } from "../../../utils/rewardDate";
 import { AccountRewardCard } from "./AccountRewardCard";
 import { CountdownTimer } from "./CountdownTimer";
 
@@ -13,33 +11,12 @@ export function IncubatingRewardPage({
   onReset,
 }) {
   const [isCountdownComplete, setIsCountdownComplete] = useState(false);
-  const [, setRefreshTick] = useState(0);
-  const rewardReadyAt = getEffectiveHatchAt(
-    redemptionInfo.eggId,
-    redemptionInfo.rewardReadyAt
-  );
-  const effectiveRedemptionInfo = rewardReadyAt
-    ? {
-        ...redemptionInfo,
-        ...getRewardInfoFromTargetDate(rewardReadyAt),
-      }
-    : redemptionInfo;
-  const isReady = effectiveRedemptionInfo.isReady || isCountdownComplete;
-  const hasReward = Boolean(
-    effectiveRedemptionInfo.reward || effectiveRedemptionInfo.account
-  );
+  const isReady = redemptionInfo.isReady || isCountdownComplete;
+  const hasReward = Boolean(redemptionInfo.reward || redemptionInfo.account);
   const eggName =
-    effectiveRedemptionInfo.eggSlot === 1 ? "Trứng vàng" : "Trứng kim cương";
+    redemptionInfo.eggSlot === 1 ? "Trứng vàng" : "Trứng kim cương";
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
-  }, []);
-
-  useEffect(() => {
-    const intervalId = window.setInterval(() => {
-      setRefreshTick((current) => current + 1);
-    }, 1000);
-
-    return () => window.clearInterval(intervalId);
   }, []);
 
   return (
@@ -53,9 +30,9 @@ export function IncubatingRewardPage({
       </div>
 
       <div className="result-summary">
-        <span>Code: {effectiveRedemptionInfo.code}</span>
-        <span>Sản phẩm: {effectiveRedemptionInfo.productName}</span>
-        <span>Ngày giờ mở: {effectiveRedemptionInfo.rewardDateTime}</span>
+        <span>Code: {redemptionInfo.code}</span>
+        <span>Sản phẩm: {redemptionInfo.productName}</span>
+        <span>Ngày giờ mở: {redemptionInfo.rewardDateTime}</span>
       </div>
 
       {isReady ? (
@@ -64,7 +41,7 @@ export function IncubatingRewardPage({
             <p className="message message--success">
               {eggName} đã nở. Đây là phần thưởng của bạn.
             </p>
-            <AccountRewardCard reward={effectiveRedemptionInfo.reward} />
+            <AccountRewardCard reward={redemptionInfo.reward} />
           </>
         ) : (
           <>
@@ -79,7 +56,7 @@ export function IncubatingRewardPage({
       ) : (
         <>
           <CountdownTimer
-            targetDate={effectiveRedemptionInfo.rewardReadyAt}
+            targetDate={redemptionInfo.rewardReadyAt}
             onComplete={handleCountdownComplete}
           />
           <p className="message message--warning">

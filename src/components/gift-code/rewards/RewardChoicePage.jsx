@@ -1,35 +1,5 @@
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
 import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
-import { getEffectiveHatchAt } from "../../../utils/eggFastHatchOverride";
-
-const MINUTE_MS = 60 * 1000;
-const HOUR_MS = 60 * MINUTE_MS;
-
-function getWaitLabel(egg, daysToWait) {
-  const hatchTime = new Date(
-    getEffectiveHatchAt(egg?.eggId, egg?.hatchAt) || ""
-  ).getTime();
-
-  if (!Number.isFinite(hatchTime)) {
-    return `Ấp ${daysToWait} ngày`;
-  }
-
-  const remainingMs = hatchTime - Date.now();
-
-  if (remainingMs <= 0) {
-    return "Mở trứng";
-  }
-
-  if (remainingMs < HOUR_MS) {
-    return `Mở sau ${Math.ceil(remainingMs / MINUTE_MS)} phút`;
-  }
-
-  if (remainingMs < 24 * HOUR_MS) {
-    return `Mở sau ${Math.ceil(remainingMs / HOUR_MS)} giờ`;
-  }
-
-  return `Ấp ${Math.ceil(remainingMs / (24 * HOUR_MS))} ngày`;
-}
 
 export function RewardChoicePage({
   code,
@@ -47,11 +17,8 @@ export function RewardChoicePage({
   const canClaimNow = availableChoices?.now ?? true;
   const canClaimLater = availableChoices?.later ?? true;
   const instantNeedsIncubation = Boolean(instantEgg?.requiresIncubation);
-  const delayedNeedsIncubation = Boolean(delayedEgg?.requiresIncubation);
-  const instantWaitLabel = getWaitLabel(instantEgg, daysToWait);
-  const delayedWaitLabel = getWaitLabel(delayedEgg, daysToWait);
   const instantActionLabel = instantNeedsIncubation
-    ? instantWaitLabel
+    ? `Ấp ${daysToWait} ngày`
     : isClaiming
       ? "Đang mở..."
       : "Nhận ngay";
@@ -106,15 +73,15 @@ export function RewardChoicePage({
             <span>
               <strong>Trứng kim cương</strong>
               <span>
-                {!delayedNeedsIncubation
+                {delayedEgg?.requiresIncubation === false
                   ? "Trứng đã sẵn sàng mở."
-                  : "Đợi đến giờ mở phần thưởng xịn hơn."}
+                  : "Ấp đủ ngày để mở phần thưởng xịn hơn."}
               </span>
             </span>
             <em>
-              {!delayedNeedsIncubation
+              {delayedEgg?.requiresIncubation === false
                 ? "Mở trứng"
-                : delayedWaitLabel}
+                : `Ấp ${daysToWait} ngày`}
             </em>
           </span>
         </button>
