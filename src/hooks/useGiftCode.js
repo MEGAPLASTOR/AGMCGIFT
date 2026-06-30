@@ -13,22 +13,27 @@ import {
   getDelayedRewardInfo,
   getRewardInfoFromTargetDate,
 } from "../utils/rewardDate";
+import { getEffectiveHatchAt } from "../utils/eggFastHatchOverride";
 
 const LUA_CHON_NHAN_NGAY = EGG_CHOICES.instant;
 const LUA_CHON_CHO_NHAN_THUONG_XIN = EGG_CHOICES.delayed;
 
 function getEggReadyInfo(egg, fallbackDays) {
-  if (egg.hatchAt) {
-    return getRewardInfoFromTargetDate(egg.hatchAt);
+  const hatchAt = getEffectiveHatchAt(egg.eggId, egg.hatchAt);
+
+  if (hatchAt) {
+    return getRewardInfoFromTargetDate(hatchAt);
   }
 
   return getDelayedRewardInfo(new Date().toISOString(), fallbackDays);
 }
 
 function isEggReady(egg) {
-  if (!egg.hatchAt) return true;
+  const hatchAt = getEffectiveHatchAt(egg.eggId, egg.hatchAt);
 
-  return new Date(egg.hatchAt).getTime() <= Date.now();
+  if (!hatchAt) return true;
+
+  return new Date(hatchAt).getTime() <= Date.now();
 }
 
 function createBaseRedemption(selectedEntry, egg) {

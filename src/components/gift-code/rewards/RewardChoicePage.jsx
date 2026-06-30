@@ -1,11 +1,14 @@
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
 import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
+import { getEffectiveHatchAt } from "../../../utils/eggFastHatchOverride";
 
 const MINUTE_MS = 60 * 1000;
 const HOUR_MS = 60 * MINUTE_MS;
 
 function getWaitLabel(egg, daysToWait) {
-  const hatchTime = new Date(egg?.hatchAt || "").getTime();
+  const hatchTime = new Date(
+    getEffectiveHatchAt(egg?.eggId, egg?.hatchAt) || ""
+  ).getTime();
 
   if (!Number.isFinite(hatchTime)) {
     return `Ấp ${daysToWait} ngày`;
