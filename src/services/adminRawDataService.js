@@ -10,6 +10,7 @@ import {
   normalizeAdminGiftPool,
 } from "./adminGiftPoolService";
 import { normalizeApiText } from "../api/eggs/utils/normalizeApiText";
+import { getEffectiveHatchAt } from "../utils/eggFastHatchOverride";
 
 const ABSOLUTE_SUCCESS_DAYS = 15;
 const RAW_ENDPOINTS = [
@@ -293,17 +294,22 @@ function normalizeProducts(products) {
 }
 
 function normalizeEggs(eggs) {
-  return eggs.map((egg) => ({
-    id: egg.id,
-    order_id: egg.order?.id || "",
-    account_id: egg.account?.id || "",
-    gift_pool_id: egg.giftPool?.id || "",
-    egg_type: Number(egg.eggType || 0),
-    status: normalizeEggStatus(egg),
-    hatch_at: normalizeDate(egg.hatchAt),
-    created_at: normalizeDate(egg.createdAt),
-    updated_at: normalizeDate(egg.updatedAt),
-  }));
+  return eggs.map((egg) => {
+    const id = egg.id;
+    const hatchAt = getEffectiveHatchAt(id, egg.hatchAt || egg.hatch_at);
+
+    return {
+      id,
+      order_id: egg.order?.id || "",
+      account_id: egg.account?.id || "",
+      gift_pool_id: egg.giftPool?.id || "",
+      egg_type: Number(egg.eggType || 0),
+      status: normalizeEggStatus({ ...egg, hatchAt }),
+      hatch_at: normalizeDate(hatchAt),
+      created_at: normalizeDate(egg.createdAt),
+      updated_at: normalizeDate(egg.updatedAt),
+    };
+  });
 }
 
 function deriveOrdersFromEggs(eggs) {

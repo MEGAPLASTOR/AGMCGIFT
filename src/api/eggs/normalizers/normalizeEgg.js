@@ -1,5 +1,6 @@
 import { EGG_CHOICES } from "../constants/eggChoices";
 import { normalizeApiText } from "../utils/normalizeApiText";
+import { getEffectiveHatchAt } from "../../../utils/eggFastHatchOverride";
 
 function getRawEggSlot(rawEgg) {
   return Number(
@@ -66,10 +67,17 @@ function getExplicitChoice(rawEgg) {
 }
 
 function hasCooldown(egg) {
+  if (egg.hatchAt) {
+    const hatchTime = new Date(egg.hatchAt).getTime();
+
+    if (Number.isFinite(hatchTime)) {
+      return hatchTime > Date.now();
+    }
+  }
+
   const statusText = normalizeApiText(egg.displayStatus);
 
   return (
-    Boolean(egg.hatchAt) ||
     statusText.includes("incubat") ||
     statusText.includes("hatch") ||
     statusText.includes("waiting") ||
@@ -113,12 +121,17 @@ function getChoice(rawEgg, egg, index, totalEggs) {
 }
 
 export function normalizeEgg(rawEgg, index = 0, totalEggs = 0) {
+  const eggId = rawEgg.eggId || rawEgg.id || rawEgg.egg_id;
+  const hatchAt = getEffectiveHatchAt(
+    eggId,
+    rawEgg.hatchAt || rawEgg.hatch_at || null
+  );
   const egg = {
-    eggId: rawEgg.eggId || rawEgg.id || rawEgg.egg_id,
+    eggId,
     eggType: Number(rawEgg.eggType ?? rawEgg.egg_type ?? 0),
     eggTier: rawEgg.eggTier || rawEgg.egg_tier || rawEgg.tier || rawEgg.giftPool?.tier || "",
     displayStatus: rawEgg.displayStatus || rawEgg.status || "Sẵn sàng",
-    hatchAt: rawEgg.hatchAt || rawEgg.hatch_at || null,
+    hatchAt,
     createdAt: rawEgg.createdAt || rawEgg.created_at || null,
     slot: getEggSlot(rawEgg, index),
   };
