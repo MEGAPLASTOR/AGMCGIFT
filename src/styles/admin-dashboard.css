@@ -4499,3 +4499,51 @@
 .admin-modal-close {
   color: #82b4ff;
 }
+
+.admin-product-mapping-list > .admin-product-mapping-pill {
+  gap: 7px;
+  min-height: 26px;
+  border: 1px solid #3a3f48;
+  border-radius: 4px;
+  background: #1b1e24;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  padding: 5px 7px 5px 10px;
+}
+
+.admin-table .admin-product-mapping-pill > strong {
+  color: #ffd966;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-table .admin-product-mapping-pill.is-egg-1 > strong {
+  color: #33e6ff;
+}
+
+.admin-product-mapping-pill > em,
+.admin-product-mapping-pill > b {
+  color: #ffffff;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.admin-product-mapping-pill > button {
+  width: 16px;
+  height: 16px;
+  min-height: 16px;
+  border: 0;
+  background: transparent;
+  color: #ff827a;
+  box-shadow: none;
+  padding: 0;
+}
+
+.admin-product-mapping-pill > button:hover {
+  background: transparent;
+  color: #ffb4ad;
+  box-shadow: none;
+  transform: none;
+}

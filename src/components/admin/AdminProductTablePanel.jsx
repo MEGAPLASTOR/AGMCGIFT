@@ -4,7 +4,6 @@ import {
   FaLink,
   FaMagnifyingGlass,
   FaRotateRight,
-  FaTrashCan,
   FaXmark,
 } from "react-icons/fa6";
 
@@ -413,20 +412,27 @@ export function AdminProductTablePanel({
                     <td>
                       {productMappings.length ? (
                         <div className="admin-product-mapping-list">
-                          {productMappings.map((mapping) => (
-                            <span key={getMappingId(mapping)}>
-                              {getEggTypeLabel(mapping.egg_type)}
-                              {" -> "}
-                              {getMappingPoolLabel(mapping, poolById)}
-                              <button
-                                type="button"
-                                disabled={isSaving}
-                                onClick={() => deleteMapping(mapping)}
+                          {productMappings.map((mapping) => {
+                            const eggType = getEggTypeValue(mapping.egg_type);
+
+                            return (
+                              <span
+                                className={`admin-product-mapping-pill is-egg-${eggType}`}
+                                key={getMappingId(mapping)}
                               >
-                                <FaTrashCan aria-hidden="true" />
-                              </button>
-                            </span>
-                          ))}
+                                <strong>{getEggTypeLabel(mapping.egg_type)}</strong>
+                                <em aria-hidden="true">-&gt;</em>
+                                <b>{getMappingPoolLabel(mapping, poolById)}</b>
+                                <button
+                                  type="button"
+                                  disabled={isSaving}
+                                  onClick={() => deleteMapping(mapping)}
+                                >
+                                  <FaXmark aria-hidden="true" />
+                                </button>
+                              </span>
+                            );
+                          })}
                         </div>
                       ) : (
                         <span className="admin-product-no-mapping">
