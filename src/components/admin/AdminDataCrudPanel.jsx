@@ -1280,9 +1280,14 @@ export function AdminDataCrudPanel({
               </strong>
               <span>{recordTitle}</span>
             </div>
-            <button type="button" className="admin-light-button" onClick={startAdd}>
+            <button
+              type="button"
+              className="admin-light-button admin-icon-only-button"
+              aria-label="Thêm bản ghi"
+              title="Thêm bản ghi"
+              onClick={startAdd}
+            >
               <FaPlus aria-hidden="true" />
-              Tạo mới
             </button>
           </div>
 
@@ -1299,7 +1304,7 @@ export function AdminDataCrudPanel({
             </div>
           ) : (
             <div className="admin-form-placeholder">
-              Chọn một dòng để sửa hoặc bấm Tạo mới để thêm tài khoản.
+              Chọn một dòng để sửa hoặc bấm nút dấu cộng để thêm tài khoản.
             </div>
           )}
 
@@ -1356,9 +1361,14 @@ export function AdminDataCrudPanel({
                   <span>{recordTitle}</span>
                 </div>
                 <div className="admin-modal-head-actions">
-                  <button type="button" className="admin-light-button" onClick={startAdd}>
+                  <button
+                    type="button"
+                    className="admin-light-button admin-icon-only-button"
+                    aria-label="Thêm bản ghi"
+                    title="Thêm bản ghi"
+                    onClick={startAdd}
+                  >
                     <FaPlus aria-hidden="true" />
-                    Tạo mới
                   </button>
                   <button
                     type="button"
@@ -1385,7 +1395,7 @@ export function AdminDataCrudPanel({
                 </div>
               ) : (
                 <div className="admin-form-placeholder">
-                  Chọn một dòng để sửa hoặc bấm Tạo mới để thêm tài khoản.
+                  Chọn một dòng để sửa hoặc bấm nút dấu cộng để thêm tài khoản.
                 </div>
               )}
 

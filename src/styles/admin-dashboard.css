@@ -170,6 +170,13 @@
   color: #17130a;
 }
 
+.admin-icon-only-button {
+  flex: 0 0 auto;
+  width: 48px;
+  min-width: 48px;
+  padding-inline: 0;
+}
+
 .admin-danger-button {
   background: #f07d7d !important;
   color: #17130a !important;
