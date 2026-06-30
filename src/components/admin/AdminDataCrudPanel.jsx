@@ -416,6 +416,80 @@ function AdminGiftAccountTable({
   );
 }
 
+function AdminRecordTable({
+  columns,
+  emptyMessage = "Không tìm thấy bản ghi phù hợp.",
+  fields,
+  onEdit,
+  rows,
+  selectedRecordId,
+  tableKey,
+}) {
+  return (
+    <div className="admin-table-wrap admin-record-table-wrap">
+      <table className="admin-table admin-record-table">
+        <thead>
+          <tr>
+            <th>Thao tác</th>
+            {columns.map((column) => (
+              <th key={column}>{getColumnLabel(fields, column)}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {rows.length ? (
+            rows.map((row) => {
+              const recordId = getRecordId(row, tableKey);
+
+              return (
+                <tr
+                  key={recordId}
+                  className={
+                    recordId === selectedRecordId
+                      ? "admin-row-selected admin-record-table__row"
+                      : "admin-record-table__row"
+                  }
+                  tabIndex={0}
+                  onClick={() => onEdit(row)}
+                  onKeyDown={(event) => {
+                    if (event.key !== "Enter" && event.key !== " ") {
+                      return;
+                    }
+
+                    event.preventDefault();
+                    onEdit(row);
+                  }}
+                >
+                  <td>
+                    <button
+                      type="button"
+                      className="admin-mini-button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onEdit(row);
+                      }}
+                    >
+                      <FaPen aria-hidden="true" />
+                      Sửa
+                    </button>
+                  </td>
+                  {columns.map((column) => (
+                    <td key={column}>{formatAccountTableValue(row[column])}</td>
+                  ))}
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={columns.length + 1}>{emptyMessage}</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function getRecordTitle(tableKey, formValues, selectedRecordId) {
   if (tableKey === "giftAccounts") {
     return formValues.username || "Tài khoản mới";
@@ -438,6 +512,25 @@ function getRecordTitle(tableKey, formValues, selectedRecordId) {
   }
 
   return selectedRecordId || "Bản ghi mới";
+}
+
+function getEntityLabel(tableKey) {
+  const labels = {
+    adminOrders: "đơn hàng",
+    customers: "khách hàng",
+    eggs: "trứng",
+    giftAccounts: "tài khoản",
+    productEggMappings: "mapping trứng",
+    products: "sản phẩm",
+  };
+
+  return labels[tableKey] || "bản ghi";
+}
+
+function getEntityHeading(tableKey) {
+  const label = getEntityLabel(tableKey);
+
+  return label === "bản ghi" ? "Thông tin bản ghi" : `Thông tin ${label}`;
 }
 
 function AdminFormField({ field, value, onChange }) {
@@ -540,6 +633,7 @@ export function AdminDataCrudPanel({
   const isGiftPoolsTable = tableKey === "giftPools";
   const isPoolMappingsTable = tableKey === "poolAccountMappings";
   const isProductMappingsTable = tableKey === "productEggMappings";
+  const shouldUseBoard = isGiftPoolsTable || isPoolMappingsTable;
   const isBackendManagedIdTable =
     isGiftAccountsTable ||
     isGiftPoolsTable ||
@@ -584,6 +678,9 @@ export function AdminDataCrudPanel({
   }, [boardConfig, boardValues, filteredRows, tableKey, tables]);
   const hasActiveForm = Object.keys(formValues).length > 0;
   const recordTitle = getRecordTitle(tableKey, formValues, selectedRecordId);
+  const entityLabel = getEntityLabel(tableKey);
+  const recordModalTitle = getEntityHeading(tableKey);
+  const deleteButtonLabel = `Xóa ${entityLabel}`;
   const addButtonLabel = isGiftAccountsTable
     ? "Thêm tài khoản"
     : isGiftPoolsTable
@@ -634,9 +731,7 @@ export function AdminDataCrudPanel({
     setSelectedRecordId("");
     setFormValues(normalizeRecordForForm(record, tableKey));
     setDeleteModalOpen(false);
-    if (isGiftAccountsTable) {
-      setRecordModalOpen(true);
-    }
+    setRecordModalOpen(true);
     setMessage("Đang tạo bản ghi mới.");
   };
 
@@ -644,9 +739,7 @@ export function AdminDataCrudPanel({
     setSelectedRecordId(getRecordId(record, tableKey));
     setFormValues(normalizeRecordForForm(record, tableKey));
     setDeleteModalOpen(false);
-    if (isGiftAccountsTable) {
-      setRecordModalOpen(true);
-    }
+    setRecordModalOpen(true);
     setMessage("Đang chỉnh sửa bản ghi đã chọn.");
   };
 
@@ -780,9 +873,7 @@ export function AdminDataCrudPanel({
                   ? "Đã đồng bộ mapping sản phẩm - trứng."
                   : "Đã lưu thay đổi."
       );
-      if (isGiftAccountsTable) {
-        setRecordModalOpen(false);
-      }
+      setRecordModalOpen(false);
     } catch (error) {
       setMessage(error.message || "Dữ liệu bản ghi không hợp lệ.");
     } finally {
@@ -791,12 +882,7 @@ export function AdminDataCrudPanel({
   };
 
   const requestDeleteSelected = () => {
-    if (isGiftAccountsTable) {
-      setDeleteModalOpen(true);
-      return;
-    }
-
-    deleteSelected();
+    setDeleteModalOpen(true);
   };
 
   const handleResetTablesClick = () => {
@@ -860,10 +946,8 @@ export function AdminDataCrudPanel({
               ? "Đã xóa mapping sản phẩm - trứng."
               : "Đã xóa bản ghi."
       );
-      if (isGiftAccountsTable) {
-        setRecordModalOpen(false);
-        setDeleteModalOpen(false);
-      }
+      setRecordModalOpen(false);
+      setDeleteModalOpen(false);
     } catch (error) {
       setMessage(error.message || "Không thể xóa bản ghi.");
     } finally {
@@ -955,7 +1039,7 @@ export function AdminDataCrudPanel({
     persistDraggedRecord(recordId, value);
   };
 
-  if (isGiftPoolsTable || isPoolMappingsTable) {
+  if (shouldUseBoard) {
     return (
       <AdminGiftPoolDragPanel
         panelTitle={panelTitle}
@@ -1003,9 +1087,7 @@ export function AdminDataCrudPanel({
       </div>
 
       <div
-        className={`admin-crud-grid${
-          isGiftAccountsTable ? " admin-crud-grid--table-only" : ""
-        }`}
+        className="admin-crud-grid admin-crud-grid--table-only"
       >
         <div className="admin-dnd-wrap">
           {isGiftAccountsTable && onImportGiftAccounts ? (
@@ -1026,7 +1108,7 @@ export function AdminDataCrudPanel({
               onEdit={startEdit}
               onStatusChange={updateGiftAccountStatus}
             />
-          ) : (
+          ) : shouldUseBoard ? (
           <div className="admin-dnd-board">
             {boardValues.map((value) => {
               const valueKey = normalizeBoardValue(value);
@@ -1128,6 +1210,15 @@ export function AdminDataCrudPanel({
               );
             })}
           </div>
+          ) : (
+            <AdminRecordTable
+              columns={visibleColumns}
+              fields={fields}
+              rows={filteredRows}
+              selectedRecordId={selectedRecordId}
+              tableKey={tableKey}
+              onEdit={startEdit}
+            />
           )}
 
           <table className="admin-table admin-crud-table" hidden>
@@ -1175,12 +1266,12 @@ export function AdminDataCrudPanel({
               )}
             </tbody>
           </table>
-          {isGiftAccountsTable && message && !isRecordModalOpen ? (
+          {message && !isRecordModalOpen ? (
             <p className="admin-crud-message">{message}</p>
           ) : null}
         </div>
 
-        {!isGiftAccountsTable ? (
+        {shouldUseBoard ? (
         <div className="admin-record-editor">
           <div className="admin-record-editor__head">
             <div>
@@ -1245,7 +1336,7 @@ export function AdminDataCrudPanel({
         ) : null}
       </div>
 
-      {isGiftAccountsTable && isRecordModalOpen ? (
+      {isRecordModalOpen ? (
         <div className="admin-modal-backdrop">
           <section
             className="admin-panel admin-modal admin-record-modal"
