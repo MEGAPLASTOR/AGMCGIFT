@@ -33,11 +33,13 @@ export default function GiftCodePage() {
     isChecking,
     isClaiming,
     availableChoices,
+    allAvailableChoicesOpened,
     choiceEggs,
     checkCode,
     claimReward,
     claimReadyReward,
     reset,
+    backToChoices,
     choices,
   } = useGiftCode(giftCatalogData);
 
@@ -56,6 +58,9 @@ export default function GiftCodePage() {
     setSelectedStageEgg(egg);
     scrollToSection(codeEntryRef.current, SCROLL_TOP_GAP);
   };
+  const resultBackLabel = allAvailableChoicesOpened
+    ? "Quay lại xem trứng"
+    : "Quay lại mở trứng tiếp";
 
   useEffect(() => {
     if (
@@ -119,7 +124,8 @@ export default function GiftCodePage() {
           <div ref={actionSectionRef}>
             <InstantRewardPage
               redemptionInfo={redemptionInfo}
-              onReset={handleReset}
+              backLabel={resultBackLabel}
+              onReset={backToChoices}
             />
           </div>
         )}
@@ -131,7 +137,8 @@ export default function GiftCodePage() {
               isClaiming={isClaiming}
               claimError={errorMsg}
               onClaimReady={claimReadyReward}
-              onReset={handleReset}
+              backLabel={resultBackLabel}
+              onReset={backToChoices}
             />
           </div>
         )}

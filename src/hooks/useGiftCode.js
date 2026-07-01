@@ -85,6 +85,7 @@ function createBaseRedemption(selectedEntry, egg) {
     productName: selectedEntry.product.tenSanPham,
     eggId: egg.eggId,
     eggType: egg.eggType,
+    eggTier: egg.eggTier,
     eggSlot: egg.slot,
     eggStatus: egg.displayStatus,
     redeemedAt: now,
@@ -105,6 +106,28 @@ function createClaimedRedemption(selectedEntry, egg, choice, reward, delayDays) 
   };
 }
 
+function buildEggsByChoice(eggs) {
+  return eggs.reduce((map, egg) => {
+    if (!map[egg.choice]) {
+      map[egg.choice] = egg;
+    }
+
+    return map;
+  }, {});
+}
+
+function markEggClaimed(entry, eggId, reward) {
+  if (!entry) return entry;
+
+  const eggs = entry.eggs.map((egg) =>
+    egg.eggId === eggId
+      ? { ...egg, isClaimed: true, account: reward, displayStatus: "CLAIMED" }
+      : egg
+  );
+
+  return { ...entry, eggs, eggsByChoice: buildEggsByChoice(eggs) };
+}
+
 function withFallbackHatchAt(entry, delayDays) {
   const eggs = entry.eggs.map((egg) => {
     if (egg.hatchAt || (egg.choice !== LUA_CHON_CHO_NHAN_THUONG_XIN && egg.eggType !== 2)) {
@@ -121,13 +144,7 @@ function withFallbackHatchAt(entry, delayDays) {
   return {
     ...entry,
     eggs,
-    eggsByChoice: eggs.reduce((map, egg) => {
-      if (!map[egg.choice]) {
-        map[egg.choice] = egg;
-      }
-
-      return map;
-    }, {}),
+    eggsByChoice: buildEggsByChoice(eggs),
   };
 }
 
@@ -270,6 +287,9 @@ export function useGiftCode(catalogData) {
         };
 
         saveStoredRedemption(newRedemption);
+        setSelectedEntry((currentEntry) =>
+          markEggClaimed(currentEntry, selectedEgg.eggId, reward)
+        );
         setRedemptionInfo(newRedemption);
         setStatus(
           choice === LUA_CHON_NHAN_NGAY
@@ -305,6 +325,9 @@ export function useGiftCode(catalogData) {
         };
 
         saveStoredRedemption(nextRedemption);
+        setSelectedEntry((currentEntry) =>
+          markEggClaimed(currentEntry, current?.eggId, reward)
+        );
         return nextRedemption;
       });
     } catch (error) {
@@ -323,6 +346,35 @@ export function useGiftCode(catalogData) {
     setIsClaiming(false);
   }, []);
 
+  const backToChoices = useCallback(() => {
+    if (!selectedEntry) return;
+
+    setStatus(GIFT_CODE_STATUS.choosing);
+    setRedemptionInfo(null);
+    setErrorMsg("");
+  }, [selectedEntry]);
+
+  const openedChoices = useMemo(
+    () => ({
+      now: Boolean(
+        choiceEggs[LUA_CHON_NHAN_NGAY]?.isClaimed ||
+          getStoredRedemption(choiceEggs[LUA_CHON_NHAN_NGAY]?.eggId)?.reward ||
+          (redemptionInfo?.choice === LUA_CHON_NHAN_NGAY && redemptionInfo?.reward)
+      ),
+      later: Boolean(
+        choiceEggs[LUA_CHON_CHO_NHAN_THUONG_XIN]?.isClaimed ||
+          getStoredRedemption(choiceEggs[LUA_CHON_CHO_NHAN_THUONG_XIN]?.eggId)?.reward ||
+          (redemptionInfo?.choice === LUA_CHON_CHO_NHAN_THUONG_XIN &&
+            redemptionInfo?.reward)
+      ),
+    }),
+    [choiceEggs, redemptionInfo]
+  );
+
+  const allAvailableChoicesOpened =
+    (!availableChoices.now || openedChoices.now) &&
+    (!availableChoices.later || openedChoices.later);
+
   return {
     status,
     selectedEntry,
@@ -334,10 +386,13 @@ export function useGiftCode(catalogData) {
     isChecking,
     isClaiming,
     availableChoices,
+    openedChoices,
+    allAvailableChoicesOpened,
     checkCode,
     claimReward,
     claimReadyReward,
     reset,
+    backToChoices,
     choices: {
       now: LUA_CHON_NHAN_NGAY,
       later: LUA_CHON_CHO_NHAN_THUONG_XIN,

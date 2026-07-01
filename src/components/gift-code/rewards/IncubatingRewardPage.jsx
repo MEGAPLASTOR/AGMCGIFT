@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { AccountRewardCard } from "./AccountRewardCard";
 import { CountdownTimer } from "./CountdownTimer";
+import { getRewardTier, RewardTierEggBadge } from "./RewardTierEggBadge";
 
 export function IncubatingRewardPage({
   redemptionInfo,
@@ -8,11 +9,13 @@ export function IncubatingRewardPage({
   claimError,
   onClaimReady,
   onReset,
+  backLabel = "Quay lại xem trứng",
 }) {
   const [isCountdownComplete, setIsCountdownComplete] = useState(false);
   const isReady = redemptionInfo.isReady || isCountdownComplete;
   const hasReward = Boolean(redemptionInfo.reward || redemptionInfo.account);
   const eggName = "Trứng bí ẩn";
+  const rewardTier = getRewardTier(redemptionInfo);
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
   }, []);
@@ -30,7 +33,11 @@ export function IncubatingRewardPage({
                 : "Đợi đủ cooldown để mở"}
           </h2>
         </div>
-        {!hasReward ? <span className="mystery-egg mystery-egg--small" aria-hidden="true">?</span> : null}
+        {hasReward ? (
+          <RewardTierEggBadge tier={rewardTier} />
+        ) : (
+          <span className="mystery-egg mystery-egg--small" aria-hidden="true">?</span>
+        )}
       </div>
 
       <div className="result-summary">
@@ -72,7 +79,7 @@ export function IncubatingRewardPage({
       {claimError ? <p className="message message--error">{claimError}</p> : null}
 
       <button type="button" onClick={onReset}>
-        Nhập code khác
+        {backLabel}
       </button>
     </section>
   );

@@ -347,6 +347,20 @@ input::placeholder {
   margin-bottom: 16px;
 }
 
+.reward-tier-egg {
+  display: grid;
+  flex: 0 0 auto;
+  width: 108px;
+  height: 108px;
+  place-items: center;
+}
+
+.reward-tier-egg img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 .countdown {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
