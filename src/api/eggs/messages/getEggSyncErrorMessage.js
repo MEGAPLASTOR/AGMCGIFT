@@ -45,7 +45,7 @@ export function getEggSyncErrorMessage(error) {
   }
 
   if (error.status === 404) {
-    return "Không tìm thấy API kiểm tra mã đơn. Vui lòng kiểm tra cấu hình proxy /api hoặc deploy lại frontend.";
+    return error.payload?.message || error.message || "Không tìm thấy mã đơn hàng này trên hệ thống.";
   }
 
   const customerStatus = normalizeApiText(
