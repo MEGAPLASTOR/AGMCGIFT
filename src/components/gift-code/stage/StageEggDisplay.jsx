@@ -22,7 +22,7 @@ export function StageEggDisplay({ selectedEgg, onSelectEgg }) {
           onClick={() => onSelectEgg("mystery")}
           aria-label="Trứng bí ẩn 15 ngày"
         >
-          <span className="mystery-egg mystery-egg--stage" aria-hidden="true">?</span>
+          <span className="stage-mystery-card" aria-hidden="true">?</span>
         </button>
       </div>
     </div>

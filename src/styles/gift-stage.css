@@ -132,11 +132,20 @@
   transform: scale(1.2);
 }
 
-.stage-hanging-egg .mystery-egg--stage {
+.stage-mystery-card {
   position: relative;
   z-index: 2;
-  width: min(86%, 210px);
-  transform: scale(1.04);
+  display: grid;
+  width: min(72%, 180px);
+  aspect-ratio: 1;
+  place-items: center;
+  border: 3px solid #17130a;
+  border-radius: 8px;
+  background: #111111;
+  box-shadow: 0 18px 12px rgba(23, 19, 10, 0.22);
+  color: #fff8bf;
+  font-size: clamp(60px, 7vw, 90px);
+  font-weight: 1000;
 }
 
 .stage-info-modules {
