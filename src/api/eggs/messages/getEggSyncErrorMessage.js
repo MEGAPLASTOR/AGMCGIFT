@@ -1,5 +1,40 @@
 import { normalizeApiText } from "../utils/normalizeApiText";
 
+export function getDeliveryStatusError(deliveryStatus) {
+  const status = normalizeApiText(deliveryStatus);
+
+  if (!status || status === "null" || status.includes("chua giao")) {
+    return "Đơn hàng chưa được giao tới hãy đợi giao tới rồi nhập code nhé ^^";
+  }
+
+  if (
+    status.includes("chuyen hoan") ||
+    status.includes("hoan") ||
+    status.includes("returned") ||
+    status.includes("refund")
+  ) {
+    return "Đơn hàng đã bị hoàn bạn không được phép nhận trứng :<";
+  }
+
+  if (
+    status.includes("dang giao") ||
+    status.includes("shipping") ||
+    status.includes("delivering")
+  ) {
+    return "Đơn hàng đang giao tới hãy chờ thêm xíu nữa rồi nhập code lại sau nhé ^^";
+  }
+
+  if (
+    status.includes("da giao") ||
+    status.includes("delivered") ||
+    status.includes("completed")
+  ) {
+    return "";
+  }
+
+  return "Đơn hàng chưa được giao tới hãy đợi giao tới rồi nhập code nhé ^^";
+}
+
 export function getEggSyncErrorMessage(error) {
   if (error.status === 0) {
     return "Hệ thống kiểm tra đơn đang tạm ngắt kết nối. Vui lòng thử lại sau.";
@@ -26,6 +61,14 @@ export function getEggSyncErrorMessage(error) {
       error.payload?.financialStatus,
     ].join(" ")
   );
+  const rawDeliveryStatus =
+    error.payload?.deliveryStatus ?? error.payload?.delivery_status;
+  const deliveryStatusError =
+    rawDeliveryStatus === undefined ? "" : getDeliveryStatusError(rawDeliveryStatus);
+
+  if (deliveryStatusError) {
+    return deliveryStatusError;
+  }
 
   if (
     Number(error.payload?.returnStreak || error.payload?.customer?.returnStreak || 0) >= 2 ||

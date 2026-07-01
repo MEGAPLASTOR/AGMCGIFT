@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 import {
   claimEggById,
   EGG_CHOICES,
+  getDeliveryStatusError,
   getEggClaimErrorMessage,
   getEggSyncErrorMessage,
   normalizeClaimEggResponse,
@@ -123,6 +124,16 @@ export function useGiftCode(catalogData) {
       );
       
       // console.log(payload);
+
+      const deliveryStatusError = getDeliveryStatusError(
+        matchedEntry.order.deliveryStatus
+      );
+
+      if (deliveryStatusError) {
+        setErrorMsg(deliveryStatusError);
+        setStatus(GIFT_CODE_STATUS.invalid);
+        return;
+      }
 
       if (!matchedEntry.eggs.length) {
         setErrorMsg("Mã đơn hợp lệ nhưng chưa có trứng khả dụng.");
