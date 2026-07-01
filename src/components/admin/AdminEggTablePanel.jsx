@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
-import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
+import {
+  FaBolt,
+  FaClock,
+  FaMagnifyingGlass,
+  FaRotateRight,
+  FaXmark,
+} from "react-icons/fa6";
 
 const EMPTY_ROWS = [];
 
@@ -89,6 +95,26 @@ function formatDateTime(value) {
     .replace(",", "");
 }
 
+function toDateTimeInputValue(value) {
+  const date = getValidDate(value) || new Date();
+
+  return [
+    date.getFullYear(),
+    String(date.getMonth() + 1).padStart(2, "0"),
+    String(date.getDate()).padStart(2, "0"),
+  ].join("-") + `T${String(date.getHours()).padStart(2, "0")}:${String(date.getMinutes()).padStart(2, "0")}`;
+}
+
+function fromDateTimeInputValue(value) {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toISOString();
+}
+
 function getEggTypeValue(egg) {
   return Number(egg?.egg_type || egg?.eggType || 0);
 }
@@ -153,6 +179,12 @@ function getStatusClass(status) {
   return "is-pending";
 }
 
+function canEditHatchTime(egg) {
+  const status = normalizeKey(egg?.status);
+
+  return !["claimed", "hatched", "opened", "cancelled", "canceled", "invalidated", "invalid"].includes(status);
+}
+
 function buildOptionRows(values, getLabel) {
   return [...new Set(values.map(normalizeText).filter(Boolean))]
     .sort((left, right) => left.localeCompare(right, "vi"))
@@ -177,11 +209,17 @@ function getEggAccount(egg, accountById) {
 export function AdminEggTablePanel({
   isRefreshing = false,
   onRefresh,
+  onSaveRecord,
+  onUpdateEggHatchTime,
   tables,
 }) {
   const [keyword, setKeyword] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [editingEgg, setEditingEgg] = useState(null);
+  const [hatchTimeValue, setHatchTimeValue] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const eggs = tables.eggs || EMPTY_ROWS;
   const orders = tables.adminOrders || EMPTY_ROWS;
@@ -297,6 +335,48 @@ export function AdminEggTablePanel({
     typeFilter,
   ]);
 
+  const openHatchTimeModal = (egg) => {
+    setEditingEgg(egg);
+    setHatchTimeValue(toDateTimeInputValue(egg.hatch_at || egg.hatchAt));
+    setMessage("");
+  };
+
+  const closeHatchTimeModal = () => {
+    if (isSaving) return;
+
+    setEditingEgg(null);
+    setMessage("");
+  };
+
+  const saveHatchTime = async () => {
+    const eggId = getEggId(editingEgg);
+    const hatchAt = fromDateTimeInputValue(hatchTimeValue);
+
+    if (!eggId || !hatchAt || isSaving) {
+      setMessage("Vui lòng chọn thời gian nở hợp lệ.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const savedEgg =
+        (await onUpdateEggHatchTime?.(eggId, hatchAt)) || {
+          ...editingEgg,
+          hatch_at: hatchAt,
+          status: new Date(hatchAt).getTime() > Date.now() ? "incubating" : "ready",
+        };
+
+      onSaveRecord?.("eggs", savedEgg);
+      setEditingEgg(null);
+      setMessage("");
+    } catch (error) {
+      setMessage(error.message || "Không thể cập nhật giờ ấp trứng.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <section className="admin-panel admin-egg-manager-panel">
       <div className="admin-egg-toolbar">
@@ -355,6 +435,7 @@ export function AdminEggTablePanel({
               <th>Tài Khoản Nhận</th>
               <th>Ngày Nở Dự Kiến</th>
               <th>Ngày Tạo</th>
+              <th>Hành Động</th>
             </tr>
           </thead>
           <tbody>
@@ -408,17 +489,98 @@ export function AdminEggTablePanel({
                     </td>
                     <td>{formatDateTime(egg.hatch_at)}</td>
                     <td>{formatDateTime(egg.created_at)}</td>
+                    <td>
+                      {canEditHatchTime(egg) ? (
+                        <button
+                          type="button"
+                          className="admin-mini-button admin-egg-hatch-button"
+                          onClick={() => openHatchTimeModal(egg)}
+                        >
+                          <FaClock aria-hidden="true" />
+                          Sửa Giờ Ấp
+                        </button>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan={8}>Không tìm thấy trứng phù hợp.</td>
+                <td colSpan={9}>Không tìm thấy trứng phù hợp.</td>
               </tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {editingEgg ? (
+        <div className="admin-modal-backdrop">
+          <section
+            className="admin-panel admin-modal admin-egg-hatch-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-egg-hatch-title"
+          >
+            <div className="admin-egg-hatch-modal__head">
+              <h2 id="admin-egg-hatch-title">Chỉnh Sửa Thời Gian Nở</h2>
+              <button
+                type="button"
+                aria-label="Đóng"
+                disabled={isSaving}
+                onClick={closeHatchTimeModal}
+              >
+                <FaXmark aria-hidden="true" />
+              </button>
+            </div>
+
+            <div className="admin-egg-hatch-note">
+              <strong>Lưu ý:</strong>
+              <ul>
+                <li>Thời gian được chọn là thời gian mà trứng sẽ có thể được mở và nhận được phần thưởng.</li>
+                <li>Nhấn nút Nở ngay rồi xác nhận để trứng có thể được mở mà không cần chờ đợi.</li>
+              </ul>
+            </div>
+
+            <label className="admin-egg-hatch-field">
+              Thời gian nở mới
+              <span>
+                <input
+                  type="datetime-local"
+                  value={hatchTimeValue}
+                  onChange={(event) => setHatchTimeValue(event.target.value)}
+                />
+                <button
+                  type="button"
+                  className="admin-light-button"
+                  disabled={isSaving}
+                  onClick={() => setHatchTimeValue(toDateTimeInputValue(new Date()))}
+                >
+                  <FaBolt aria-hidden="true" />
+                  Nở ngay
+                </button>
+              </span>
+            </label>
+
+            {message ? <p className="admin-crud-message">{message}</p> : null}
+
+            <div className="admin-crud-actions admin-egg-hatch-actions">
+              <button
+                type="button"
+                className="admin-light-button"
+                disabled={isSaving}
+                onClick={closeHatchTimeModal}
+              >
+                Hủy
+              </button>
+              <button type="button" disabled={isSaving} onClick={saveHatchTime}>
+                {isSaving ? "Đang lưu..." : "Xác nhận"}
+              </button>
+            </div>
+          </section>
+        </div>
+      ) : null}
     </section>
   );
 }

@@ -10,6 +10,7 @@ import {
 } from "../api/eggs";
 import { GIFT_CODE_STATUS } from "../constants/giftCodeStatus";
 import {
+  addDays,
   getDelayedRewardInfo,
   getRewardInfoFromTargetDate,
 } from "../utils/rewardDate";
@@ -47,6 +48,32 @@ function createBaseRedemption(selectedEntry, egg) {
     eggType: egg.eggType,
     eggStatus: egg.displayStatus,
     redeemedAt: now,
+  };
+}
+
+function withFallbackHatchAt(entry, delayDays) {
+  const eggs = entry.eggs.map((egg) => {
+    if (egg.hatchAt || (egg.choice !== LUA_CHON_CHO_NHAN_THUONG_XIN && egg.eggType !== 2)) {
+      return egg;
+    }
+
+    return {
+      ...egg,
+      hatchAt: addDays(egg.createdAt || new Date().toISOString(), delayDays).toISOString(),
+      requiresIncubation: true,
+    };
+  });
+
+  return {
+    ...entry,
+    eggs,
+    eggsByChoice: eggs.reduce((map, egg) => {
+      if (!map[egg.choice]) {
+        map[egg.choice] = egg;
+      }
+
+      return map;
+    }, {}),
   };
 }
 
@@ -90,7 +117,10 @@ export function useGiftCode(catalogData) {
     try {
       // Kiểm tra mã đơn qua /api/eggs/sync và nhận danh sách trứng hợp lệ.
       const payload = await syncEggsByOrderCode(trimmedCode);
-      const matchedEntry = normalizeSyncEggResponse(payload, trimmedCode);
+      const matchedEntry = withFallbackHatchAt(
+        normalizeSyncEggResponse(payload, trimmedCode),
+        soNgayCho
+      );
       
       // console.log(payload);
 
@@ -109,7 +139,7 @@ export function useGiftCode(catalogData) {
     } finally {
       setIsChecking(false);
     }
-  }, []);
+  }, [soNgayCho]);
 
   const claimReward = useCallback(
     async (choice) => {

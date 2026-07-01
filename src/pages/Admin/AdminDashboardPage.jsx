@@ -30,6 +30,7 @@ import {
 } from "../../services/adminDashboardService";
 import { updateAdminCredentials } from "../../services/adminAuthService";
 import { updateAdminCustomerStatus } from "../../services/adminCustomerService";
+import { updateAdminEggHatchTime } from "../../services/adminEggService";
 import {
   createAdminGiftAccount,
   deleteAdminGiftAccount,
@@ -208,6 +209,10 @@ function findProductEggMappingRow(tables, record) {
       normalizeComparable(mapping.gift_pool_id) === poolId &&
       Number(mapping.egg_type) === eggType
   );
+}
+
+function findEggRow(tables, eggId) {
+  return (tables.eggs || []).find((egg) => normalizeComparable(egg.id) === normalizeComparable(eggId));
 }
 
 export default function AdminDashboardPage() {
@@ -565,6 +570,23 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleUpdateEggHatchTime = async (eggId, hatchAt) => {
+    try {
+      const fallbackEgg = await updateAdminEggHatchTime(
+        eggId,
+        hatchAt,
+        admin.authHeader
+      );
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+
+      return findEggRow(rawTables, eggId) || fallbackEgg;
+    } catch (updateError) {
+      handleAuthError(updateError);
+      throw updateError;
+    }
+  };
+
   const SidebarToggleIcon = isNavCollapsed ? FaChevronRight : FaChevronLeft;
 
   if (!admin) {
@@ -721,6 +743,7 @@ export default function AdminDashboardPage() {
               onUpdateCustomerStatus={handleUpdateCustomerStatus}
               onSaveProductEggMapping={handleSaveProductEggMapping}
               onDeleteProductEggMapping={handleDeleteProductEggMapping}
+              onUpdateEggHatchTime={handleUpdateEggHatchTime}
               onImportGiftAccounts={adminTables.importGiftAccounts}
               onUploadGiftAccounts={handleUploadGiftAccounts}
               isRefreshing={adminTables.isLoadingRawData}
