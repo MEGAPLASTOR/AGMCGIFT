@@ -9,6 +9,9 @@ export default defineConfig({
       '/api': {
         target: 'https://backend.anhgamc.com',
         changeOrigin: true,
+        headers: {
+          Origin: 'https://backend.anhgamc.com',
+        },
       },
     },
   },
