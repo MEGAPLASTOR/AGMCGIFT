@@ -33,3 +33,7 @@ export function getAdminCustomerStatusEndpoint(customerCode) {
 export function getAdminProductEggMappingEndpoint(id) {
   return `${ADMIN_ENDPOINTS.productEggMappings}/${encodeURIComponent(id)}`;
 }
+
+export function getAdminEggHatchTimeEndpoint(id) {
+  return `${ADMIN_ENDPOINTS.eggs}/${encodeURIComponent(id)}/hatch-time`;
+}
