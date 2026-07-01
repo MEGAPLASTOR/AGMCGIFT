@@ -4,6 +4,7 @@ export function AccountRewardCard({ reward, account }) {
     accountInfo.tenAcc || accountInfo.tenPhanThuong || accountInfo.platform;
   const username = accountInfo.taiKhoan || accountInfo.username;
   const password = accountInfo.matKhau || accountInfo.password;
+  const tier = accountInfo.tier;
   const note = accountInfo.ghiChu || accountInfo.message;
 
   return (
@@ -31,6 +32,12 @@ export function AccountRewardCard({ reward, account }) {
           <div>
             <dt>Nền tảng</dt>
             <dd>{accountInfo.platform}</dd>
+          </div>
+        ) : null}
+        {tier ? (
+          <div>
+            <dt>Tier</dt>
+            <dd>{tier}</dd>
           </div>
         ) : null}
         {note ? (

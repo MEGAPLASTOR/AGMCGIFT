@@ -7,6 +7,7 @@ export function normalizeClaimEggResponse(payload) {
     taiKhoan: account.username || account.taiKhoan || root.username || "",
     matKhau: account.password || account.matKhau || root.password || "",
     platform: account.platform || root.platform || "",
+    tier: account.tier || root.tier || "",
     ghiChu: root.message || account.message || "",
     raw: root,
   };
