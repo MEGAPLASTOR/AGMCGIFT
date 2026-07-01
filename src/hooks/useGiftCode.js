@@ -222,25 +222,23 @@ export function useGiftCode(catalogData) {
       if (selectedEgg.isClaimed) {
         const reward = getSavedOrApiReward(selectedEgg);
 
-        if (!reward) {
-          setErrorMsg("Trứng này đã mở rồi nhưng API chưa trả lại acc để xem lại. Vui lòng liên hệ hỗ trợ.");
+        if (reward) {
+          setRedemptionInfo(
+            createClaimedRedemption(selectedEntry, selectedEgg, choice, reward, soNgayCho)
+          );
+          setErrorMsg("");
+          setStatus(
+            choice === LUA_CHON_NHAN_NGAY
+              ? GIFT_CODE_STATUS.claimedNow
+              : GIFT_CODE_STATUS.claimedLater
+          );
           return;
         }
-
-        setRedemptionInfo(
-          createClaimedRedemption(selectedEntry, selectedEgg, choice, reward, soNgayCho)
-        );
-        setErrorMsg("");
-        setStatus(
-          choice === LUA_CHON_NHAN_NGAY
-            ? GIFT_CODE_STATUS.claimedNow
-            : GIFT_CODE_STATUS.claimedLater
-        );
-        return;
       }
 
       if (
         choice === LUA_CHON_CHO_NHAN_THUONG_XIN &&
+        !selectedEgg.isClaimed &&
         (!selectedEgg.hatchAt || !isEggReady(selectedEgg))
       ) {
         setRedemptionInfo({
