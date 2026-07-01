@@ -1,13 +1,11 @@
 import { AccountRewardCard } from "./AccountRewardCard";
-import { getRewardTier, RewardTierEggBadge } from "./RewardTierEggBadge";
+import { RewardTierEggBadge } from "./RewardTierEggBadge";
 
 export function InstantRewardPage({
   redemptionInfo,
   onReset,
   backLabel = "Quay lại xem trứng",
 }) {
-  const rewardTier = getRewardTier(redemptionInfo);
-
   return (
     <section className="gift-panel gift-panel--result">
       <div className="incubating-page__hero">
@@ -15,7 +13,7 @@ export function InstantRewardPage({
           <p className="eyebrow">Trứng đã nở</p>
           <h2>Nhận acc thành công</h2>
         </div>
-        <RewardTierEggBadge tier={rewardTier} />
+        <RewardTierEggBadge redemptionInfo={redemptionInfo} />
       </div>
 
       <div className="result-summary">

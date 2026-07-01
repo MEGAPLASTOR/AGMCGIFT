@@ -168,7 +168,10 @@ export function useGiftCode(catalogData) {
     }),
     [selectedEntry]
   );
-  const choiceEggs = selectedEntry?.eggsByChoice || {};
+  const choiceEggs = useMemo(
+    () => selectedEntry?.eggsByChoice || {},
+    [selectedEntry]
+  );
 
   const checkCode = useCallback(async (inputCode) => {
     const trimmedCode = inputCode.trim().toUpperCase();
@@ -314,6 +317,7 @@ export function useGiftCode(catalogData) {
     try {
       const claimPayload = await claimEggById(redemptionInfo.eggId);
       const reward = normalizeClaimEggResponse(claimPayload);
+      const eggId = redemptionInfo.eggId;
 
       setRedemptionInfo((current) => {
         const nextRedemption = {
@@ -325,11 +329,9 @@ export function useGiftCode(catalogData) {
         };
 
         saveStoredRedemption(nextRedemption);
-        setSelectedEntry((currentEntry) =>
-          markEggClaimed(currentEntry, current?.eggId, reward)
-        );
         return nextRedemption;
       });
+      setSelectedEntry((currentEntry) => markEggClaimed(currentEntry, eggId, reward));
     } catch (error) {
       setErrorMsg(getEggClaimErrorMessage(error));
     } finally {

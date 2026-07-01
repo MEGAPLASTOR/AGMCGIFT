@@ -3,7 +3,7 @@ import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 
 const DIAMOND_TIERS = new Set(["A", "B", "C"]);
 
-export function getRewardTier(redemptionInfo) {
+function getRewardTier(redemptionInfo) {
   return String(
     redemptionInfo?.reward?.tier ||
       redemptionInfo?.account?.tier ||
@@ -14,8 +14,8 @@ export function getRewardTier(redemptionInfo) {
     .toUpperCase();
 }
 
-export function RewardTierEggBadge({ tier }) {
-  const isDiamond = DIAMOND_TIERS.has(String(tier || "").trim().toUpperCase());
+export function RewardTierEggBadge({ redemptionInfo }) {
+  const isDiamond = DIAMOND_TIERS.has(getRewardTier(redemptionInfo));
 
   return (
     <span

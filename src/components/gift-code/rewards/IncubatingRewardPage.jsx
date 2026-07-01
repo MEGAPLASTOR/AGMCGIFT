@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { AccountRewardCard } from "./AccountRewardCard";
 import { CountdownTimer } from "./CountdownTimer";
-import { getRewardTier, RewardTierEggBadge } from "./RewardTierEggBadge";
+import { RewardTierEggBadge } from "./RewardTierEggBadge";
 
 export function IncubatingRewardPage({
   redemptionInfo,
@@ -15,7 +15,6 @@ export function IncubatingRewardPage({
   const isReady = redemptionInfo.isReady || isCountdownComplete;
   const hasReward = Boolean(redemptionInfo.reward || redemptionInfo.account);
   const eggName = "Trứng bí ẩn";
-  const rewardTier = getRewardTier(redemptionInfo);
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
   }, []);
@@ -34,7 +33,7 @@ export function IncubatingRewardPage({
           </h2>
         </div>
         {hasReward ? (
-          <RewardTierEggBadge tier={rewardTier} />
+          <RewardTierEggBadge redemptionInfo={redemptionInfo} />
         ) : (
           <span className="mystery-egg mystery-egg--small" aria-hidden="true">?</span>
         )}
