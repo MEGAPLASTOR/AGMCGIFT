@@ -385,20 +385,31 @@ function mergeAdminRawRows(raw) {
 
 export async function fetchAdminRawTables(authHeader) {
   const results = await Promise.allSettled(
-    RAW_ENDPOINTS.map(async ([key, endpoint]) => [
-      key,
-      await fetchAdminRawEndpoint(key, endpoint, authHeader),
-    ])
+    RAW_ENDPOINTS.map(async ([key, endpoint]) => {
+      const rows = await fetchAdminRawEndpoint(key, endpoint, authHeader);
+      const detailPromise =
+        key === "giftPools" && rows.length
+          ? fetchAdminGiftPoolDetails(rows, authHeader)
+          : null;
+
+      return [key, rows, detailPromise];
+    })
   );
   const raw = {};
   const errors = [];
+  let giftPoolDetailPromise = null;
 
   results.forEach((result, index) => {
     const [key, endpoint] = RAW_ENDPOINTS[index];
 
     if (result.status === "fulfilled") {
-      const [, rows] = result.value;
+      const [, rows, detailPromise] = result.value;
       raw[key] = rows;
+
+      if (key === "giftPools") {
+        giftPoolDetailPromise = detailPromise;
+      }
+
       return;
     }
 
@@ -424,8 +435,8 @@ export async function fetchAdminRawTables(authHeader) {
     );
   }
 
-  if (raw.giftPools?.length) {
-    const detailResult = await fetchAdminGiftPoolDetails(raw.giftPools, authHeader);
+  if (raw.giftPools?.length && giftPoolDetailPromise) {
+    const detailResult = await giftPoolDetailPromise;
 
     raw.giftPools = detailResult.pools;
 

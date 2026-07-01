@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { startTransition, useCallback, useMemo, useRef, useState } from "react";
 import {
   createAdminTableState,
   getRecordId,
@@ -6,11 +6,12 @@ import {
 import { fetchAdminRawTables } from "../services/adminRawDataService";
 
 // Admin CRUD state manager.
-// Các thao tác lưu/xóa được nối với service tương ứng ở trang admin.
 export function useAdminDataTables(sourceTables) {
   const [tables, setTables] = useState(() => createAdminTableState(sourceTables));
   const [isLoadingRawData, setIsLoadingRawData] = useState(false);
   const [rawDataError, setRawDataError] = useState("");
+  const inFlightLoadRef = useRef(null);
+  const activeLoadIdRef = useRef(0);
 
   const tableCounts = useMemo(
     () =>
@@ -55,7 +56,7 @@ export function useAdminDataTables(sourceTables) {
     }));
   };
 
-  // Nhập account từ file và merge vào bảng đang hiển thị.
+  // Import accounts from file and merge them into the current tables.
   const importGiftAccounts = ({ accounts, mappings }) => {
     const existingAccountIds = new Set(
       (tables.giftAccounts || []).map((account) => account.id)
@@ -135,7 +136,7 @@ export function useAdminDataTables(sourceTables) {
     };
   };
 
-  // Fallback đổi mật khẩu khi dùng dữ liệu local.
+  // Local fallback password change.
   const changeAdminPassword = ({ adminId, currentPassword, newPassword }) => {
     const matchedAdmin = (tables.admins || []).find((admin) => admin.id === adminId);
 
@@ -169,39 +170,77 @@ export function useAdminDataTables(sourceTables) {
     async (authHeader, options = {}) => {
       const { silent = false } = options;
 
+      if (inFlightLoadRef.current) {
+        if (!silent) {
+          const sharedLoadId = activeLoadIdRef.current;
+          setIsLoadingRawData(true);
+
+          return inFlightLoadRef.current.finally(() => {
+            if (activeLoadIdRef.current === sharedLoadId) {
+              setIsLoadingRawData(false);
+            }
+          });
+        }
+
+        return inFlightLoadRef.current;
+      }
+
+      const loadId = activeLoadIdRef.current + 1;
+      activeLoadIdRef.current = loadId;
+
       if (!silent) {
         setIsLoadingRawData(true);
       }
 
-      setRawDataError("");
+      let loadPromise;
+      loadPromise = (async () => {
+        try {
+          const rawTables = await fetchAdminRawTables(authHeader);
+          const { __rawErrors: rawErrors = [], ...loadedTables } = rawTables;
+          const nextTables = createAdminTableState({
+            ...sourceTables,
+            ...loadedTables,
+          });
 
-      try {
-        const rawTables = await fetchAdminRawTables(authHeader);
-        const { __rawErrors: rawErrors = [], ...loadedTables } = rawTables;
+          if (activeLoadIdRef.current === loadId) {
+            startTransition(() => {
+              setTables(nextTables);
+            });
+            setRawDataError(
+              rawErrors.length
+                ? `Một số dữ liệu chưa tải được: ${rawErrors
+                    .map((error) =>
+                      `${error.endpoint}${error.status ? ` (${error.status})` : ""}`
+                    )
+                    .join(", ")}`
+                : ""
+            );
+          }
 
-        setTables(createAdminTableState({ ...sourceTables, ...loadedTables }));
+          return rawTables;
+        } catch (error) {
+          if (activeLoadIdRef.current === loadId) {
+            const statusText = error.status ? ` (${error.status})` : "";
+            const endpointText = error.endpoint ? ` tại ${error.endpoint}` : "";
+            setRawDataError(
+              `${error.message || "Không tải được dữ liệu quản trị."}${statusText}${endpointText}`
+            );
+          }
 
-        if (rawErrors.length) {
-          setRawDataError(
-            `Một số dữ liệu chưa tải được: ${rawErrors
-              .map((error) => `${error.endpoint}${error.status ? ` (${error.status})` : ""}`)
-              .join(", ")}`
-          );
+          throw error;
+        } finally {
+          if (inFlightLoadRef.current === loadPromise) {
+            inFlightLoadRef.current = null;
+          }
+
+          if (!silent && activeLoadIdRef.current === loadId) {
+            setIsLoadingRawData(false);
+          }
         }
+      })();
 
-        return rawTables;
-      } catch (error) {
-        const statusText = error.status ? ` (${error.status})` : "";
-        const endpointText = error.endpoint ? ` tại ${error.endpoint}` : "";
-        setRawDataError(
-          `${error.message || "Không tải được dữ liệu quản trị."}${statusText}${endpointText}`
-        );
-        throw error;
-      } finally {
-        if (!silent) {
-          setIsLoadingRawData(false);
-        }
-      }
+      inFlightLoadRef.current = loadPromise;
+      return loadPromise;
     },
     [sourceTables]
   );
