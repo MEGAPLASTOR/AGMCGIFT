@@ -243,6 +243,32 @@ input::placeholder {
   filter: drop-shadow(0 18px 12px rgba(23, 19, 10, 0.22));
 }
 
+.mystery-egg {
+  display: grid;
+  width: min(76%, 210px);
+  aspect-ratio: 0.74;
+  place-items: center;
+  border: 3px solid #17130a;
+  border-radius: 50% 50% 45% 45% / 58% 58% 42% 42%;
+  background:
+    radial-gradient(circle at 36% 24%, rgba(255, 255, 255, 0.22) 0 9%, transparent 10%),
+    linear-gradient(150deg, #3a3a3a 0%, #111111 58%, #000000 100%);
+  box-shadow:
+    inset -18px -24px 0 rgba(0, 0, 0, 0.34),
+    0 18px 12px rgba(23, 19, 10, 0.22);
+  color: #fff8bf;
+  font-size: clamp(62px, 8vw, 96px);
+  font-weight: 1000;
+  line-height: 1;
+  user-select: none;
+}
+
+.mystery-egg--small {
+  flex: 0 0 auto;
+  width: min(30vw, 160px);
+  font-size: clamp(54px, 7vw, 76px);
+}
+
 .reward-egg-card__content {
   position: relative;
   z-index: 1;

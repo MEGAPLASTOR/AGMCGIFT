@@ -17,7 +17,7 @@ export function GiftCodeEntryPanel({
       <div className="code-entry-header">
         <div>
           <span>Mã đơn hàng</span>
-          <strong>Nhập mã đơn để mở lượt chọn trứng</strong>
+          <strong>Nhập mã đơn để nhận trứng</strong>
         </div>
         <div className="code-entry-status" aria-hidden="true">
           <span />

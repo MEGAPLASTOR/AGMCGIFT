@@ -132,6 +132,13 @@
   transform: scale(1.2);
 }
 
+.stage-hanging-egg .mystery-egg--stage {
+  position: relative;
+  z-index: 2;
+  width: min(86%, 210px);
+  transform: scale(1.04);
+}
+
 .stage-info-modules {
   position: relative;
   z-index: 1;

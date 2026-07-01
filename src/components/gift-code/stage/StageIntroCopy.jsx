@@ -4,8 +4,8 @@ export function StageIntroCopy({ daysToWait }) {
       <p className="eyebrow">Sự kiện mở trứng</p>
       <h1>Săn acc Blox Fruit trong ổ trứng may mắn</h1>
       <p>
-        Nhập code, chọn trứng và để hệ thống random. Trứng nhận ngay nở liền,
-        trứng ấp {daysToWait} ngày giữ phần thưởng xịn hơn.
+        Nhập code để nhận trứng. Trứng mở ngay nở liền, trứng bí ẩn ấp {daysToWait} ngày
+        mới mở được phần thưởng.
       </p>
     </div>
   );

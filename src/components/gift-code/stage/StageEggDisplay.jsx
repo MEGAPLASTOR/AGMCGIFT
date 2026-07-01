@@ -1,5 +1,4 @@
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
-import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 
 export function StageEggDisplay({ selectedEgg, onSelectEgg }) {
   return (
@@ -18,12 +17,12 @@ export function StageEggDisplay({ selectedEgg, onSelectEgg }) {
         <button
           type="button"
           className={`stage-hanging-egg stage-hanging-egg--diamond ${
-            selectedEgg === "diamond" ? "stage-hanging-egg--selected" : ""
+            selectedEgg === "mystery" ? "stage-hanging-egg--selected" : ""
           }`}
-          onClick={() => onSelectEgg("diamond")}
-          aria-label="Chọn trứng kim cương"
+          onClick={() => onSelectEgg("mystery")}
+          aria-label="Trứng bí ẩn 15 ngày"
         >
-          <img src={eggPremium15Days} alt="" />
+          <span className="mystery-egg mystery-egg--stage" aria-hidden="true">?</span>
         </button>
       </div>
     </div>

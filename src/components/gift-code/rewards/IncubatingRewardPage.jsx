@@ -1,5 +1,4 @@
 import { useCallback, useState } from "react";
-import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 import { AccountRewardCard } from "./AccountRewardCard";
 import { CountdownTimer } from "./CountdownTimer";
 
@@ -13,8 +12,7 @@ export function IncubatingRewardPage({
   const [isCountdownComplete, setIsCountdownComplete] = useState(false);
   const isReady = redemptionInfo.isReady || isCountdownComplete;
   const hasReward = Boolean(redemptionInfo.reward || redemptionInfo.account);
-  const eggName =
-    redemptionInfo.eggSlot === 1 ? "Trứng vàng" : "Trứng kim cương";
+  const eggName = "Trứng bí ẩn";
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
   }, []);
@@ -23,10 +21,16 @@ export function IncubatingRewardPage({
     <section className="gift-panel gift-panel--result gift-panel--incubating">
       <div className="incubating-page__hero">
         <div>
-          <p className="eyebrow">{eggName} đang ấp</p>
-          <h2>Đợi đủ ngày để nhận acc</h2>
+          <p className="eyebrow">{hasReward ? `${eggName} đã mở` : `${eggName} 15 ngày`}</p>
+          <h2>
+            {hasReward
+              ? "Nhận acc thành công"
+              : isReady
+                ? "Mở để nhận acc"
+                : "Đợi đủ cooldown để mở"}
+          </h2>
         </div>
-        <img src={eggPremium15Days} alt="" />
+        {!hasReward ? <span className="mystery-egg mystery-egg--small" aria-hidden="true">?</span> : null}
       </div>
 
       <div className="result-summary">
@@ -46,10 +50,10 @@ export function IncubatingRewardPage({
         ) : (
           <>
             <p className="message message--success">
-              {eggName} đã sẵn sàng. Bấm mở để nhận acc.
+              {eggName} đã hết cooldown. Bấm mở để nhận acc.
             </p>
             <button type="button" onClick={onClaimReady} disabled={isClaiming}>
-              {isClaiming ? "Đang mở trứng..." : `Mở ${eggName.toLowerCase()}`}
+              {isClaiming ? "Đang mở trứng..." : "Mở trứng bí ẩn"}
             </button>
           </>
         )
@@ -60,7 +64,7 @@ export function IncubatingRewardPage({
             onComplete={handleCountdownComplete}
           />
           <p className="message message--warning">
-            Acc xịn đã được giữ lại. Khi đếm ngược về 0, trứng sẽ sẵn sàng mở.
+            Trứng đang được che lại. Khi đếm ngược về 0, bạn mới mở được phần thưởng.
           </p>
         </>
       )}

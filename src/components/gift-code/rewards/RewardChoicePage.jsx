@@ -1,5 +1,10 @@
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
-import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
+
+function isReadyToOpen(egg) {
+  if (!egg?.hatchAt) return true;
+
+  return new Date(egg.hatchAt).getTime() <= Date.now();
+}
 
 export function RewardChoicePage({
   code,
@@ -18,6 +23,7 @@ export function RewardChoicePage({
   const canClaimLater = availableChoices?.later ?? true;
   const instantOpened = Boolean(instantEgg?.isClaimed);
   const delayedOpened = Boolean(delayedEgg?.isClaimed);
+  const delayedReady = isReadyToOpen(delayedEgg);
   const instantNeedsIncubation = Boolean(instantEgg?.requiresIncubation);
   const instantActionLabel = instantOpened
     ? "Xem acc"
@@ -36,13 +42,13 @@ export function RewardChoicePage({
   const delayedDescription = delayedOpened
     ? "Trứng này đã mở, bấm để xem lại acc."
     : !canClaimLater
-      ? "Không có trứng kim cương cho mã này."
-      : delayedEgg?.requiresIncubation === false
-        ? "Trứng đã sẵn sàng mở."
-        : "Ấp đủ ngày để mở phần thưởng xịn hơn.";
+      ? "Không có trứng ấp 15 ngày cho mã này."
+      : delayedReady
+        ? "Hết cooldown, bấm mở để random phần thưởng."
+        : "Đang ấp, chưa lộ trứng vàng hay kim cương.";
   const delayedActionLabel = delayedOpened
     ? "Xem acc"
-    : delayedEgg?.requiresIncubation === false
+    : delayedReady
       ? isClaiming
         ? "Đang mở..."
         : "Mở trứng"
@@ -59,8 +65,8 @@ export function RewardChoicePage({
       </div>
 
       <p className="panel-note">
-        Sản phẩm: <strong>{productName}</strong>. Acc vẫn đang ẩn, chỉ random
-        sau khi bạn chọn trứng.
+        Sản phẩm: <strong>{productName}</strong>. Mã này có thể nhận cả trứng mở ngay
+        và trứng bí ẩn 15 ngày nếu đơn có đủ trứng.
       </p>
 
       <div className="reward-egg-grid">
@@ -89,11 +95,11 @@ export function RewardChoicePage({
           onClick={onClaimLater}
         >
           <span className="reward-egg-card__image">
-            <img src={eggPremium15Days} alt="" />
+            <span className="mystery-egg" aria-hidden="true">?</span>
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>Trứng kim cương</strong>
+              <strong>{delayedOpened ? "Trứng đã mở" : "Trứng bí ẩn 15 ngày"}</strong>
               <span>{delayedDescription}</span>
             </span>
             <em>{delayedActionLabel}</em>
