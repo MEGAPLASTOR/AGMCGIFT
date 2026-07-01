@@ -314,6 +314,11 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
           order.fulfillment,
           order.total,
           order.product,
+          ...(order.products || []).flatMap((product) => [
+            product.name,
+            product.sku,
+            product.quantity,
+          ]),
           order.createdAt,
         ]
           .map(normalizeStatus)
@@ -500,7 +505,38 @@ export function AdminAnalyticsPanel({ dashboard, isRefreshing = false, onRefresh
                         </span>
                       </td>
                       <td>{order.total || "0 ₫"}</td>
-                      <td>{order.product || "-"}</td>
+                      <td>
+                        {order.products?.length ? (
+                          <div className="admin-dark-order-products">
+                            {order.products.map((product, index) => (
+                              <div
+                                className="admin-dark-order-product"
+                                key={`${order.code}-${product.sku}-${index}`}
+                              >
+                                <div className="admin-dark-order-product__image">
+                                  {product.imageUrl ? (
+                                    <img
+                                      alt={product.name || "SP"}
+                                      src={product.imageUrl}
+                                    />
+                                  ) : (
+                                    <span>SP</span>
+                                  )}
+                                </div>
+                                <div>
+                                  <strong>{product.name || "-"}</strong>
+                                  <span>
+                                    SKU: {product.sku || "-"} - SL:{" "}
+                                    {formatNumber(product.quantity)}
+                                  </span>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          order.product || "-"
+                        )}
+                      </td>
                       <td>{order.createdAt || order.updatedAt || "-"}</td>
                     </tr>
                   );

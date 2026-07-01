@@ -4284,6 +4284,47 @@
   color: #37e6ff;
 }
 
+.admin-dark-order-products {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-dark-order-product {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+}
+
+.admin-dark-order-product__image {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #202329;
+}
+
+.admin-dark-order-product__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-dark-order-product__image span,
+.admin-dark-order-product span {
+  color: #aab7c8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-dark-order-product strong {
+  display: block;
+  color: #ffffff;
+  line-height: 1.25;
+}
+
 .admin-dark-status {
   display: inline-flex;
   align-items: center;

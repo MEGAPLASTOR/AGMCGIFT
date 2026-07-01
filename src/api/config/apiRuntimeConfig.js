@@ -26,6 +26,6 @@ export function getApiBaseUrl() {
   return normalizeApiBaseUrl(
     import.meta.env.VITE_API_BASE_URL ||
       getRuntimeApiBaseUrl() ||
-      (import.meta.env.DEV ? DEFAULT_DEV_API_BASE_URL : "")
+      DEFAULT_DEV_API_BASE_URL
   );
 }

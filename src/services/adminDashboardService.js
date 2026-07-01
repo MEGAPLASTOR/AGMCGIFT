@@ -302,7 +302,12 @@ export function authenticateAdmin(tables, username, password) {
 }
 
 function getOrderItemMap(orderItems) {
-  return new Map(orderItems.map((item) => [item.order_id, item]));
+  return orderItems.reduce((map, item) => {
+    const items = map.get(item.order_id) || [];
+    items.push(item);
+    map.set(item.order_id, items);
+    return map;
+  }, new Map());
 }
 
 function getPoolAccountCount(poolAccountMappings) {
@@ -683,12 +688,19 @@ export function buildAdminDashboard(tables) {
       })
       .slice(0, 10)
       .map((order) => {
-      const item = orderItemMap.get(order.id);
+      const items = orderItemMap.get(order.id) || [];
+      const products = items.map((item) => ({
+        name: item.product_name || "-",
+        sku: item.sku || "-",
+        quantity: Number(item.quantity || 0),
+        imageUrl: item.image_url || "",
+      }));
 
       return {
         code: order.order_code,
         customer: order.customer_code || "-",
-        product: item?.product_name || "-",
+        product: products.map((item) => item.name).join(", ") || "-",
+        products,
         status: order.status,
         fulfillment: order.fulfillment_status,
         total: formatCurrency(order.total_price),

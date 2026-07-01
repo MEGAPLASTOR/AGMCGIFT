@@ -245,8 +245,15 @@ function normalizeOrderItems(orders) {
       order_id: order.id,
       kv_product_id: item.kvProductId || item.kv_product_id || "",
       kv_variant_id: "",
-      product_name: item.productName || "",
-      sku: item.sku || "",
+      product_name:
+        item.productName ||
+        item.product_name ||
+        item.fullName ||
+        item.full_name ||
+        item.name ||
+        "",
+      sku: item.sku || item.code || "",
+      image_url: item.imageUrl || item.image_url || item.image || "",
       quantity: Number(item.quantity || 0),
     }))
   );
