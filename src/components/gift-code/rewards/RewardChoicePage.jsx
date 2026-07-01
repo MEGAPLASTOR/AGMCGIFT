@@ -16,15 +16,37 @@ export function RewardChoicePage({
 }) {
   const canClaimNow = availableChoices?.now ?? true;
   const canClaimLater = availableChoices?.later ?? true;
+  const instantOpened = Boolean(instantEgg?.isClaimed);
+  const delayedOpened = Boolean(delayedEgg?.isClaimed);
   const instantNeedsIncubation = Boolean(instantEgg?.requiresIncubation);
-  const instantActionLabel = instantNeedsIncubation
-    ? `Ấp ${daysToWait} ngày`
-    : isClaiming
-      ? "Đang mở..."
-      : "Nhận ngay";
-  const instantDescription = instantNeedsIncubation
-    ? "Trứng này cần chờ đủ cooldown trước khi mở."
-    : "Nhận acc ngay sau khi random.";
+  const instantActionLabel = instantOpened
+    ? "Xem acc"
+    : instantNeedsIncubation
+      ? `Ấp ${daysToWait} ngày`
+      : isClaiming
+        ? "Đang mở..."
+        : "Nhận ngay";
+  const instantDescription = instantOpened
+    ? "Trứng này đã mở, bấm để xem lại acc."
+    : !canClaimNow
+      ? "Mã này đã mở trứng kim cương."
+      : instantNeedsIncubation
+        ? "Trứng này cần chờ đủ cooldown trước khi mở."
+        : "Nhận acc ngay sau khi random.";
+  const delayedDescription = delayedOpened
+    ? "Trứng này đã mở, bấm để xem lại acc."
+    : !canClaimLater
+      ? "Mã này đã mở trứng vàng."
+      : delayedEgg?.requiresIncubation === false
+        ? "Trứng đã sẵn sàng mở."
+        : "Ấp đủ ngày để mở phần thưởng xịn hơn.";
+  const delayedActionLabel = delayedOpened
+    ? "Xem acc"
+    : delayedEgg?.requiresIncubation === false
+      ? isClaiming
+        ? "Đang mở..."
+        : "Mở trứng"
+      : `Ấp ${daysToWait} ngày`;
 
   return (
     <section className="gift-panel reward-choice-page">
@@ -72,17 +94,9 @@ export function RewardChoicePage({
           <span className="reward-egg-card__content">
             <span>
               <strong>Trứng kim cương</strong>
-              <span>
-                {delayedEgg?.requiresIncubation === false
-                  ? "Trứng đã sẵn sàng mở."
-                  : "Ấp đủ ngày để mở phần thưởng xịn hơn."}
-              </span>
+              <span>{delayedDescription}</span>
             </span>
-            <em>
-              {delayedEgg?.requiresIncubation === false
-                ? "Mở trứng"
-                : `Ấp ${daysToWait} ngày`}
-            </em>
+            <em>{delayedActionLabel}</em>
           </span>
         </button>
       </div>
