@@ -114,9 +114,9 @@
   animation: stage-egg-shake-gold 2.35s ease-in-out infinite;
 }
 
-.stage-hanging-egg--diamond {
+.stage-hanging-egg--mystery {
   margin-left: clamp(-58px, -4vw, -24px);
-  animation: stage-egg-shake-diamond 2.55s ease-in-out infinite;
+  animation: stage-egg-shake-mystery 2.55s ease-in-out infinite;
 }
 
 .stage-hanging-egg img {

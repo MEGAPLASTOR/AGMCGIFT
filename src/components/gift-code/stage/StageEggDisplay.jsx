@@ -16,7 +16,7 @@ export function StageEggDisplay({ selectedEgg, onSelectEgg }) {
         </button>
         <button
           type="button"
-          className={`stage-hanging-egg stage-hanging-egg--diamond ${
+          className={`stage-hanging-egg stage-hanging-egg--mystery ${
             selectedEgg === "mystery" ? "stage-hanging-egg--selected" : ""
           }`}
           onClick={() => onSelectEgg("mystery")}
