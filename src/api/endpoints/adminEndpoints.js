@@ -34,6 +34,12 @@ export function getAdminProductEggMappingEndpoint(id) {
   return `${ADMIN_ENDPOINTS.productEggMappings}/${encodeURIComponent(id)}`;
 }
 
+export function getAdminProductEggMappingRatesEndpoint(productId) {
+  return `${ADMIN_ENDPOINTS.productEggMappings}/products/${encodeURIComponent(
+    productId
+  )}/rates`;
+}
+
 export function getAdminEggHatchTimeEndpoint(id) {
   return `${ADMIN_ENDPOINTS.eggs}/${encodeURIComponent(id)}/hatch-time`;
 }

@@ -3927,6 +3927,11 @@
   gap: 8px;
 }
 
+.admin-product-row-actions {
+  display: grid;
+  gap: 8px;
+}
+
 .admin-product-mapping-list > span {
   display: inline-flex;
   align-items: center;
@@ -4855,6 +4860,13 @@
 
 .admin-customer-return-streak.is-warning {
   color: #ff827a;
+}
+
+.admin-product-mapping-pill > small,
+.admin-product-rate-total {
+  color: #82b4ff;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .admin-customer-edit-button {

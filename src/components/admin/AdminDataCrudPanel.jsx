@@ -833,6 +833,7 @@ export function AdminDataCrudPanel({
   onUpdateCustomerStatus,
   onSaveProductEggMapping,
   onDeleteProductEggMapping,
+  onUpdateProductEggMappingRates,
   onUpdateEggHatchTime,
   onImportGiftAccounts,
   onUploadGiftAccounts,
@@ -1515,6 +1516,7 @@ export function AdminDataCrudPanel({
         onSaveProductEggMapping={onSaveProductEggMapping}
         onSaveRecord={onSaveRecord}
         onSyncProducts={onSyncProducts}
+        onUpdateProductEggMappingRates={onUpdateProductEggMappingRates}
       />
     );
   }

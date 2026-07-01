@@ -47,6 +47,7 @@ import {
 import {
   deleteAdminProductEggMapping,
   linkAdminProductEggMapping,
+  updateAdminProductEggMappingRates,
 } from "../../services/adminProductEggMappingService";
 import { syncAllAdminProducts } from "../../services/adminProductService";
 
@@ -201,13 +202,19 @@ function findProductEggMappingRow(tables, record) {
   const poolId = normalizeComparable(
     record.gift_pool_id || record.pool_id || record.poolId
   );
-  const eggType = Number(record.egg_type || record.eggType);
 
   return (tables.productEggMappings || []).find(
     (mapping) =>
       normalizeComparable(mapping.kv_product_id) === productId &&
-      normalizeComparable(mapping.gift_pool_id) === poolId &&
-      Number(mapping.egg_type) === eggType
+      normalizeComparable(mapping.gift_pool_id) === poolId
+  );
+}
+
+function findProductEggMappingRows(tables, productId) {
+  const normalizedProductId = normalizeComparable(productId);
+
+  return (tables.productEggMappings || []).filter(
+    (mapping) => normalizeComparable(mapping.kv_product_id) === normalizedProductId
   );
 }
 
@@ -570,6 +577,23 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleUpdateProductEggMappingRates = async (productId, mappings) => {
+    try {
+      await updateAdminProductEggMappingRates(
+        productId,
+        mappings,
+        admin.authHeader
+      );
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+
+      return findProductEggMappingRows(rawTables, productId);
+    } catch (updateError) {
+      handleAuthError(updateError);
+      throw updateError;
+    }
+  };
+
   const handleUpdateEggHatchTime = async (eggId, hatchAt) => {
     try {
       const fallbackEgg = await updateAdminEggHatchTime(
@@ -743,6 +767,7 @@ export default function AdminDashboardPage() {
               onUpdateCustomerStatus={handleUpdateCustomerStatus}
               onSaveProductEggMapping={handleSaveProductEggMapping}
               onDeleteProductEggMapping={handleDeleteProductEggMapping}
+              onUpdateProductEggMappingRates={handleUpdateProductEggMappingRates}
               onUpdateEggHatchTime={handleUpdateEggHatchTime}
               onImportGiftAccounts={adminTables.importGiftAccounts}
               onUploadGiftAccounts={handleUploadGiftAccounts}

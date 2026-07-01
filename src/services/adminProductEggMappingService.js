@@ -1,6 +1,7 @@
 import {
   ADMIN_ENDPOINTS,
   getAdminProductEggMappingEndpoint,
+  getAdminProductEggMappingRatesEndpoint,
 } from "../api/endpoints/adminEndpoints";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { requestJson } from "../api/http/requestJson";
@@ -28,7 +29,6 @@ function getResponseRecord(payload) {
 function buildProductEggMappingPayload(record) {
   const productId = Number(record.productId || record.kvProductId || record.kv_product_id);
   const poolId = normalizeText(record.poolId || record.pool_id || record.gift_pool_id);
-  const eggType = Number(record.eggType || record.egg_type);
 
   if (!Number.isFinite(productId) || productId <= 0) {
     throw new Error("Vui lòng nhập kv_product_id hợp lệ.");
@@ -38,39 +38,36 @@ function buildProductEggMappingPayload(record) {
     throw new Error("Vui lòng nhập gift_pool_id.");
   }
 
-  if (![1, 2].includes(eggType)) {
-    throw new Error("egg_type chỉ được là 1 hoặc 2.");
-  }
-
-  return { productId, poolId, eggType };
+  return { productId, poolId };
 }
 
 function normalizeProductEggMapping(record, fallback = {}) {
   const source = record || {};
   const giftPool = source.giftPool || source.gift_pool || {};
+  const productId =
+    source.productId ||
+    source.kvProductId ||
+    source.kv_product_id ||
+    fallback.kv_product_id ||
+    fallback.productId ||
+    "";
+  const poolId =
+    source.poolId ||
+    source.pool_id ||
+    source.giftPoolId ||
+    source.gift_pool_id ||
+    giftPool.id ||
+    fallback.gift_pool_id ||
+    "";
 
   return {
-    id:
-      source.id ||
-      fallback.id ||
-      `${source.productId || fallback.productId || fallback.kv_product_id || ""}:${source.eggType || fallback.egg_type || ""}`,
-    kv_product_id: String(
-      source.productId ||
-        source.kvProductId ||
-        source.kv_product_id ||
-        fallback.kv_product_id ||
-        ""
-    ),
+    id: source.id || fallback.id || `${productId}:${poolId}`,
+    kv_product_id: String(productId),
     kv_variant_id: source.kv_variant_id || fallback.kv_variant_id || "",
     egg_type: Number(source.eggType || source.egg_type || fallback.egg_type || 0),
-    gift_pool_id:
-      source.poolId ||
-      source.pool_id ||
-      source.gift_pool_id ||
-      giftPool.id ||
-      fallback.gift_pool_id ||
-      "",
+    gift_pool_id: poolId,
     egg_tier: source.eggTier || source.egg_tier || giftPool.tier || fallback.egg_tier || "",
+    rate: Number(source.rate ?? source.ratePercent ?? source.rate_percent ?? fallback.rate ?? 0),
     created_at: source.createdAt || source.created_at || fallback.created_at || null,
     updated_at: source.updatedAt || source.updated_at || fallback.updated_at || null,
   };
@@ -90,8 +87,49 @@ export async function linkAdminProductEggMapping(record, authHeader) {
     ...record,
     kv_product_id: String(requestBody.productId),
     gift_pool_id: requestBody.poolId,
-    egg_type: requestBody.eggType,
   });
+}
+
+function buildProductEggMappingRatesPayload(mappings) {
+  const payload = (Array.isArray(mappings) ? mappings : [])
+    .map((mapping) => ({
+      mappingId: normalizeText(mapping.mappingId || mapping.id),
+      rate: Number(mapping.rate),
+    }))
+    .filter((mapping) => mapping.mappingId);
+
+  if (!payload.length) {
+    throw new Error("Vui lòng chọn mapping cần cập nhật tỉ lệ.");
+  }
+
+  payload.forEach((mapping) => {
+    if (!Number.isFinite(mapping.rate) || mapping.rate < 0) {
+      throw new Error("Tỉ lệ mapping phải là số không âm.");
+    }
+  });
+
+  return payload;
+}
+
+export async function updateAdminProductEggMappingRates(productId, mappings, authHeader) {
+  const normalizedProductId = Number(productId);
+
+  if (!Number.isFinite(normalizedProductId) || normalizedProductId <= 0) {
+    throw new Error("Vui lòng chọn sản phẩm hợp lệ để cập nhật tỉ lệ.");
+  }
+
+  const endpoint = getAdminProductEggMappingRatesEndpoint(normalizedProductId);
+  const requestBody = buildProductEggMappingRatesPayload(mappings);
+
+  await requestJson(endpoint, {
+    method: "PUT",
+    body: requestBody,
+    headers: {
+      Authorization: requireAuthHeader(authHeader, endpoint),
+    },
+  });
+
+  return requestBody;
 }
 
 export function deleteAdminProductEggMapping(id, authHeader) {

@@ -266,20 +266,22 @@ function normalizeProductEggMappings(products) {
       const eggType = Number(mapping.eggType ?? mapping.egg_type ?? 0);
       const productId =
         product.kvProductId || product.kv_product_id || product.productId || "";
+      const poolId =
+        mapping.poolId ||
+        mapping.pool_id ||
+        mapping.giftPoolId ||
+        mapping.gift_pool_id ||
+        giftPool.id ||
+        "";
 
       return {
-        id: mapping.id || `${productId}:${eggType}`,
+        id: mapping.id || `${productId}:${poolId || mapping.eggTier || eggType}`,
         kv_product_id: String(productId),
         kv_variant_id: mapping.kvVariantId || mapping.kv_variant_id || "",
         egg_type: eggType,
-        gift_pool_id:
-          mapping.poolId ||
-          mapping.pool_id ||
-          mapping.giftPoolId ||
-          mapping.gift_pool_id ||
-          giftPool.id ||
-          "",
+        gift_pool_id: poolId,
         egg_tier: mapping.eggTier || mapping.egg_tier || giftPool.tier || "",
+        rate: Number(mapping.rate ?? mapping.ratePercent ?? mapping.rate_percent ?? 0),
         created_at: normalizeDate(mapping.createdAt || mapping.created_at),
         updated_at: normalizeDate(mapping.updatedAt || mapping.updated_at),
       };

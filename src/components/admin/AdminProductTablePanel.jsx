@@ -1,25 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   FaCloudArrowDown,
   FaLink,
   FaMagnifyingGlass,
+  FaPercent,
   FaRotateRight,
   FaXmark,
 } from "react-icons/fa6";
 
 const EMPTY_ROWS = [];
-const EGG_TYPES = [
-  {
-    value: 1,
-    label: "T1 (Nhận ngay)",
-    optionLabel: "T1 (Nhận ngay) - Trứng thưởng",
-  },
-  {
-    value: 2,
-    label: "T2 (Cần ấp)",
-    optionLabel: "T2 (Cần ấp) - Trứng kim cương",
-  },
-];
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -57,20 +46,12 @@ function getMappingProductId(mapping) {
 }
 
 function getMappingId(mapping) {
-  return normalizeText(mapping?.id) || `${getMappingProductId(mapping)}:${mapping?.egg_type}`;
-}
-
-function getEggTypeValue(value) {
-  const eggType = Number(value);
-
-  return EGG_TYPES.some((type) => type.value === eggType) ? eggType : 0;
-}
-
-function getEggTypeOrder(value) {
-  const eggType = getEggTypeValue(value);
-  const order = EGG_TYPES.findIndex((type) => type.value === eggType);
-
-  return order >= 0 ? order : Number.MAX_SAFE_INTEGER;
+  return (
+    normalizeText(mapping?.id) ||
+    `${getMappingProductId(mapping)}:${normalizeText(
+      mapping?.gift_pool_id || mapping?.poolId
+    )}`
+  );
 }
 
 function getPoolId(pool) {
@@ -85,10 +66,18 @@ function formatCurrency(value) {
   return new Intl.NumberFormat("vi-VN").format(Number(value || 0));
 }
 
-function getEggTypeLabel(value) {
-  const matchedType = EGG_TYPES.find((type) => type.value === getEggTypeValue(value));
+function getMappingRate(mapping) {
+  return Number(mapping?.rate ?? mapping?.ratePercent ?? mapping?.rate_percent ?? 0);
+}
 
-  return matchedType?.label || `Trứng Loại ${value}`;
+function formatRate(value) {
+  const rate = Number(value);
+
+  if (!Number.isFinite(rate)) {
+    return "0%";
+  }
+
+  return `${rate.toFixed(1)}%`;
 }
 
 function getPoolLabel(pool) {
@@ -107,32 +96,26 @@ function getMappingPoolLabel(mapping, poolById) {
   return tier ? `${getPoolName(pool) || fallbackName} (Tier ${tier})` : fallbackName;
 }
 
-function buildMappingRecord(product, eggType, poolId) {
+function buildMappingRecord(product, poolId) {
   const productId = getProductId(product);
 
   return {
     productId,
     kvProductId: productId,
     kv_product_id: productId,
-    eggType: Number(eggType),
-    egg_type: Number(eggType),
     poolId,
     pool_id: poolId,
     gift_pool_id: poolId,
   };
 }
 
-function sortMappingsByEggType(mappings) {
+function sortMappingsByPool(mappings) {
   return [...mappings].sort((left, right) => {
-    const eggTypeDiff =
-      getEggTypeOrder(left.egg_type || left.eggType) -
-      getEggTypeOrder(right.egg_type || right.eggType);
+    const leftTier = normalizeText(left.egg_tier || left.eggTier);
+    const rightTier = normalizeText(right.egg_tier || right.eggTier);
+    const tierDiff = leftTier.localeCompare(rightTier, "vi");
 
-    if (eggTypeDiff !== 0) {
-      return eggTypeDiff;
-    }
-
-    return getMappingId(left).localeCompare(getMappingId(right), "vi");
+    return tierDiff || getMappingId(left).localeCompare(getMappingId(right), "vi");
   });
 }
 
@@ -145,13 +128,16 @@ export function AdminProductTablePanel({
   onSaveRecord,
   onDeleteRecord,
   onSyncProducts,
+  onUpdateProductEggMappingRates,
   tables,
 }) {
   const [keyword, setKeyword] = useState("");
   const [selectedProductId, setSelectedProductId] = useState("");
-  const [selectedEggType, setSelectedEggType] = useState(1);
   const [selectedPoolId, setSelectedPoolId] = useState("");
+  const [rateProductId, setRateProductId] = useState("");
+  const [draftRates, setDraftRates] = useState({});
   const [message, setMessage] = useState("");
+  const [rateMessage, setRateMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const products = tables.products || EMPTY_ROWS;
@@ -205,7 +191,7 @@ export function AdminProductTablePanel({
     });
 
     map.forEach((productMappings, productId) => {
-      map.set(productId, sortMappingsByEggType(productMappings));
+      map.set(productId, sortMappingsByPool(productMappings));
     });
 
     return map;
@@ -217,9 +203,10 @@ export function AdminProductTablePanel({
   const selectedProductMappings = selectedProductId
     ? mappingsByProductId.get(selectedProductId) || EMPTY_ROWS
     : EMPTY_ROWS;
-  const selectedExistingMapping = selectedProductMappings.find(
-    (mapping) => Number(mapping.egg_type || 0) === Number(selectedEggType)
-  );
+  const rateProduct = rateProductId ? productById.get(rateProductId) || null : null;
+  const rateProductMappings = rateProductId
+    ? mappingsByProductId.get(rateProductId) || EMPTY_ROWS
+    : EMPTY_ROWS;
 
   const filteredProducts = useMemo(
     () =>
@@ -239,10 +226,10 @@ export function AdminProductTablePanel({
           productMappings
             .map(
               (mapping) =>
-                `${getEggTypeLabel(mapping.egg_type)} ${getMappingPoolLabel(
+                `${getMappingPoolLabel(
                   mapping,
                   poolById
-                )}`
+                )} ${formatRate(getMappingRate(mapping))}`
             )
             .join(" "),
         ]
@@ -254,61 +241,42 @@ export function AdminProductTablePanel({
     [mappingsByProductId, normalizedKeyword, poolById, products]
   );
 
-  useEffect(() => {
-    if (!selectedProduct) {
-      return;
-    }
-
-    setSelectedPoolId(selectedExistingMapping?.gift_pool_id || "");
-  }, [selectedExistingMapping, selectedProduct]);
-
   const openMappingModal = (product, mapping) => {
     const productId = getProductId(product);
-    const eggType = getEggTypeValue(mapping?.egg_type) || EGG_TYPES[0].value;
 
     setSelectedProductId(productId);
-    setSelectedEggType(eggType);
     setSelectedPoolId(mapping?.gift_pool_id || "");
     setMessage("");
   };
 
   const closeMappingModal = () => {
     setSelectedProductId("");
-    setSelectedEggType(1);
+    setSelectedPoolId("");
     setMessage("");
   };
 
   const saveMapping = async () => {
     if (!selectedProduct || !selectedPoolId || isSaving) {
-      setMessage("Vui lòng chọn đủ sản phẩm, loại trứng và bể quà.");
+      setMessage("Vui lòng chọn đủ sản phẩm và bể quà.");
       return;
     }
 
     setIsSaving(true);
 
     try {
-      if (
-        selectedExistingMapping &&
-        selectedExistingMapping.gift_pool_id &&
-        selectedExistingMapping.gift_pool_id === selectedPoolId
-      ) {
+      const hasSamePool = selectedProductMappings.some(
+        (mapping) =>
+          normalizeKey(mapping.gift_pool_id || mapping.poolId) ===
+          normalizeKey(selectedPoolId)
+      );
+
+      if (hasSamePool) {
         setMessage("Ánh xạ này đã tồn tại.");
         return;
       }
 
-      if (
-        selectedExistingMapping &&
-        selectedExistingMapping.gift_pool_id &&
-        selectedExistingMapping.gift_pool_id !== selectedPoolId
-      ) {
-        const mappingId = getMappingId(selectedExistingMapping);
-
-        await onDeleteProductEggMapping?.(mappingId);
-        onDeleteRecord?.("productEggMappings", mappingId);
-      }
-
       const savedMapping = await onSaveProductEggMapping?.(
-        buildMappingRecord(selectedProduct, selectedEggType, selectedPoolId)
+        buildMappingRecord(selectedProduct, selectedPoolId)
       );
 
       if (savedMapping) {
@@ -339,6 +307,75 @@ export function AdminProductTablePanel({
       setMessage("Đã xóa ánh xạ sản phẩm.");
     } catch (error) {
       setMessage(error.message || "Không thể xóa ánh xạ sản phẩm.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const openRateModal = (product, productMappings) => {
+    const productId = getProductId(product);
+
+    setRateProductId(productId);
+    setDraftRates(
+      Object.fromEntries(
+        productMappings.map((mapping) => [
+          getMappingId(mapping),
+          String(getMappingRate(mapping)),
+        ])
+      )
+    );
+    setRateMessage("");
+  };
+
+  const closeRateModal = () => {
+    setRateProductId("");
+    setDraftRates({});
+    setRateMessage("");
+  };
+
+  const saveRates = async () => {
+    if (!rateProduct || !rateProductMappings.length || isSaving) {
+      return;
+    }
+
+    const fallbackMappings = rateProductMappings.map((mapping) => ({
+      ...mapping,
+      rate: Number(draftRates[getMappingId(mapping)] ?? 0),
+    }));
+    const totalRate = fallbackMappings.reduce(
+      (total, mapping) => total + getMappingRate(mapping),
+      0
+    );
+
+    if (fallbackMappings.some((mapping) => !Number.isFinite(getMappingRate(mapping)))) {
+      setRateMessage("Tỉ lệ phải là số.");
+      return;
+    }
+
+    if (Math.abs(totalRate - 100) > 0.01) {
+      setRateMessage("Tổng tỉ lệ phải bằng 100%.");
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const savedMappings = await onUpdateProductEggMappingRates?.(
+        getProductId(rateProduct),
+        fallbackMappings
+      );
+      const rowsToSave = Array.isArray(savedMappings) && savedMappings.length
+        ? savedMappings
+        : fallbackMappings;
+
+      rowsToSave.forEach((mapping) => {
+        onSaveRecord?.("productEggMappings", mapping);
+      });
+
+      setMessage("Đã cập nhật tỉ lệ ánh xạ.");
+      closeRateModal();
+    } catch (error) {
+      setRateMessage(error.message || "Không thể cập nhật tỉ lệ ánh xạ.");
     } finally {
       setIsSaving(false);
     }
@@ -423,27 +460,22 @@ export function AdminProductTablePanel({
                     <td>
                       {productMappings.length ? (
                         <div className="admin-product-mapping-list">
-                          {productMappings.map((mapping) => {
-                            const eggType = getEggTypeValue(mapping.egg_type);
-
-                            return (
-                              <span
-                                className={`admin-product-mapping-pill is-egg-${eggType}`}
-                                key={getMappingId(mapping)}
+                          {productMappings.map((mapping) => (
+                            <span
+                              className="admin-product-mapping-pill"
+                              key={getMappingId(mapping)}
+                            >
+                              <strong>{getMappingPoolLabel(mapping, poolById)}</strong>
+                              <small>{formatRate(getMappingRate(mapping))}</small>
+                              <button
+                                type="button"
+                                disabled={isSaving}
+                                onClick={() => deleteMapping(mapping)}
                               >
-                                <strong>{getEggTypeLabel(mapping.egg_type)}</strong>
-                                <em aria-hidden="true">-&gt;</em>
-                                <b>{getMappingPoolLabel(mapping, poolById)}</b>
-                                <button
-                                  type="button"
-                                  disabled={isSaving}
-                                  onClick={() => deleteMapping(mapping)}
-                                >
-                                  <FaXmark aria-hidden="true" />
-                                </button>
-                              </span>
-                            );
-                          })}
+                                <FaXmark aria-hidden="true" />
+                              </button>
+                            </span>
+                          ))}
                         </div>
                       ) : (
                         <span className="admin-product-no-mapping">
@@ -452,14 +484,25 @@ export function AdminProductTablePanel({
                       )}
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        className="admin-mini-button admin-product-link-button"
-                        onClick={() => openMappingModal(product, productMappings[0])}
-                      >
-                        <FaLink aria-hidden="true" />
-                        {productMappings.length ? "Thêm Ánh Xạ" : "Thêm Ánh Xạ"}
-                      </button>
+                      <div className="admin-product-row-actions">
+                        <button
+                          type="button"
+                          className="admin-mini-button admin-product-link-button"
+                          onClick={() => openMappingModal(product)}
+                        >
+                          <FaLink aria-hidden="true" />
+                          Thêm Ánh Xạ
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-mini-button admin-product-link-button"
+                          disabled={!productMappings.length}
+                          onClick={() => openRateModal(product, productMappings)}
+                        >
+                          <FaPercent aria-hidden="true" />
+                          Tỉ lệ
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -489,7 +532,7 @@ export function AdminProductTablePanel({
               <div className="admin-record-editor__head">
                 <div>
                   <strong id="admin-product-mapping-title">
-                    Tạo Ánh Xạ Sản Phẩm - Trứng
+                    Tạo Ánh Xạ Sản Phẩm - Bể Quà
                   </strong>
                   <span>{getProductId(selectedProduct)}</span>
                 </div>
@@ -507,19 +550,6 @@ export function AdminProductTablePanel({
                 <label>
                   Sản phẩm chọn
                   <input type="text" readOnly value={getProductName(selectedProduct)} />
-                </label>
-                <label>
-                  Loại trứng đẻ ra
-                  <select
-                    value={selectedEggType}
-                    onChange={(event) => setSelectedEggType(Number(event.target.value))}
-                  >
-                    {EGG_TYPES.map((type) => (
-                      <option key={type.value} value={type.value}>
-                        {type.optionLabel}
-                      </option>
-                    ))}
-                  </select>
                 </label>
                 <label>
                   Bể quà tặng liên kết
@@ -554,6 +584,90 @@ export function AdminProductTablePanel({
                 </button>
                 <button type="button" disabled={isSaving} onClick={saveMapping}>
                   {isSaving ? "Đang lưu..." : "Tạo liên kết"}
+                </button>
+              </div>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {rateProduct ? (
+        <div className="admin-modal-backdrop">
+          <section
+            className="admin-panel admin-modal admin-product-mapping-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-product-rate-title"
+          >
+            <div className="admin-product-mapping-editor">
+              <div className="admin-record-editor__head">
+                <div>
+                  <strong id="admin-product-rate-title">
+                    Chỉnh Tỉ Lệ Ánh Xạ
+                  </strong>
+                  <span>{getProductId(rateProduct)}</span>
+                </div>
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  aria-label="Đóng modal tỉ lệ ánh xạ"
+                  onClick={closeRateModal}
+                >
+                  <FaXmark aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="admin-product-mapping-form">
+                {rateProductMappings.map((mapping) => {
+                  const mappingId = getMappingId(mapping);
+
+                  return (
+                    <label key={mappingId}>
+                      {getMappingPoolLabel(mapping, poolById)}
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        step="0.1"
+                        value={draftRates[mappingId] ?? ""}
+                        onChange={(event) =>
+                          setDraftRates((currentRates) => ({
+                            ...currentRates,
+                            [mappingId]: event.target.value,
+                          }))
+                        }
+                      />
+                    </label>
+                  );
+                })}
+              </div>
+
+              <p className="admin-product-rate-total">
+                Tổng:{" "}
+                {formatRate(
+                  rateProductMappings.reduce(
+                    (total, mapping) =>
+                      total + Number(draftRates[getMappingId(mapping)] || 0),
+                    0
+                  )
+                )}
+              </p>
+
+              {rateMessage ? (
+                <p className="admin-crud-message">{rateMessage}</p>
+              ) : null}
+
+              <div className="admin-crud-actions admin-product-mapping-actions">
+                <button
+                  type="button"
+                  className="admin-light-button"
+                  disabled={isSaving}
+                  onClick={closeRateModal}
+                >
+                  Hủy
+                </button>
+                <button type="button" disabled={isSaving} onClick={saveRates}>
+                  {isSaving ? "Đang lưu..." : "Lưu tỉ lệ"}
                 </button>
               </div>
             </div>
