@@ -17,7 +17,7 @@
   }
 }
 
-@keyframes stage-egg-shake-mystery {
+@keyframes stage-egg-shake-diamond {
   0%,
   100% {
     transform: translateY(0) rotate(1.8deg) scale(1);

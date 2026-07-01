@@ -34,7 +34,7 @@
     width: min(42vw, 260px);
   }
 
-  .stage-hanging-egg--mystery {
+  .stage-hanging-egg--diamond {
     margin-left: clamp(-44px, -5vw, -20px);
   }
 
@@ -127,7 +127,7 @@
     width: min(40vw, 188px);
   }
 
-  .stage-hanging-egg--mystery {
+  .stage-hanging-egg--diamond {
     margin-left: -24px;
   }
 
@@ -234,7 +234,7 @@
     width: min(39vw, 148px);
   }
 
-  .stage-hanging-egg--mystery {
+  .stage-hanging-egg--diamond {
     margin-left: -14px;
   }
 
