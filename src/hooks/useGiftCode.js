@@ -47,10 +47,6 @@ function saveStoredRedemption(redemption) {
   );
 }
 
-function getClaimedEgg(entry) {
-  return entry?.eggs.find((egg) => egg.isClaimed) || null;
-}
-
 function getSavedOrApiReward(egg) {
   const saved = getStoredRedemption(egg.eggId);
 
@@ -146,16 +142,15 @@ export function useGiftCode(catalogData) {
   const soNgayCho =
     (catalogData.config || catalogData.cauHinh)?.soNgayChoNhanThuongXin || 15;
 
-  const claimedEgg = useMemo(() => getClaimedEgg(selectedEntry), [selectedEntry]);
-  const availableChoices = useMemo(() => {
-    const instantEgg = selectedEntry?.eggsByChoice?.[LUA_CHON_NHAN_NGAY];
-    const delayedEgg = selectedEntry?.eggsByChoice?.[LUA_CHON_CHO_NHAN_THUONG_XIN];
-
-    return {
-      now: Boolean(instantEgg && (!claimedEgg || instantEgg.eggId === claimedEgg.eggId)),
-      later: Boolean(delayedEgg && (!claimedEgg || delayedEgg.eggId === claimedEgg.eggId)),
-    };
-  }, [claimedEgg, selectedEntry]);
+  const availableChoices = useMemo(
+    () => ({
+      now: Boolean(selectedEntry?.eggsByChoice?.[LUA_CHON_NHAN_NGAY]),
+      later: Boolean(
+        selectedEntry?.eggsByChoice?.[LUA_CHON_CHO_NHAN_THUONG_XIN]
+      ),
+    }),
+    [selectedEntry]
+  );
   const choiceEggs = selectedEntry?.eggsByChoice || {};
 
   const checkCode = useCallback(async (inputCode) => {
@@ -224,14 +219,7 @@ export function useGiftCode(catalogData) {
       }
 
       const baseRedemption = createBaseRedemption(selectedEntry, selectedEgg);
-      const alreadyClaimedEgg = getClaimedEgg(selectedEntry);
-
-      if (alreadyClaimedEgg) {
-        if (alreadyClaimedEgg.eggId !== selectedEgg.eggId) {
-          setErrorMsg("Mã đơn này đã mở một trứng rồi. Chỉ bấm lại trứng đã mở để xem acc.");
-          return;
-        }
-
+      if (selectedEgg.isClaimed) {
         const reward = getSavedOrApiReward(selectedEgg);
 
         if (!reward) {

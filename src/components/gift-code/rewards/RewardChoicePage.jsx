@@ -29,14 +29,14 @@ export function RewardChoicePage({
   const instantDescription = instantOpened
     ? "Trứng này đã mở, bấm để xem lại acc."
     : !canClaimNow
-      ? "Mã này đã mở trứng kim cương."
+      ? "Không có trứng vàng cho mã này."
       : instantNeedsIncubation
         ? "Trứng này cần chờ đủ cooldown trước khi mở."
         : "Nhận acc ngay sau khi random.";
   const delayedDescription = delayedOpened
     ? "Trứng này đã mở, bấm để xem lại acc."
     : !canClaimLater
-      ? "Mã này đã mở trứng vàng."
+      ? "Không có trứng kim cương cho mã này."
       : delayedEgg?.requiresIncubation === false
         ? "Trứng đã sẵn sàng mở."
         : "Ấp đủ ngày để mở phần thưởng xịn hơn.";
@@ -53,7 +53,7 @@ export function RewardChoicePage({
       <div className="panel-heading">
         <div>
           <p className="eyebrow">Mã đơn hợp lệ</p>
-          <h2>Chọn một quả trứng</h2>
+          <h2>Chọn trứng muốn mở</h2>
         </div>
         <span className="panel-chip">{code}</span>
       </div>
