@@ -18,6 +18,48 @@ import {
 
 const LUA_CHON_NHAN_NGAY = EGG_CHOICES.instant;
 const LUA_CHON_CHO_NHAN_THUONG_XIN = EGG_CHOICES.delayed;
+const CLAIMED_REWARDS_STORAGE_KEY = "agmcGiftClaimedRewards";
+
+function readStoredRedemptions() {
+  if (typeof window === "undefined") return {};
+
+  try {
+    return JSON.parse(window.localStorage.getItem(CLAIMED_REWARDS_STORAGE_KEY) || "{}") || {};
+  } catch {
+    return {};
+  }
+}
+
+function getStoredRedemption(eggId) {
+  return readStoredRedemptions()[eggId] || null;
+}
+
+function saveStoredRedemption(redemption) {
+  if (typeof window === "undefined" || !redemption?.eggId || !redemption?.reward) {
+    return;
+  }
+
+  const redemptions = readStoredRedemptions();
+  redemptions[redemption.eggId] = redemption;
+  window.localStorage.setItem(
+    CLAIMED_REWARDS_STORAGE_KEY,
+    JSON.stringify(redemptions)
+  );
+}
+
+function getClaimedEgg(entry) {
+  return entry?.eggs.find((egg) => egg.isClaimed) || null;
+}
+
+function getSavedOrApiReward(egg) {
+  const saved = getStoredRedemption(egg.eggId);
+
+  if (saved?.reward) {
+    return saved.reward;
+  }
+
+  return egg.account ? normalizeClaimEggResponse({ account: egg.account }) : null;
+}
 
 function getEggReadyInfo(egg, fallbackDays) {
   if (egg.hatchAt) {
@@ -47,8 +89,23 @@ function createBaseRedemption(selectedEntry, egg) {
     productName: selectedEntry.product.tenSanPham,
     eggId: egg.eggId,
     eggType: egg.eggType,
+    eggSlot: egg.slot,
     eggStatus: egg.displayStatus,
     redeemedAt: now,
+  };
+}
+
+function createClaimedRedemption(selectedEntry, egg, choice, reward, delayDays) {
+  return {
+    ...createBaseRedemption(selectedEntry, egg),
+    choice,
+    reward,
+    account: reward,
+    claimedAt: new Date().toISOString(),
+    isReady: true,
+    ...(choice === LUA_CHON_CHO_NHAN_THUONG_XIN
+      ? getEggReadyInfo(egg, delayDays)
+      : {}),
   };
 }
 
@@ -89,15 +146,16 @@ export function useGiftCode(catalogData) {
   const soNgayCho =
     (catalogData.config || catalogData.cauHinh)?.soNgayChoNhanThuongXin || 15;
 
-  const availableChoices = useMemo(
-    () => ({
-      now: Boolean(selectedEntry?.eggsByChoice?.[LUA_CHON_NHAN_NGAY]),
-      later: Boolean(
-        selectedEntry?.eggsByChoice?.[LUA_CHON_CHO_NHAN_THUONG_XIN]
-      ),
-    }),
-    [selectedEntry]
-  );
+  const claimedEgg = useMemo(() => getClaimedEgg(selectedEntry), [selectedEntry]);
+  const availableChoices = useMemo(() => {
+    const instantEgg = selectedEntry?.eggsByChoice?.[LUA_CHON_NHAN_NGAY];
+    const delayedEgg = selectedEntry?.eggsByChoice?.[LUA_CHON_CHO_NHAN_THUONG_XIN];
+
+    return {
+      now: Boolean(instantEgg && (!claimedEgg || instantEgg.eggId === claimedEgg.eggId)),
+      later: Boolean(delayedEgg && (!claimedEgg || delayedEgg.eggId === claimedEgg.eggId)),
+    };
+  }, [claimedEgg, selectedEntry]);
   const choiceEggs = selectedEntry?.eggsByChoice || {};
 
   const checkCode = useCallback(async (inputCode) => {
@@ -166,6 +224,32 @@ export function useGiftCode(catalogData) {
       }
 
       const baseRedemption = createBaseRedemption(selectedEntry, selectedEgg);
+      const alreadyClaimedEgg = getClaimedEgg(selectedEntry);
+
+      if (alreadyClaimedEgg) {
+        if (alreadyClaimedEgg.eggId !== selectedEgg.eggId) {
+          setErrorMsg("Mã đơn này đã mở một trứng rồi. Chỉ bấm lại trứng đã mở để xem acc.");
+          return;
+        }
+
+        const reward = getSavedOrApiReward(selectedEgg);
+
+        if (!reward) {
+          setErrorMsg("Trứng này đã mở rồi nhưng API chưa trả lại acc để xem lại. Vui lòng liên hệ hỗ trợ.");
+          return;
+        }
+
+        setRedemptionInfo(
+          createClaimedRedemption(selectedEntry, selectedEgg, choice, reward, soNgayCho)
+        );
+        setErrorMsg("");
+        setStatus(
+          choice === LUA_CHON_NHAN_NGAY
+            ? GIFT_CODE_STATUS.claimedNow
+            : GIFT_CODE_STATUS.claimedLater
+        );
+        return;
+      }
 
       if (
         choice === LUA_CHON_CHO_NHAN_THUONG_XIN &&
@@ -199,6 +283,7 @@ export function useGiftCode(catalogData) {
             : {}),
         };
 
+        saveStoredRedemption(newRedemption);
         setRedemptionInfo(newRedemption);
         setStatus(
           choice === LUA_CHON_NHAN_NGAY
@@ -224,13 +309,18 @@ export function useGiftCode(catalogData) {
       const claimPayload = await claimEggById(redemptionInfo.eggId);
       const reward = normalizeClaimEggResponse(claimPayload);
 
-      setRedemptionInfo((current) => ({
-        ...current,
-        reward,
-        account: reward,
-        claimedAt: new Date().toISOString(),
-        isReady: true,
-      }));
+      setRedemptionInfo((current) => {
+        const nextRedemption = {
+          ...current,
+          reward,
+          account: reward,
+          claimedAt: new Date().toISOString(),
+          isReady: true,
+        };
+
+        saveStoredRedemption(nextRedemption);
+        return nextRedemption;
+      });
     } catch (error) {
       setErrorMsg(getEggClaimErrorMessage(error));
     } finally {

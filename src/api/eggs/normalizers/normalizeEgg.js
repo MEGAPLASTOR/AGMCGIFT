@@ -80,6 +80,23 @@ function hasCooldown(egg) {
   );
 }
 
+function getEggAccount(rawEgg) {
+  return rawEgg.account || rawEgg.giftAccount || rawEgg.reward || null;
+}
+
+function isClaimed(rawEgg, egg) {
+  const statusText = normalizeApiText(egg.displayStatus);
+
+  return (
+    Boolean(getEggAccount(rawEgg)) ||
+    statusText.includes("claim") ||
+    statusText.includes("opened") ||
+    statusText.includes("redeemed") ||
+    statusText.includes("da mo") ||
+    statusText.includes("da nhan")
+  );
+}
+
 function getChoice(rawEgg, egg, index, totalEggs) {
   const explicitChoice = getExplicitChoice(rawEgg);
 
@@ -127,6 +144,8 @@ export function normalizeEgg(rawEgg, index = 0, totalEggs = 0) {
   return {
     ...egg,
     requiresIncubation,
+    isClaimed: isClaimed(rawEgg, egg),
+    account: getEggAccount(rawEgg),
     choice: getChoice(rawEgg, egg, index, totalEggs),
   };
 }
