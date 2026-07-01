@@ -291,6 +291,7 @@ function normalizeProducts(products) {
   return products.map((product) => ({
     id: String(product.kvProductId || ""),
     kvProductId: product.kvProductId,
+    sku: product.sku || product.code || "",
     name: product.name,
     fullName: product.fullName,
     basePrice: product.basePrice || 0,

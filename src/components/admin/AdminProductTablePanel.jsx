@@ -42,6 +42,10 @@ function getProductName(product) {
   return normalizeText(product?.name || product?.fullName || product?.id);
 }
 
+function getProductSku(product) {
+  return normalizeText(product?.sku || product?.code || product?.maSanPham);
+}
+
 function getProductImage(product) {
   return normalizeText(product?.imageUrl || product?.image_url || product?.image);
 }
@@ -228,6 +232,7 @@ export function AdminProductTablePanel({
         const productMappings = mappingsByProductId.get(productId) || EMPTY_ROWS;
         const searchText = [
           productId,
+          getProductSku(product),
           getProductName(product),
           product.fullName,
           product.basePrice,
@@ -380,6 +385,7 @@ export function AdminProductTablePanel({
             <tr>
               <th>Ảnh</th>
               <th>ID KiotViet</th>
+              <th>SKU</th>
               <th>Tên Sản Phẩm</th>
               <th>Giá Gốc (VND)</th>
               <th>Cấu Hình Ánh Xạ Trứng (Game Rules)</th>
@@ -405,6 +411,11 @@ export function AdminProductTablePanel({
                       </div>
                     </td>
                     <td>{productId || "-"}</td>
+                    <td>
+                      <code className="admin-product-sku">
+                        {getProductSku(product) || "-"}
+                      </code>
+                    </td>
                     <td>
                       <strong>{getProductName(product) || "-"}</strong>
                     </td>
@@ -455,7 +466,7 @@ export function AdminProductTablePanel({
               })
             ) : (
               <tr>
-                <td colSpan={6}>Không tìm thấy sản phẩm phù hợp.</td>
+                <td colSpan={7}>Không tìm thấy sản phẩm phù hợp.</td>
               </tr>
             )}
           </tbody>
