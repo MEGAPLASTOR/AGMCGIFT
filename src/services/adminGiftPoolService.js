@@ -181,22 +181,17 @@ export async function getAdminGiftPoolDetail(id, authHeader) {
 
 export async function fetchAdminGiftPoolDetails(pools, authHeader) {
   const normalizedPools = pools.map((pool) => normalizeAdminGiftPool(pool));
-  const details = await Promise.allSettled(
-    normalizedPools
-      .filter((pool) => pool.id)
-      .map((pool) => getAdminGiftPoolDetail(pool.id, authHeader))
-  );
   const detailById = new Map();
   const errors = [];
 
-  details.forEach((result) => {
-    if (result.status === "fulfilled") {
-      detailById.set(result.value.id, result.value);
-      return;
+  for (const pool of normalizedPools.filter((item) => item.id)) {
+    try {
+      const detail = await getAdminGiftPoolDetail(pool.id, authHeader);
+      detailById.set(detail.id, detail);
+    } catch (error) {
+      errors.push(error);
     }
-
-    errors.push(result.reason);
-  });
+  }
 
   return {
     pools: normalizedPools.map((pool) => detailById.get(pool.id) || pool),
