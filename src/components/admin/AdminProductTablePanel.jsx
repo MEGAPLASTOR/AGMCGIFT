@@ -7,6 +7,13 @@ import {
   FaRotateRight,
   FaXmark,
 } from "react-icons/fa6";
+import {
+  confirmAdminAction,
+  showAdminAlert,
+} from "../../services/adminBrowserFeedback";
+import { useAdminClientPagination } from "../../hooks/useAdminClientPagination";
+import { AdminClientPagination } from "./AdminClientPagination";
+import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
 
@@ -136,8 +143,6 @@ export function AdminProductTablePanel({
   const [selectedPoolId, setSelectedPoolId] = useState("");
   const [rateProductId, setRateProductId] = useState("");
   const [draftRates, setDraftRates] = useState({});
-  const [message, setMessage] = useState("");
-  const [rateMessage, setRateMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const products = tables.products || EMPTY_ROWS;
@@ -240,24 +245,27 @@ export function AdminProductTablePanel({
       }),
     [mappingsByProductId, normalizedKeyword, poolById, products]
   );
+  const pagination = useAdminClientPagination(
+    filteredProducts,
+    `${keyword}|${products.length}|${mappings.length}`
+  );
+  const paginatedProducts = pagination.pageRows;
 
   const openMappingModal = (product, mapping) => {
     const productId = getProductId(product);
 
     setSelectedProductId(productId);
     setSelectedPoolId(mapping?.gift_pool_id || "");
-    setMessage("");
   };
 
   const closeMappingModal = () => {
     setSelectedProductId("");
     setSelectedPoolId("");
-    setMessage("");
   };
 
   const saveMapping = async () => {
     if (!selectedProduct || !selectedPoolId || isSaving) {
-      setMessage("Vui lòng chọn đủ sản phẩm và bể quà.");
+      showAdminAlert("Vui lòng chọn đủ sản phẩm và bể quà.");
       return;
     }
 
@@ -271,7 +279,7 @@ export function AdminProductTablePanel({
       );
 
       if (hasSamePool) {
-        setMessage("Ánh xạ này đã tồn tại.");
+        showAdminAlert("Ánh xạ này đã tồn tại.");
         return;
       }
 
@@ -283,10 +291,10 @@ export function AdminProductTablePanel({
         onSaveRecord?.("productEggMappings", savedMapping);
       }
 
-      setMessage("Đã lưu ánh xạ sản phẩm - trứng.");
+      showAdminAlert("Đã lưu ánh xạ sản phẩm - trứng.");
       closeMappingModal();
     } catch (error) {
-      setMessage(error.message || "Không thể lưu ánh xạ sản phẩm.");
+      showAdminAlert(error.message || "Không thể lưu ánh xạ sản phẩm.");
     } finally {
       setIsSaving(false);
     }
@@ -299,14 +307,18 @@ export function AdminProductTablePanel({
       return;
     }
 
+    if (!confirmAdminAction("Xác nhận xóa ánh xạ sản phẩm này?")) {
+      return;
+    }
+
     setIsSaving(true);
 
     try {
       await onDeleteProductEggMapping?.(mappingId);
       onDeleteRecord?.("productEggMappings", mappingId);
-      setMessage("Đã xóa ánh xạ sản phẩm.");
+      showAdminAlert("Đã xóa ánh xạ sản phẩm.");
     } catch (error) {
-      setMessage(error.message || "Không thể xóa ánh xạ sản phẩm.");
+      showAdminAlert(error.message || "Không thể xóa ánh xạ sản phẩm.");
     } finally {
       setIsSaving(false);
     }
@@ -324,13 +336,11 @@ export function AdminProductTablePanel({
         ])
       )
     );
-    setRateMessage("");
   };
 
   const closeRateModal = () => {
     setRateProductId("");
     setDraftRates({});
-    setRateMessage("");
   };
 
   const saveRates = async () => {
@@ -348,12 +358,16 @@ export function AdminProductTablePanel({
     );
 
     if (fallbackMappings.some((mapping) => !Number.isFinite(getMappingRate(mapping)))) {
-      setRateMessage("Tỉ lệ phải là số.");
+      showAdminAlert("Tỉ lệ phải là số.");
       return;
     }
 
     if (Math.abs(totalRate - 100) > 0.01) {
-      setRateMessage("Tổng tỉ lệ phải bằng 100%.");
+      showAdminAlert("Tổng tỉ lệ phải bằng 100%.");
+      return;
+    }
+
+    if (!confirmAdminAction("Xác nhận cập nhật tỉ lệ ánh xạ?")) {
       return;
     }
 
@@ -372,10 +386,10 @@ export function AdminProductTablePanel({
         onSaveRecord?.("productEggMappings", mapping);
       });
 
-      setMessage("Đã cập nhật tỉ lệ ánh xạ.");
+      showAdminAlert("Đã cập nhật tỉ lệ ánh xạ.");
       closeRateModal();
     } catch (error) {
-      setRateMessage(error.message || "Không thể cập nhật tỉ lệ ánh xạ.");
+      showAdminAlert(error.message || "Không thể cập nhật tỉ lệ ánh xạ.");
     } finally {
       setIsSaving(false);
     }
@@ -430,8 +444,8 @@ export function AdminProductTablePanel({
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.length ? (
-              filteredProducts.map((product) => {
+            {paginatedProducts.length ? (
+              paginatedProducts.map((product) => {
                 const productId = getProductId(product);
                 const imageUrl = getProductImage(product);
                 const productMappings = mappingsByProductId.get(productId) || EMPTY_ROWS;
@@ -516,12 +530,10 @@ export function AdminProductTablePanel({
         </table>
       </div>
 
-      {message && !selectedProduct ? (
-        <p className="admin-crud-message">{message}</p>
-      ) : null}
+      <AdminClientPagination itemLabel="sản phẩm" pagination={pagination} />
 
       {selectedProduct ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-product-mapping-modal"
             role="dialog"
@@ -571,8 +583,6 @@ export function AdminProductTablePanel({
                 </label>
               </div>
 
-              {message ? <p className="admin-crud-message">{message}</p> : null}
-
               <div className="admin-crud-actions admin-product-mapping-actions">
                 <button
                   type="button"
@@ -588,11 +598,11 @@ export function AdminProductTablePanel({
               </div>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
 
       {rateProduct ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-product-mapping-modal"
             role="dialog"
@@ -653,10 +663,6 @@ export function AdminProductTablePanel({
                 )}
               </p>
 
-              {rateMessage ? (
-                <p className="admin-crud-message">{rateMessage}</p>
-              ) : null}
-
               <div className="admin-crud-actions admin-product-mapping-actions">
                 <button
                   type="button"
@@ -672,7 +678,7 @@ export function AdminProductTablePanel({
               </div>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
     </section>
   );

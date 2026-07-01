@@ -1,16 +1,22 @@
-const orderFinancialStatusOptions = [
+export const orderFinancialStatusOptions = [
   { value: "paid", label: "paid" },
   { value: "pending", label: "pending" },
   { value: "refunded", label: "refunded" },
 ];
 
-const orderFulfillmentStatusOptions = [
-  { value: "delivered", label: "delivered" },
+export const orderFulfillmentStatusOptions = [
+  { value: "Chưa giao hàng", label: "Chưa giao hàng" },
+  { value: "Đang giao hàng", label: "Đang giao hàng" },
+  { value: "Đã giao hàng", label: "Đã giao hàng" },
+  { value: "Đang chuyển hoàn", label: "Đang chuyển hoàn" },
+  { value: "Đã chuyển hoàn", label: "Đã chuyển hoàn" },
+  { value: "delivering", label: "delivering" },
   { value: "shipping", label: "shipping" },
+  { value: "delivered", label: "delivered" },
   { value: "returned", label: "returned" },
 ];
 
-const orderStatusOptions = [
+export const orderStatusOptions = [
   { value: "Paid", label: "Paid" },
   { value: "Pending", label: "Pending" },
   { value: "Cancel", label: "Cancel" },
@@ -21,11 +27,13 @@ const eggTypeOptions = [
   { value: 2, label: "T2 (Cần ấp)" },
 ];
 
-const eggStatusOptions = [
-  { value: "locked", label: "locked" },
-  { value: "ready", label: "ready" },
+export const eggStatusOptions = [
+  { value: "pending", label: "PENDING" },
+  { value: "claimed", label: "CLAIMED" },
+  { value: "cancelled", label: "CANCELLED" },
   { value: "incubating", label: "incubating" },
-  { value: "hatched", label: "hatched" },
+  { value: "ready", label: "ready" },
+  { value: "locked", label: "locked" },
   { value: "invalidated", label: "invalidated" },
 ];
 
@@ -36,11 +44,11 @@ const poolTierOptions = [
   { value: "D", label: "D" },
 ];
 
-const accountStatusOptions = [
+export const accountStatusOptions = [
   { value: "available", label: "AVAILABLE" },
   { value: "assigned", label: "ASSIGNED" },
-  { value: "reserved", label: "reserved" },
-  { value: "used", label: "used" },
+  { value: "reserved", label: "RESERVED" },
+  { value: "used", label: "USED" },
 ];
 
 const adminRoleOptions = [
@@ -420,6 +428,38 @@ export function searchTableRows(rows, keyword) {
   return rows.filter((row) =>
     JSON.stringify(row).toLowerCase().includes(normalizedKeyword)
   );
+}
+
+export function mergeSelectOptions(options = [], values = [], getLabel) {
+  const map = new Map();
+
+  options.forEach((option) => {
+    const value = String(option?.value ?? "").trim();
+
+    if (!value) {
+      return;
+    }
+
+    map.set(value.toLowerCase(), {
+      value: option.value,
+      label: option.label ?? value,
+    });
+  });
+
+  values.forEach((rawValue) => {
+    const value = String(rawValue ?? "").trim();
+
+    if (!value || map.has(value.toLowerCase())) {
+      return;
+    }
+
+    map.set(value.toLowerCase(), {
+      value,
+      label: getLabel ? getLabel(value) : value,
+    });
+  });
+
+  return [...map.values()];
 }
 
 export function getVisibleColumns(rows) {

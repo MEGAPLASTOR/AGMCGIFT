@@ -20,13 +20,21 @@ import {
   getRecordId,
   getTableFields,
   getVisibleColumns,
+  mergeSelectOptions,
   normalizeRecordForForm,
   searchTableRows,
 } from "../../services/adminCrudService";
 import { parseAccountImportFile } from "../../services/accountImportService";
+import {
+  confirmAdminAction,
+  showAdminAlert,
+} from "../../services/adminBrowserFeedback";
+import { useAdminClientPagination } from "../../hooks/useAdminClientPagination";
+import { AdminClientPagination } from "./AdminClientPagination";
 import { AdminCustomerTablePanel } from "./AdminCustomerTablePanel";
 import { AdminEggTablePanel } from "./AdminEggTablePanel";
 import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
+import { AdminModalPortal } from "./AdminModalPortal";
 import { AdminGiftPoolTablePanel } from "./AdminGiftPoolTablePanel";
 import { AdminProductTablePanel } from "./AdminProductTablePanel";
 
@@ -80,13 +88,13 @@ const BOARD_CONFIG_BY_TABLE = {
   },
   customers: {
     field: "status",
-    fallbackValue: "ACTIVE",
-    values: ["ACTIVE", "WARNING", "BANNED"],
+    fallbackValue: "NEW",
+    values: ["NEW", "TRUSTED_1", "TRUSTED_2", "WARNING", "BANNED"],
   },
   eggs: {
     field: "status",
-    fallbackValue: "ready",
-    values: ["locked", "ready", "incubating", "hatched", "invalidated"],
+    fallbackValue: "pending",
+    values: ["pending", "claimed", "cancelled", "incubating", "ready", "locked"],
   },
   productEggMappings: {
     field: "egg_type",
@@ -847,7 +855,6 @@ export function AdminDataCrudPanel({
   const [keyword, setKeyword] = useState("");
   const [selectedRecordId, setSelectedRecordId] = useState("");
   const [formValues, setFormValues] = useState({});
-  const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isRecordModalOpen, setRecordModalOpen] = useState(false);
   const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -934,9 +941,24 @@ export function AdminDataCrudPanel({
     );
   }, [accountStatusFilter, filteredRows, isGiftAccountsTable]);
   const accountStatusOptions = useMemo(
-    () => getFieldOptions(fields, "status"),
-    [fields]
+    () =>
+      mergeSelectOptions(
+        getFieldOptions(fields, "status"),
+        rows.map((row) => row.status),
+        (value) => normalizeBoardValue(value).toUpperCase()
+      ),
+    [fields, rows]
   );
+  const accountPagination = useAdminClientPagination(
+    accountRows,
+    `${tableKey}|${keyword}|${accountStatusFilter}|${rows.length}`
+  );
+  const recordPagination = useAdminClientPagination(
+    filteredRows,
+    `${tableKey}|${keyword}|${rows.length}`
+  );
+  const paginatedAccountRows = accountPagination.pageRows;
+  const paginatedRows = recordPagination.pageRows;
   const visibleColumns = useMemo(
     () =>
       getPriorityColumns(tableKey, filteredRows.length ? filteredRows : rows, fields),
@@ -986,11 +1008,11 @@ export function AdminDataCrudPanel({
     setSelectedAccountIds(new Set());
     setSelectedRecordId("");
     setFormValues({});
-    setMessage("");
     setRecordModalOpen(false);
     setDeleteModalOpen(false);
     setResetModalOpen(false);
   };
+  const notify = (nextMessage) => showAdminAlert(nextMessage);
 
   useEffect(() => {
     if (!activeTableKey || activeTableKey === tableKey) {
@@ -1051,7 +1073,7 @@ export function AdminDataCrudPanel({
     setSelectedAccountIds((currentIds) => {
       const nextIds = new Set(currentIds);
 
-      accountRows.forEach((row) => {
+      paginatedAccountRows.forEach((row) => {
         const accountId = getRecordId(row, "giftAccounts");
 
         if (isSelected) {
@@ -1077,7 +1099,7 @@ export function AdminDataCrudPanel({
           payload?.successCount ??
           payload?.count;
 
-        setMessage(
+        notify(
           payload?.message ||
             (Number.isFinite(Number(importedCount))
               ? `Đã upload và nhập ${importedCount} account thành công.`
@@ -1092,11 +1114,11 @@ export function AdminDataCrudPanel({
         ? ` và ${result.mappingsImported} liên kết kho`
         : "";
 
-      setMessage(
+      notify(
         `Đã nhập ${result?.accountsImported || 0} account${mappingMessage}.`
       );
     } catch (error) {
-      setMessage(error.message || "Không thể nhập file account.");
+      notify(error.message || "Không thể nhập file account.");
     } finally {
       setImportingAccounts(false);
     }
@@ -1119,16 +1141,24 @@ export function AdminDataCrudPanel({
       return;
     }
 
+    if (
+      !confirmAdminAction(
+        ids.length === 1
+          ? "Xác nhận xóa tài khoản đã chọn?"
+          : `Xác nhận xóa ${ids.length} tài khoản đã chọn?`
+      )
+    ) {
+      return;
+    }
+
     setIsSaving(true);
 
     try {
-      for (const accountId of ids) {
-        if (onDeleteGiftAccount) {
-          await onDeleteGiftAccount(accountId);
-        }
-
-        onDeleteRecord("giftAccounts", accountId);
+      if (onDeleteGiftAccount) {
+        await onDeleteGiftAccount(ids);
       }
+
+      ids.forEach((accountId) => onDeleteRecord("giftAccounts", accountId));
 
       setSelectedAccountIds((currentIds) => {
         const nextIds = new Set(currentIds);
@@ -1142,9 +1172,9 @@ export function AdminDataCrudPanel({
         setRecordModalOpen(false);
       }
 
-      setMessage(`Đã xóa ${ids.length} tài khoản.`);
+      notify(`Đã xóa ${ids.length} tài khoản.`);
     } catch (error) {
-      setMessage(error.message || "Không thể xóa tài khoản.");
+      notify(error.message || "Không thể xóa tài khoản.");
     } finally {
       setIsSaving(false);
     }
@@ -1156,7 +1186,6 @@ export function AdminDataCrudPanel({
     setFormValues(normalizeRecordForForm(record, tableKey));
     setDeleteModalOpen(false);
     setRecordModalOpen(true);
-    setMessage("Đang tạo bản ghi mới.");
   };
 
   const startEdit = (record) => {
@@ -1164,7 +1193,6 @@ export function AdminDataCrudPanel({
     setFormValues(normalizeRecordForForm(record, tableKey));
     setDeleteModalOpen(false);
     setRecordModalOpen(true);
-    setMessage("Đang chỉnh sửa bản ghi đã chọn.");
   };
 
   const _updateGiftAccountStatus = async (record, nextStatus) => {
@@ -1175,7 +1203,7 @@ export function AdminDataCrudPanel({
     const recordId = getRecordId(record, "giftAccounts");
 
     if (!recordId) {
-      setMessage("Không tìm thấy ID tài khoản để đổi trạng thái.");
+      notify("Không tìm thấy ID tài khoản để đổi trạng thái.");
       return;
     }
 
@@ -1202,9 +1230,9 @@ export function AdminDataCrudPanel({
         setFormValues(normalizeRecordForForm(savedRecord, "giftAccounts"));
       }
 
-      setMessage("Đã cập nhật trạng thái tài khoản.");
+      notify("Đã cập nhật trạng thái tài khoản.");
     } catch (error) {
-      setMessage(error.message || "Không thể cập nhật trạng thái tài khoản.");
+      notify(error.message || "Không thể cập nhật trạng thái tài khoản.");
     } finally {
       setIsSaving(false);
       setSavingStatusRecordId("");
@@ -1282,7 +1310,7 @@ export function AdminDataCrudPanel({
         onSaveRecord(tableKey, savedRecord);
       });
       setSelectedRecordId(getRecordId(primaryRecord, tableKey));
-      setMessage(
+      notify(
         isGiftAccountsTable && isCreating && onCreateGiftAccount
           ? "Đã thêm tài khoản thành công."
           : isGiftAccountsTable && !isCreating && onUpdateGiftAccount
@@ -1299,7 +1327,7 @@ export function AdminDataCrudPanel({
       );
       setRecordModalOpen(false);
     } catch (error) {
-      setMessage(error.message || "Dữ liệu bản ghi không hợp lệ.");
+      notify(error.message || "Dữ liệu bản ghi không hợp lệ.");
     } finally {
       setIsSaving(false);
     }
@@ -1320,7 +1348,7 @@ export function AdminDataCrudPanel({
     setRecordModalOpen(false);
     setDeleteModalOpen(false);
     setResetModalOpen(false);
-    setMessage("Đã khôi phục dữ liệu.");
+    notify("Đã khôi phục dữ liệu.");
   };
 
   const deleteSelected = async () => {
@@ -1329,7 +1357,7 @@ export function AdminDataCrudPanel({
     }
 
     if (!selectedRecordId) {
-      setMessage("Chọn một bản ghi trước khi xóa.");
+      notify("Chọn một bản ghi trước khi xóa.");
       return;
     }
 
@@ -1359,7 +1387,7 @@ export function AdminDataCrudPanel({
       onDeleteRecord(tableKey, selectedRecordId);
       setSelectedRecordId("");
       setFormValues({});
-      setMessage(
+      notify(
         isGiftPoolsTable
           ? "Đã xóa bể quà."
           : isGiftAccountsTable && onDeleteGiftAccount
@@ -1373,7 +1401,7 @@ export function AdminDataCrudPanel({
       setRecordModalOpen(false);
       setDeleteModalOpen(false);
     } catch (error) {
-      setMessage(error.message || "Không thể xóa bản ghi.");
+      notify(error.message || "Không thể xóa bản ghi.");
     } finally {
       setIsSaving(false);
     }
@@ -1421,9 +1449,8 @@ export function AdminDataCrudPanel({
       onSaveRecord(tableKey, savedRecord);
       setSelectedRecordId(getRecordId(savedRecord, tableKey) || recordId);
       setFormValues(normalizeRecordForForm(savedRecord, tableKey));
-      setMessage("Đã cập nhật bằng kéo thả.");
     } catch (error) {
-      setMessage(error.message || "Không thể cập nhật bằng kéo thả.");
+      notify(error.message || "Không thể cập nhật bằng kéo thả.");
     } finally {
       setIsSaving(false);
       setDraggingRecordId("");
@@ -1648,7 +1675,7 @@ export function AdminDataCrudPanel({
           {isGiftAccountsTable ? (
             <AdminGiftAccountTable
               isSaving={isSaving}
-              rows={accountRows}
+              rows={paginatedAccountRows}
               selectedAccountIds={selectedAccountIds}
               selectedRecordId={selectedRecordId}
               toggleAccountSelection={toggleAccountSelection}
@@ -1764,12 +1791,17 @@ export function AdminDataCrudPanel({
             <AdminRecordTable
               columns={visibleColumns}
               fields={fields}
-              rows={filteredRows}
+              rows={paginatedRows}
               selectedRecordId={selectedRecordId}
               tableKey={tableKey}
               onEdit={startEdit}
             />
           )}
+
+          <AdminClientPagination
+            itemLabel={isGiftAccountsTable ? "tài khoản" : "bản ghi"}
+            pagination={isGiftAccountsTable ? accountPagination : recordPagination}
+          />
 
           <table className="admin-table admin-crud-table" hidden>
             <thead>
@@ -1781,8 +1813,8 @@ export function AdminDataCrudPanel({
               </tr>
             </thead>
             <tbody>
-              {filteredRows.length ? (
-                filteredRows.slice(0, 12).map((row) => {
+              {paginatedRows.length ? (
+                paginatedRows.map((row) => {
                   const recordId = getRecordId(row, tableKey);
                   return (
                     <tr
@@ -1816,9 +1848,6 @@ export function AdminDataCrudPanel({
               )}
             </tbody>
           </table>
-          {message && !isRecordModalOpen ? (
-            <p className="admin-crud-message">{message}</p>
-          ) : null}
         </div>
 
         {shouldUseBoard ? (
@@ -1848,8 +1877,6 @@ export function AdminDataCrudPanel({
               Chọn một dòng để sửa hoặc bấm nút dấu cộng để thêm tài khoản.
             </div>
           )}
-
-          {message ? <p>{message}</p> : null}
 
           <div className="admin-crud-actions">
             <button
@@ -1883,7 +1910,7 @@ export function AdminDataCrudPanel({
       </div>
 
       {isRecordModalOpen ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-record-modal"
             role="dialog"
@@ -1935,8 +1962,6 @@ export function AdminDataCrudPanel({
                 </div>
               )}
 
-              {message ? <p>{message}</p> : null}
-
               {isGiftAccountsTable ? (
                 <div className="admin-crud-actions admin-account-modal-actions">
                   <button
@@ -1983,11 +2008,11 @@ export function AdminDataCrudPanel({
               </div>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
 
       {isDeleteModalOpen ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-confirm-modal"
             role="dialog"
@@ -2032,11 +2057,11 @@ export function AdminDataCrudPanel({
               </button>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
 
       {isResetModalOpen ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-confirm-modal"
             role="dialog"
@@ -2075,7 +2100,7 @@ export function AdminDataCrudPanel({
               </button>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
     </section>
   );

@@ -9,6 +9,8 @@ import {
   FaTrashCan,
   FaXmark,
 } from "react-icons/fa6";
+import { showAdminAlert } from "../../services/adminBrowserFeedback";
+import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
 const UNASSIGNED_POOL_ID = "__unassigned__";
@@ -232,7 +234,6 @@ export function AdminGiftPoolDragPanel({
   const [keyword, setKeyword] = useState("");
   const [selectedPoolId, setSelectedPoolId] = useState("");
   const [poolForm, setPoolForm] = useState(createEmptyPoolForm);
-  const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [draggingAccountId, setDraggingAccountId] = useState("");
   const [dragOverPoolId, setDragOverPoolId] = useState("");
@@ -409,7 +410,6 @@ export function AdminGiftPoolDragPanel({
     setSelectedPoolId("");
     setPoolForm(createEmptyPoolForm());
     setPoolModalOpen(true);
-    setMessage("Đang tạo bể quà mới.");
   };
 
   const startEditPool = (pool) => {
@@ -418,7 +418,6 @@ export function AdminGiftPoolDragPanel({
     setSelectedPoolId(poolId);
     setPoolForm(createPoolForm(pool));
     setPoolModalOpen(true);
-    setMessage("Đang chỉnh sửa bể quà đã chọn.");
   };
 
   const closePoolModal = () => {
@@ -450,7 +449,7 @@ export function AdminGiftPoolDragPanel({
     };
 
     if (!record.pool_name) {
-      setMessage("Vui lòng nhập tên bể quà.");
+      showAdminAlert("Vui lòng nhập tên bể quà.");
       return;
     }
 
@@ -472,11 +471,9 @@ export function AdminGiftPoolDragPanel({
       setSelectedPoolId(nextPoolId);
       setPoolForm(createPoolForm(nextPool));
       setPoolModalOpen(false);
-      setMessage(
-        selectedPoolId ? "Đã cập nhật bể quà." : "Đã tạo bể quà mới."
-      );
+      showAdminAlert(selectedPoolId ? "Đã cập nhật bể quà." : "Đã tạo bể quà mới.");
     } catch (error) {
-      setMessage(error.message || "Không thể lưu bể quà.");
+      showAdminAlert(error.message || "Không thể lưu bể quà.");
     } finally {
       setIsSaving(false);
     }
@@ -504,9 +501,9 @@ export function AdminGiftPoolDragPanel({
         setPoolModalOpen(false);
       }
 
-      setMessage("Đã xóa bể quà.");
+      showAdminAlert("Đã xóa bể quà.");
     } catch (error) {
-      setMessage(error.message || "Không thể xóa bể quà.");
+      showAdminAlert(error.message || "Không thể xóa bể quà.");
     } finally {
       setIsSaving(false);
     }
@@ -531,11 +528,6 @@ export function AdminGiftPoolDragPanel({
 
       return nextMoves;
     });
-    setMessage(
-      nextPoolId
-        ? "Account đã được đưa vào hàng chờ lưu. Bấm Lưu thay đổi account để đồng bộ CSDL."
-        : "Account đã được đưa về nguồn ở hàng chờ lưu. Bấm Lưu thay đổi account để đồng bộ CSDL."
-    );
   };
 
   const saveDraftMoves = async () => {
@@ -581,11 +573,9 @@ export function AdminGiftPoolDragPanel({
       }
 
       setDraftMoves(new Map());
-      setMessage(`Đã lưu ${movesToSave.length} thay đổi account vào CSDL.`);
+      showAdminAlert(`Đã lưu ${movesToSave.length} thay đổi account vào CSDL.`);
     } catch (error) {
-      setMessage(
-        error.message || "Không thể lưu thay đổi account vào bể quà."
-      );
+      showAdminAlert(error.message || "Không thể lưu thay đổi account vào bể quà.");
     } finally {
       setIsSaving(false);
       setDraggingAccountId("");
@@ -599,7 +589,6 @@ export function AdminGiftPoolDragPanel({
     }
 
     setDraftMoves(new Map());
-    setMessage("Đã hủy các thay đổi account chưa lưu.");
   };
 
   const handleDragStart = (event, accountId) => {
@@ -705,8 +694,6 @@ export function AdminGiftPoolDragPanel({
           <strong>{pendingMoves.length}</strong>
         </article>
       </div>
-
-      {message ? <p className="admin-pool-message">{message}</p> : null}
 
       <div className="admin-pool-layout admin-pool-layout--table">
         <section
@@ -857,7 +844,7 @@ export function AdminGiftPoolDragPanel({
       </div>
 
       {isPoolModalOpen ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-pool-editor-modal"
             role="dialog"
@@ -927,7 +914,7 @@ export function AdminGiftPoolDragPanel({
               </form>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
     </section>
   );

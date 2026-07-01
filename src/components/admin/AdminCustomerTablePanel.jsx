@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   FaMagnifyingGlass,
   FaPen,
@@ -6,6 +6,14 @@ import {
   FaTriangleExclamation,
   FaXmark,
 } from "react-icons/fa6";
+import { mergeSelectOptions } from "../../services/adminCrudService";
+import {
+  confirmAdminAction,
+  showAdminAlert,
+} from "../../services/adminBrowserFeedback";
+import { useAdminClientPagination } from "../../hooks/useAdminClientPagination";
+import { AdminClientPagination } from "./AdminClientPagination";
+import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
 const STATUS_OPTIONS = [
@@ -110,10 +118,14 @@ export function AdminCustomerTablePanel({
   const [statusFilter, setStatusFilter] = useState("");
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [formValues, setFormValues] = useState(null);
-  const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const customers = tables.customers || EMPTY_ROWS;
   const normalizedKeyword = normalizeKey(keyword);
+  const statusOptions = useMemo(
+    () =>
+      mergeSelectOptions(STATUS_OPTIONS, customers.map((customer) => customer.status)),
+    [customers]
+  );
 
   const filteredCustomers = useMemo(
     () =>
@@ -124,21 +136,15 @@ export function AdminCustomerTablePanel({
       ),
     [customers, normalizedKeyword, statusFilter]
   );
-
-  useEffect(() => {
-    if (!message) {
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => setMessage(""), 2800);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [message]);
+  const pagination = useAdminClientPagination(
+    filteredCustomers,
+    `${keyword}|${statusFilter}|${customers.length}`
+  );
+  const paginatedCustomers = pagination.pageRows;
 
   const openEditModal = (customer) => {
     setEditingCustomer(customer);
     setFormValues(getCustomerForm(customer));
-    setMessage("");
   };
 
   const closeEditModal = () => {
@@ -165,6 +171,16 @@ export function AdminCustomerTablePanel({
       returnStreak: getNumber(formValues.returnStreak),
     };
 
+    if (
+      !confirmAdminAction(
+        `Xác nhận cập nhật trạng thái khách hàng ${
+          getCustomerCode(editingCustomer) || ""
+        }?`
+      )
+    ) {
+      return;
+    }
+
     setIsSaving(true);
 
     try {
@@ -173,10 +189,10 @@ export function AdminCustomerTablePanel({
         : nextCustomer;
 
       onSaveRecord?.("customers", savedCustomer || nextCustomer);
-      setMessage("Đã cập nhật trạng thái khách hàng.");
+      showAdminAlert("Đã cập nhật trạng thái khách hàng.");
       closeEditModal();
     } catch (error) {
-      setMessage(error.message || "Không thể cập nhật khách hàng.");
+      showAdminAlert(error.message || "Không thể cập nhật khách hàng.");
     } finally {
       setIsSaving(false);
     }
@@ -203,7 +219,7 @@ export function AdminCustomerTablePanel({
             onChange={(event) => setStatusFilter(event.target.value)}
           >
             <option value="">Mọi trạng thái</option>
-            {STATUS_OPTIONS.map((option) => (
+            {statusOptions.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.value}
               </option>
@@ -231,8 +247,8 @@ export function AdminCustomerTablePanel({
             </tr>
           </thead>
           <tbody>
-            {filteredCustomers.length ? (
-              filteredCustomers.map((customer) => {
+            {paginatedCustomers.length ? (
+              paginatedCustomers.map((customer) => {
                 const customerId = getCustomerId(customer);
                 const returnStreak = getNumber(customer.returnStreak);
 
@@ -288,12 +304,10 @@ export function AdminCustomerTablePanel({
         </table>
       </div>
 
-      {message ? (
-        <p className="admin-crud-message admin-fade-message">{message}</p>
-      ) : null}
+      <AdminClientPagination itemLabel="khách hàng" pagination={pagination} />
 
       {editingCustomer && formValues ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-customer-modal"
             role="dialog"
@@ -324,7 +338,7 @@ export function AdminCustomerTablePanel({
                   value={formValues.status}
                   onChange={(event) => updateField("status", event.target.value)}
                 >
-                  {STATUS_OPTIONS.map((option) => (
+                  {statusOptions.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
@@ -369,7 +383,7 @@ export function AdminCustomerTablePanel({
               </button>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
     </section>
   );

@@ -6,8 +6,23 @@ import {
   FaRotateRight,
   FaXmark,
 } from "react-icons/fa6";
+import {
+  confirmAdminAction,
+  showAdminAlert,
+} from "../../services/adminBrowserFeedback";
+import { useAdminClientPagination } from "../../hooks/useAdminClientPagination";
+import { AdminClientPagination } from "./AdminClientPagination";
+import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
+const STATUS_FALLBACKS = [
+  "pending",
+  "claimed",
+  "cancelled",
+  "incubating",
+  "ready",
+  "locked",
+];
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -218,7 +233,6 @@ export function AdminEggTablePanel({
   const [statusFilter, setStatusFilter] = useState("");
   const [editingEgg, setEditingEgg] = useState(null);
   const [hatchTimeValue, setHatchTimeValue] = useState("");
-  const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const eggs = tables.eggs || EMPTY_ROWS;
@@ -277,7 +291,11 @@ export function AdminEggTablePanel({
   }, [eggs]);
 
   const statusOptions = useMemo(
-    () => buildOptionRows(eggs.map((egg) => egg.status), getStatusLabel),
+    () =>
+      buildOptionRows(
+        [...STATUS_FALLBACKS, ...eggs.map((egg) => egg.status)],
+        getStatusLabel
+      ),
     [eggs]
   );
 
@@ -334,18 +352,21 @@ export function AdminEggTablePanel({
     statusFilter,
     typeFilter,
   ]);
+  const pagination = useAdminClientPagination(
+    filteredEggs,
+    `${keyword}|${typeFilter}|${statusFilter}|${eggs.length}`
+  );
+  const paginatedEggs = pagination.pageRows;
 
   const openHatchTimeModal = (egg) => {
     setEditingEgg(egg);
     setHatchTimeValue(toDateTimeInputValue(egg.hatch_at || egg.hatchAt));
-    setMessage("");
   };
 
   const closeHatchTimeModal = () => {
     if (isSaving) return;
 
     setEditingEgg(null);
-    setMessage("");
   };
 
   const saveHatchTime = async () => {
@@ -353,7 +374,11 @@ export function AdminEggTablePanel({
     const hatchAt = fromDateTimeInputValue(hatchTimeValue);
 
     if (!eggId || !hatchAt || isSaving) {
-      setMessage("Vui lòng chọn thời gian nở hợp lệ.");
+      showAdminAlert("Vui lòng chọn thời gian nở hợp lệ.");
+      return;
+    }
+
+    if (!confirmAdminAction("Xác nhận cập nhật thời gian nở trứng?")) {
       return;
     }
 
@@ -369,9 +394,9 @@ export function AdminEggTablePanel({
 
       onSaveRecord?.("eggs", savedEgg);
       setEditingEgg(null);
-      setMessage("");
+      showAdminAlert("Đã cập nhật thời gian nở trứng.");
     } catch (error) {
-      setMessage(error.message || "Không thể cập nhật giờ ấp trứng.");
+      showAdminAlert(error.message || "Không thể cập nhật giờ ấp trứng.");
     } finally {
       setIsSaving(false);
     }
@@ -439,8 +464,8 @@ export function AdminEggTablePanel({
             </tr>
           </thead>
           <tbody>
-            {filteredEggs.length ? (
-              filteredEggs.map((egg) => {
+            {paginatedEggs.length ? (
+              paginatedEggs.map((egg) => {
                 const type = getEggTypeValue(egg);
                 const order = getEggOrder(egg, orderById);
                 const pool = getEggPool(egg, poolById);
@@ -515,8 +540,10 @@ export function AdminEggTablePanel({
         </table>
       </div>
 
+      <AdminClientPagination itemLabel="trứng" pagination={pagination} />
+
       {editingEgg ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-egg-hatch-modal"
             role="dialog"
@@ -563,8 +590,6 @@ export function AdminEggTablePanel({
               </span>
             </label>
 
-            {message ? <p className="admin-crud-message">{message}</p> : null}
-
             <div className="admin-crud-actions admin-egg-hatch-actions">
               <button
                 type="button"
@@ -579,7 +604,7 @@ export function AdminEggTablePanel({
               </button>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
     </section>
   );

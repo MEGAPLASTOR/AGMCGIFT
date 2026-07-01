@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { showAdminAlert } from "../../services/adminBrowserFeedback";
+import { AdminModalPortal } from "./AdminModalPortal";
 
 // Fallback đổi thông tin đăng nhập khi dùng dữ liệu local.
 export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
@@ -6,7 +8,6 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
   const [newUsername, setNewUsername] = useState(admin.username || "");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
 
   const resetForm = () => {
@@ -30,22 +31,22 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
     const isChangingPassword = Boolean(newPassword || confirmPassword);
 
     if (!currentPassword) {
-      setMessage("Vui lòng nhập mật khẩu hiện tại.");
+      showAdminAlert("Vui lòng nhập mật khẩu hiện tại.");
       return;
     }
 
     if (!isChangingUsername && !isChangingPassword) {
-      setMessage("Nhập username mới hoặc mật khẩu mới để cập nhật.");
+      showAdminAlert("Nhập username mới hoặc mật khẩu mới để cập nhật.");
       return;
     }
 
     if (isChangingPassword && newPassword.length < 6) {
-      setMessage("Mật khẩu mới cần ít nhất 6 ký tự.");
+      showAdminAlert("Mật khẩu mới cần ít nhất 6 ký tự.");
       return;
     }
 
     if (isChangingPassword && newPassword !== confirmPassword) {
-      setMessage("Mật khẩu xác nhận chưa khớp.");
+      showAdminAlert("Mật khẩu xác nhận chưa khớp.");
       return;
     }
 
@@ -59,13 +60,13 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
         newPassword: isChangingPassword ? newPassword : "",
       });
 
-      setMessage(result.message || "Đã cập nhật thông tin đăng nhập.");
+      showAdminAlert(result.message || "Đã cập nhật thông tin đăng nhập.");
 
       if (result.ok !== false) {
         resetForm();
       }
     } catch (error) {
-      setMessage(error.message || "Không cập nhật được thông tin đăng nhập.");
+      showAdminAlert(error.message || "Không cập nhật được thông tin đăng nhập.");
     } finally {
       setIsSaving(false);
     }
@@ -78,8 +79,7 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
   };
 
   return (
-    <div
-      className="admin-modal-backdrop"
+    <AdminModalPortal
       role="presentation"
       onMouseDown={handleBackdropClick}
     >
@@ -143,9 +143,7 @@ export function AdminPasswordPanel({ admin, onChangePassword, onClose }) {
             {isSaving ? "Đang cập nhật..." : "Cập nhật thông tin"}
           </button>
         </form>
-
-        {message ? <p>{message}</p> : null}
       </section>
-    </div>
+    </AdminModalPortal>
   );
 }

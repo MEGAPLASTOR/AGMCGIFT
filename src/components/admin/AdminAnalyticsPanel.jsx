@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
+import { getDeliveryStatusKind } from "../../api/eggs/utils/getDeliveryStatusKind";
 
 const ORDER_CHART_COLORS = {
   success: "#82aef4",
@@ -64,6 +65,15 @@ function buildConicGradient(items) {
 
 function getStatusTone(status) {
   const normalizedStatus = normalizeStatus(status);
+  const deliveryKind = getDeliveryStatusKind(status);
+
+  if (deliveryKind === "returned") {
+    return "cancelled";
+  }
+
+  if (deliveryKind === "delivered") {
+    return "success";
+  }
 
   if (
     normalizedStatus.includes("cancel") ||
@@ -77,7 +87,6 @@ function getStatusTone(status) {
   if (
     normalizedStatus.includes("paid") ||
     normalizedStatus.includes("success") ||
-    normalizedStatus.includes("giao") ||
     normalizedStatus.includes("delivered")
   ) {
     return "success";
@@ -99,10 +108,10 @@ function getOrderStatusRows(counts = {}, summary = {}) {
     countMatching(
       counts,
       (status) =>
+        getDeliveryStatusKind(status) === "delivered" ||
         status.includes("paid") ||
         status.includes("success") ||
-        status.includes("delivered") ||
-        status.includes("giao")
+        status.includes("delivered")
     ) || Number(summary.paidOrders || 0);
   const pending = Math.max(
     0,

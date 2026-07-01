@@ -1,8 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { showAdminAlert } from "../../services/adminBrowserFeedback";
 
 export function AdminLoginPanel({ error, isLoading, onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    if (!error) {
+      return;
+    }
+
+    showAdminAlert(error);
+  }, [error]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -40,7 +49,6 @@ export function AdminLoginPanel({ error, isLoading, onLogin }) {
             onChange={(event) => setPassword(event.target.value)}
           />
         </label>
-        {error ? <p className="admin-error">{error}</p> : null}
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Đang đăng nhập..." : "Vào dashboard"}
         </button>

@@ -1,38 +1,22 @@
+import { getDeliveryStatusKind } from "../utils/getDeliveryStatusKind";
 import { normalizeApiText } from "../utils/normalizeApiText";
 
 export function getDeliveryStatusError(deliveryStatus) {
-  const status = normalizeApiText(deliveryStatus);
+  const deliveryKind = getDeliveryStatusKind(deliveryStatus);
 
-  if (!status || status === "null" || status.includes("chua giao")) {
+  if (deliveryKind === "not_delivered" || deliveryKind === "unknown") {
     return "Đơn hàng chưa được giao tới hãy đợi giao tới rồi nhập code nhé ^^";
   }
 
-  if (
-    status.includes("chuyen hoan") ||
-    status.includes("hoan") ||
-    status.includes("returned") ||
-    status.includes("refund")
-  ) {
+  if (deliveryKind === "returned") {
     return "Đơn hàng đã bị hoàn bạn không được phép nhận trứng :<";
   }
 
-  if (
-    status.includes("dang giao") ||
-    status.includes("shipping") ||
-    status.includes("delivering")
-  ) {
+  if (deliveryKind === "delivering") {
     return "Đơn hàng đang giao tới hãy chờ thêm xíu nữa rồi nhập code lại sau nhé ^^";
   }
 
-  if (
-    status.includes("da giao") ||
-    status.includes("delivered") ||
-    status.includes("completed")
-  ) {
-    return "";
-  }
-
-  return "Đơn hàng chưa được giao tới hãy đợi giao tới rồi nhập code nhé ^^";
+  return "";
 }
 
 export function getEggSyncErrorMessage(error) {
@@ -45,7 +29,11 @@ export function getEggSyncErrorMessage(error) {
   }
 
   if (error.status === 404) {
-    return error.payload?.message || error.message || "Không tìm thấy mã đơn hàng này trên hệ thống.";
+    return (
+      error.payload?.message ||
+      error.message ||
+      "Không tìm thấy mã đơn hàng này trên hệ thống."
+    );
   }
 
   const customerStatus = normalizeApiText(
@@ -71,7 +59,8 @@ export function getEggSyncErrorMessage(error) {
   }
 
   if (
-    Number(error.payload?.returnStreak || error.payload?.customer?.returnStreak || 0) >= 2 ||
+    Number(error.payload?.returnStreak || error.payload?.customer?.returnStreak || 0) >=
+      2 ||
     customerStatus.includes("ban") ||
     customerStatus.includes("khoa") ||
     messageText.includes("vi pham") ||

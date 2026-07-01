@@ -7,6 +7,13 @@ import {
   FaTrashCan,
   FaXmark,
 } from "react-icons/fa6";
+import {
+  confirmAdminAction,
+  showAdminAlert,
+} from "../../services/adminBrowserFeedback";
+import { useAdminClientPagination } from "../../hooks/useAdminClientPagination";
+import { AdminClientPagination } from "./AdminClientPagination";
+import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
 const TIER_ORDER = ["A", "B", "C", "D", "E"];
@@ -142,7 +149,6 @@ export function AdminGiftPoolTablePanel({
   onRemovePoolAccount,
 }) {
   const [keyword, setKeyword] = useState("");
-  const [message, setMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [editingPoolId, setEditingPoolId] = useState("");
   const [poolForm, setPoolForm] = useState(createEmptyPoolForm);
@@ -300,6 +306,11 @@ export function AdminGiftPoolTablePanel({
         ),
     [normalizedKeyword, pools]
   );
+  const poolPagination = useAdminClientPagination(
+    filteredPools,
+    `${keyword}|${pools.length}`
+  );
+  const paginatedPools = poolPagination.pageRows;
 
   const selectedPool = useMemo(
     () => pools.find((pool) => getPoolId(pool) === detailPoolId) || null,
@@ -312,6 +323,11 @@ export function AdminGiftPoolTablePanel({
   const currentPoolAccounts = selectedPool
     ? poolAccountsByPoolId.get(getPoolId(selectedPool)) || EMPTY_ROWS
     : EMPTY_ROWS;
+  const poolAccountPagination = useAdminClientPagination(
+    currentPoolAccounts,
+    `${detailPoolId}|${selectedTier}|${currentPoolAccounts.length}`
+  );
+  const paginatedPoolAccounts = poolAccountPagination.pageRows;
   const currentPoolAccountIds = useMemo(
     () => currentPoolAccounts.map(getAccountId).filter(Boolean),
     [currentPoolAccounts]
@@ -321,9 +337,9 @@ export function AdminGiftPoolTablePanel({
     [selectedPoolAccountIds]
   );
   const allPoolAccountsSelected =
-    currentPoolAccountIds.length > 0 &&
-    currentPoolAccountIds.every((accountId) =>
-      selectedPoolAccountIdSet.has(accountId)
+    paginatedPoolAccounts.length > 0 &&
+    paginatedPoolAccounts.every((account) =>
+      selectedPoolAccountIdSet.has(getAccountId(account))
     );
   const candidateAccounts = useMemo(() => {
     const currentPoolAccountIdSet = new Set(currentPoolAccountIds);
@@ -363,14 +379,12 @@ export function AdminGiftPoolTablePanel({
     setEditingPoolId("");
     setPoolForm(createEmptyPoolForm());
     setPoolModalOpen(true);
-    setMessage("");
   };
 
   const openEditPoolModal = (pool) => {
     setEditingPoolId(getPoolId(pool));
     setPoolForm(createPoolForm(pool));
     setPoolModalOpen(true);
-    setMessage("");
   };
 
   const openDetailModal = (pool) => {
@@ -380,7 +394,6 @@ export function AdminGiftPoolTablePanel({
     setSelectedTier(poolTier || tierOptions[0] || "A");
     setSelectedAccountId("");
     setSelectedPoolAccountIds([]);
-    setMessage("");
   };
 
   const updatePoolField = (field, value) => {
@@ -402,7 +415,7 @@ export function AdminGiftPoolTablePanel({
     };
 
     if (!record.pool_name) {
-      setMessage("Vui lòng nhập tên bể quà.");
+      showAdminAlert("Vui lòng nhập tên bể quà.");
       return;
     }
 
@@ -422,9 +435,9 @@ export function AdminGiftPoolTablePanel({
       onSaveRecord("giftPools", nextPool);
       setPoolModalOpen(false);
       setEditingPoolId("");
-      setMessage(editingPoolId ? "Đã cập nhật bể quà." : "Đã tạo bể quà mới.");
+      showAdminAlert(editingPoolId ? "Đã cập nhật bể quà." : "Đã tạo bể quà mới.");
     } catch (error) {
-      setMessage(error.message || "Không thể lưu bể quà.");
+      showAdminAlert(error.message || "Không thể lưu bể quà.");
     } finally {
       setIsSaving(false);
     }
@@ -453,9 +466,9 @@ export function AdminGiftPoolTablePanel({
       }
 
       setDeletePoolId("");
-      setMessage("Đã xóa bể quà.");
+      showAdminAlert("Đã xóa bể quà.");
     } catch (error) {
-      setMessage(error.message || "Không thể xóa bể quà.");
+      showAdminAlert(error.message || "Không thể xóa bể quà.");
     } finally {
       setIsSaving(false);
     }
@@ -466,6 +479,16 @@ export function AdminGiftPoolTablePanel({
     const uniqueAccountIds = [...new Set(accountIds.map(normalizeText).filter(Boolean))];
 
     if (!poolId || !uniqueAccountIds.length || isSaving) {
+      return;
+    }
+
+    if (
+      !confirmAdminAction(
+        uniqueAccountIds.length === 1
+          ? "Xác nhận thêm account vào bể quà?"
+          : `Xác nhận thêm ${uniqueAccountIds.length} account vào bể quà?`
+      )
+    ) {
       return;
     }
 
@@ -486,9 +509,9 @@ export function AdminGiftPoolTablePanel({
       nextMappings.forEach((mapping) =>
         onSaveRecord("poolAccountMappings", mapping)
       );
-      setMessage(`Đã thêm ${uniqueAccountIds.length} account vào bể.`);
+      showAdminAlert(`Đã thêm ${uniqueAccountIds.length} account vào bể.`);
     } catch (error) {
-      setMessage(error.message || "Không thể thêm account vào bể.");
+      showAdminAlert(error.message || "Không thể thêm account vào bể.");
     } finally {
       setIsSaving(false);
     }
@@ -504,7 +527,7 @@ export function AdminGiftPoolTablePanel({
 
   const toggleAllPoolAccounts = () => {
     setSelectedPoolAccountIds(
-      allPoolAccountsSelected ? [] : currentPoolAccountIds
+      allPoolAccountsSelected ? [] : paginatedPoolAccounts.map(getAccountId).filter(Boolean)
     );
   };
 
@@ -513,6 +536,16 @@ export function AdminGiftPoolTablePanel({
     const uniqueAccountIds = [...new Set(accountIds.map(normalizeText).filter(Boolean))];
 
     if (!poolId || !uniqueAccountIds.length || isSaving) {
+      return;
+    }
+
+    if (
+      !confirmAdminAction(
+        uniqueAccountIds.length === 1
+          ? "Xác nhận gỡ account khỏi bể quà?"
+          : `Xác nhận gỡ ${uniqueAccountIds.length} account khỏi bể quà?`
+      )
+    ) {
       return;
     }
 
@@ -542,9 +575,9 @@ export function AdminGiftPoolTablePanel({
       setSelectedPoolAccountIds((currentIds) =>
         currentIds.filter((accountId) => !uniqueAccountIds.includes(accountId))
       );
-      setMessage(`Đã gỡ ${uniqueAccountIds.length} account khỏi bể.`);
+      showAdminAlert(`Đã gỡ ${uniqueAccountIds.length} account khỏi bể.`);
     } catch (error) {
-      setMessage(error.message || "Không thể gỡ account khỏi bể.");
+      showAdminAlert(error.message || "Không thể gỡ account khỏi bể.");
     } finally {
       setIsSaving(false);
     }
@@ -590,8 +623,8 @@ export function AdminGiftPoolTablePanel({
             </tr>
           </thead>
           <tbody>
-            {filteredPools.length ? (
-              filteredPools.map((pool) => {
+            {paginatedPools.length ? (
+              paginatedPools.map((pool) => {
                 const poolId = getPoolId(pool);
                 const poolAccounts = poolAccountsByPoolId.get(poolId) || EMPTY_ROWS;
 
@@ -648,10 +681,10 @@ export function AdminGiftPoolTablePanel({
         </table>
       </div>
 
-      {message ? <p className="admin-crud-message">{message}</p> : null}
+      <AdminClientPagination itemLabel="bể quà" pagination={poolPagination} />
 
       {isPoolModalOpen ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-gift-pool-modal"
             role="dialog"
@@ -718,11 +751,11 @@ export function AdminGiftPoolTablePanel({
               </div>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
 
       {selectedPool ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-gift-pool-detail-modal"
             role="dialog"
@@ -845,8 +878,8 @@ export function AdminGiftPoolTablePanel({
                     </tr>
                   </thead>
                   <tbody>
-                    {currentPoolAccounts.length ? (
-                      currentPoolAccounts.map((account) => {
+                    {paginatedPoolAccounts.length ? (
+                      paginatedPoolAccounts.map((account) => {
                         const accountId = getAccountId(account);
 
                         return (
@@ -902,13 +935,18 @@ export function AdminGiftPoolTablePanel({
                   </tbody>
                 </table>
               </div>
+
+              <AdminClientPagination
+                itemLabel="account trong bể"
+                pagination={poolAccountPagination}
+              />
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
 
       {deletePool ? (
-        <div className="admin-modal-backdrop">
+        <AdminModalPortal>
           <section
             className="admin-panel admin-modal admin-confirm-modal"
             role="dialog"
@@ -950,11 +988,11 @@ export function AdminGiftPoolTablePanel({
                 onClick={confirmDeletePool}
               >
                 <FaTrashCan aria-hidden="true" />
-                {isSaving ? "Đang xóa..." : "Xóa bể"}
+                <span>{isSaving ? "Đang xóa..." : "Xóa bể"}</span>
               </button>
             </div>
           </section>
-        </div>
+        </AdminModalPortal>
       ) : null}
     </section>
   );

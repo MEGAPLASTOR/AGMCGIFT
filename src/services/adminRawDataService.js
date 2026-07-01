@@ -1,6 +1,7 @@
 import { getApiBaseUrl } from "../api/config/apiRuntimeConfig";
 import { ADMIN_ENDPOINTS } from "../api/endpoints/adminEndpoints";
 import { getDefaultApiErrorMessage } from "../api/errors/apiErrorMessages";
+import { getDeliveryStatusKind } from "../api/eggs/utils/getDeliveryStatusKind";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { readResponsePayload } from "../api/http/readResponsePayload";
 import {
@@ -11,7 +12,6 @@ import {
 } from "./adminGiftPoolService";
 import { normalizeApiText } from "../api/eggs/utils/normalizeApiText";
 
-const ABSOLUTE_SUCCESS_DAYS = 15;
 const RAW_ENDPOINTS = [
   ["customers", ADMIN_ENDPOINTS.customers],
   ["eggs", ADMIN_ENDPOINTS.eggs],
@@ -103,12 +103,12 @@ function normalizeDate(value) {
 function normalizeEggStatus(rawEgg) {
   const status = String(rawEgg.status || "").trim().toUpperCase();
 
-  if (status === "CLAIMED") return "hatched";
+  if (status === "CLAIMED") return "claimed";
   if (status === "CANCELLED" || status === "INVALIDATED" || status === "INVALIDED") {
-    return "invalidated";
+    return "cancelled";
   }
 
-  if (Number(rawEgg.eggType) === 2 && rawEgg.hatchAt) {
+  if (status === "PENDING" && Number(rawEgg.eggType) === 2 && rawEgg.hatchAt) {
     return new Date(rawEgg.hatchAt).getTime() > Date.now() ? "incubating" : "ready";
   }
 
@@ -127,21 +127,15 @@ function getDeliveredAt(order) {
   );
 }
 
-function isOlderThanDays(dateValue, days) {
-  if (!dateValue) {
-    return false;
-  }
-
-  const date = new Date(dateValue);
-
-  if (Number.isNaN(date.getTime())) {
-    return false;
-  }
-
-  return Date.now() - date.getTime() >= days * 24 * 60 * 60 * 1000;
-}
-
 function normalizeOrderStatus(order) {
+  const deliveryKind = getDeliveryStatusKind(
+    [
+      order.deliveryStatus,
+      order.delivery_status,
+      order.fulfillmentStatus,
+      order.fulfillment_status,
+    ].join(" ")
+  );
   const statusText = normalizeApiText(
     [
       order.status,
@@ -155,31 +149,17 @@ function normalizeOrderStatus(order) {
     ].join(" ")
   );
 
-  if (
-    statusText.includes("cancel") ||
-    statusText.includes("huy") ||
-    statusText.includes("chuyen hoan") ||
-    statusText.includes("hoan tra") ||
-    statusText.includes("tra hang") ||
-    statusText.includes("returned") ||
-    statusText.includes("refund")
-  ) {
+  if (deliveryKind === "returned" || statusText.includes("cancel") || statusText.includes("huy")) {
     return "Cancel";
   }
 
-  if (statusText.includes("paid") || statusText.includes("tuyet doi")) {
-    return "Paid";
-  }
-
   if (
-    statusText.includes("delivered") ||
-    statusText.includes("completed") ||
-    statusText.includes("success") ||
-    statusText.includes("da giao")
+    deliveryKind === "delivered" ||
+    statusText.includes("paid") ||
+    statusText.includes("tuyet doi") ||
+    statusText.includes("success")
   ) {
-    return isOlderThanDays(getDeliveredAt(order), ABSOLUTE_SUCCESS_DAYS)
-      ? "Paid"
-      : "Pending";
+    return "Paid";
   }
 
   return "Pending";

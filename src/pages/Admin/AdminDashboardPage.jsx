@@ -21,6 +21,7 @@ import { AdminAnalyticsPanel } from "../../components/admin/AdminAnalyticsPanel"
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
+import { showAdminAlert } from "../../services/adminBrowserFeedback";
 import { giftCatalogData } from "../../config/giftCatalogData";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
 import { useAdminDataTables } from "../../hooks/useAdminDataTables";
@@ -33,6 +34,7 @@ import { updateAdminCustomerStatus } from "../../services/adminCustomerService";
 import { updateAdminEggHatchTime } from "../../services/adminEggService";
 import {
   createAdminGiftAccount,
+  deleteAdminGiftAccounts,
   deleteAdminGiftAccount,
   updateAdminGiftAccount,
   uploadAdminGiftAccounts,
@@ -368,6 +370,14 @@ export default function AdminDashboardPage() {
     loadRawTables,
   ]);
 
+  useEffect(() => {
+    if (!adminTables.rawDataError) {
+      return;
+    }
+
+    showAdminAlert(adminTables.rawDataError);
+  }, [adminTables.rawDataError]);
+
   const handleToggleAdminNav = () => {
     setNavCollapsed((currentValue) => !currentValue);
   };
@@ -467,7 +477,9 @@ export default function AdminDashboardPage() {
 
   const handleDeleteGiftAccount = async (id) => {
     try {
-      return await deleteAdminGiftAccount(id, admin.authHeader);
+      return Array.isArray(id)
+        ? await deleteAdminGiftAccounts(id, admin.authHeader)
+        : await deleteAdminGiftAccount(id, admin.authHeader);
     } catch (deleteError) {
       handleAuthError(deleteError);
       throw deleteError;
@@ -675,21 +687,6 @@ export default function AdminDashboardPage() {
           onChangePassword={handleChangeAdminCredentials}
           onClose={() => setPasswordModalOpen(false)}
         />
-      ) : null}
-
-      {adminTables.isLoadingRawData || adminTables.rawDataError ? (
-        <section className="admin-panel">
-          <div className="admin-panel__head">
-            <div>
-              <h2>Trạng thái dữ liệu</h2>
-              <span>
-                {adminTables.isLoadingRawData
-                  ? "Đang tải dữ liệu hệ thống"
-                  : adminTables.rawDataError}
-              </span>
-            </div>
-          </div>
-        </section>
       ) : null}
 
       <div
