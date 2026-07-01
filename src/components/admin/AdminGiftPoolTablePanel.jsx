@@ -150,6 +150,7 @@ export function AdminGiftPoolTablePanel({
   const [detailPoolId, setDetailPoolId] = useState("");
   const [selectedTier, setSelectedTier] = useState("A");
   const [selectedAccountId, setSelectedAccountId] = useState("");
+  const [selectedPoolAccountIds, setSelectedPoolAccountIds] = useState([]);
   const [deletePoolId, setDeletePoolId] = useState("");
 
   const pools = tables.giftPools || EMPTY_ROWS;
@@ -311,8 +312,21 @@ export function AdminGiftPoolTablePanel({
   const currentPoolAccounts = selectedPool
     ? poolAccountsByPoolId.get(getPoolId(selectedPool)) || EMPTY_ROWS
     : EMPTY_ROWS;
+  const currentPoolAccountIds = useMemo(
+    () => currentPoolAccounts.map(getAccountId).filter(Boolean),
+    [currentPoolAccounts]
+  );
+  const selectedPoolAccountIdSet = useMemo(
+    () => new Set(selectedPoolAccountIds),
+    [selectedPoolAccountIds]
+  );
+  const allPoolAccountsSelected =
+    currentPoolAccountIds.length > 0 &&
+    currentPoolAccountIds.every((accountId) =>
+      selectedPoolAccountIdSet.has(accountId)
+    );
   const candidateAccounts = useMemo(() => {
-    const currentPoolAccountIds = new Set(currentPoolAccounts.map(getAccountId));
+    const currentPoolAccountIdSet = new Set(currentPoolAccountIds);
 
     return accounts
       .filter((account) => {
@@ -321,7 +335,7 @@ export function AdminGiftPoolTablePanel({
         return (
           accountId &&
           accountMatchesTier(account, selectedTier) &&
-          !currentPoolAccountIds.has(accountId) &&
+          !currentPoolAccountIdSet.has(accountId) &&
           !mappedAccountIds.has(accountId)
         );
       })
@@ -331,13 +345,19 @@ export function AdminGiftPoolTablePanel({
           "vi"
         )
       );
-  }, [accounts, currentPoolAccounts, mappedAccountIds, selectedTier]);
+  }, [accounts, currentPoolAccountIds, mappedAccountIds, selectedTier]);
 
   useEffect(() => {
     if (!candidateAccounts.some((account) => getAccountId(account) === selectedAccountId)) {
       setSelectedAccountId(getAccountId(candidateAccounts[0]) || "");
     }
   }, [candidateAccounts, selectedAccountId]);
+
+  useEffect(() => {
+    setSelectedPoolAccountIds((currentIds) =>
+      currentIds.filter((accountId) => currentPoolAccountIds.includes(accountId))
+    );
+  }, [currentPoolAccountIds]);
 
   const openCreatePoolModal = () => {
     setEditingPoolId("");
@@ -359,6 +379,7 @@ export function AdminGiftPoolTablePanel({
     setDetailPoolId(getPoolId(pool));
     setSelectedTier(poolTier || tierOptions[0] || "A");
     setSelectedAccountId("");
+    setSelectedPoolAccountIds([]);
     setMessage("");
   };
 
@@ -473,10 +494,25 @@ export function AdminGiftPoolTablePanel({
     }
   };
 
-  const removeAccountFromPool = async (accountId) => {
-    const poolId = getPoolId(selectedPool);
+  const togglePoolAccount = (accountId) => {
+    setSelectedPoolAccountIds((currentIds) =>
+      currentIds.includes(accountId)
+        ? currentIds.filter((currentId) => currentId !== accountId)
+        : [...currentIds, accountId]
+    );
+  };
 
-    if (!poolId || !accountId || isSaving) {
+  const toggleAllPoolAccounts = () => {
+    setSelectedPoolAccountIds(
+      allPoolAccountsSelected ? [] : currentPoolAccountIds
+    );
+  };
+
+  const removeAccountsFromPool = async (accountIds) => {
+    const poolId = getPoolId(selectedPool);
+    const uniqueAccountIds = [...new Set(accountIds.map(normalizeText).filter(Boolean))];
+
+    if (!poolId || !uniqueAccountIds.length || isSaving) {
       return;
     }
 
@@ -485,30 +521,37 @@ export function AdminGiftPoolTablePanel({
     try {
       const result = await onRemovePoolAccount({
         pool_id: poolId,
-        account_ids: [accountId],
+        account_ids: uniqueAccountIds,
       });
       const returnedMappings = Array.isArray(result) ? result : [result].filter(Boolean);
       const mappingIds = returnedMappings.length
         ? returnedMappings.map(getMappingId)
-        : [
+        : uniqueAccountIds.map((accountId) =>
             getMappingId(
               mappings.find(
                 (mapping) =>
                   getMappingPoolId(mapping) === poolId &&
                   getMappingAccountId(mapping) === accountId
               ) || createPoolAccountMapping(poolId, accountId)
-            ),
-          ];
+            )
+          );
 
       mappingIds.forEach((mappingId) =>
         onDeleteRecord("poolAccountMappings", mappingId)
       );
-      setMessage("Đã gỡ account khỏi bể.");
+      setSelectedPoolAccountIds((currentIds) =>
+        currentIds.filter((accountId) => !uniqueAccountIds.includes(accountId))
+      );
+      setMessage(`Đã gỡ ${uniqueAccountIds.length} account khỏi bể.`);
     } catch (error) {
       setMessage(error.message || "Không thể gỡ account khỏi bể.");
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const removeAccountFromPool = (accountId) => {
+    removeAccountsFromPool([accountId]);
   };
 
   return (
@@ -698,7 +741,10 @@ export function AdminGiftPoolTablePanel({
                   type="button"
                   className="admin-modal-close"
                   aria-label="Đóng chi tiết bể quà"
-                  onClick={() => setDetailPoolId("")}
+                  onClick={() => {
+                    setDetailPoolId("");
+                    setSelectedPoolAccountIds([]);
+                  }}
                 >
                   <FaXmark aria-hidden="true" />
                   Đóng
@@ -764,10 +810,32 @@ export function AdminGiftPoolTablePanel({
                 </button>
               </div>
 
+              <div className="admin-gift-pool-bulk-actions">
+                <span>{selectedPoolAccountIds.length} account đã chọn</span>
+                <button
+                  type="button"
+                  className="admin-mini-button admin-danger-button"
+                  disabled={!selectedPoolAccountIds.length || isSaving}
+                  onClick={() => removeAccountsFromPool(selectedPoolAccountIds)}
+                >
+                  <FaTrashCan aria-hidden="true" />
+                  Gỡ đã chọn
+                </button>
+              </div>
+
               <div className="admin-table-wrap admin-gift-pool-account-wrap">
                 <table className="admin-table admin-gift-pool-account-table">
                   <thead>
                     <tr>
+                      <th>
+                        <input
+                          aria-label="Chọn tất cả account trong bể"
+                          checked={allPoolAccountsSelected}
+                          disabled={!currentPoolAccountIds.length || isSaving}
+                          type="checkbox"
+                          onChange={toggleAllPoolAccounts}
+                        />
+                      </th>
                       <th>Username / Account</th>
                       <th>Password</th>
                       <th>Nền tảng</th>
@@ -783,6 +851,15 @@ export function AdminGiftPoolTablePanel({
 
                         return (
                           <tr key={accountId}>
+                            <td>
+                              <input
+                                aria-label={`Chọn ${account.username || accountId}`}
+                                checked={selectedPoolAccountIdSet.has(accountId)}
+                                disabled={isSaving}
+                                type="checkbox"
+                                onChange={() => togglePoolAccount(accountId)}
+                              />
+                            </td>
                             <td>
                               <strong>{account.username || accountId}</strong>
                               <small>{accountId}</small>
@@ -819,7 +896,7 @@ export function AdminGiftPoolTablePanel({
                       })
                     ) : (
                       <tr>
-                        <td colSpan={6}>Bể này chưa có account.</td>
+                        <td colSpan={7}>Bể này chưa có account.</td>
                       </tr>
                     )}
                   </tbody>
