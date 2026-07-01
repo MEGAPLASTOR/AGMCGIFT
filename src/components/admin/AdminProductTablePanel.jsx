@@ -447,7 +447,7 @@ export function AdminProductTablePanel({
                         onClick={() => openMappingModal(product, productMappings[0])}
                       >
                         <FaLink aria-hidden="true" />
-                        {productMappings.length ? "Sửa Ánh Xạ" : "Thêm Ánh Xạ"}
+                        {productMappings.length ? "Thêm Ánh Xạ" : "Thêm Ánh Xạ"}
                       </button>
                     </td>
                   </tr>
