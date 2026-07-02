@@ -1,4 +1,4 @@
-export const GIFT_CODE_EXAMPLE = "HDSPE_260622PSYR4BHX";
+export const GIFT_CODE_EXAMPLE = "260622PSYR4BHX";
 export const GIFT_CODE_FORMAT_LABEL =
   "HDSPE_ + 6 chữ số + 8 ký tự chữ/số";
 export const GIFT_CODE_PATTERN = /^DHSPE_\d{6}[A-Z0-9]{20}$/;
