@@ -1,5 +1,5 @@
-export function AccountRewardCard({ reward, account }) {
-  const accountInfo = account || reward;
+export function AccountRewardCard({ reward, account, title = "Acc nhận được" }) {
+  const accountInfo = account || reward || {};
   const accountName =
     accountInfo.tenAcc || accountInfo.tenPhanThuong || accountInfo.platform;
   const username = accountInfo.taiKhoan || accountInfo.username;
@@ -14,7 +14,7 @@ export function AccountRewardCard({ reward, account }) {
           OK
         </span>
         <div>
-          <span>Acc nhận được</span>
+          <span>{title}</span>
           <strong>{accountName || "Acc Blox Fruit"}</strong>
         </div>
       </div>

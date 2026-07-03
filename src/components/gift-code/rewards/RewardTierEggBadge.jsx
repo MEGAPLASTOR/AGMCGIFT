@@ -3,19 +3,22 @@ import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 
 const DIAMOND_TIERS = new Set(["A", "B", "C"]);
 
-function getRewardTier(redemptionInfo) {
-  return String(
-    redemptionInfo?.reward?.tier ||
-      redemptionInfo?.account?.tier ||
-      redemptionInfo?.eggTier ||
-      ""
-  )
-    .trim()
-    .toUpperCase();
+function getRewardTiers(redemptionInfo) {
+  const rewards = [
+    ...(Array.isArray(redemptionInfo?.accounts) ? redemptionInfo.accounts : []),
+    redemptionInfo?.reward,
+    redemptionInfo?.account,
+  ].filter(Boolean);
+
+  return rewards
+    .map((reward) => String(reward?.tier || redemptionInfo?.eggTier || "").trim().toUpperCase())
+    .filter(Boolean);
 }
 
 export function RewardTierEggBadge({ redemptionInfo }) {
-  const isDiamond = DIAMOND_TIERS.has(getRewardTier(redemptionInfo));
+  const isDiamond = getRewardTiers(redemptionInfo).some((tier) =>
+    DIAMOND_TIERS.has(tier)
+  );
 
   return (
     <span

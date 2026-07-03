@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaBars,
+  FaBolt,
   FaBoxOpen,
   FaBoxesStacked,
   FaCartShopping,
@@ -19,6 +20,7 @@ import {
 } from "react-icons/fa6";
 import { AdminAnalyticsPanel } from "../../components/admin/AdminAnalyticsPanel";
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
+import { AdminEarlyHatchPanel } from "../../components/admin/AdminEarlyHatchPanel";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
 import { showAdminAlert } from "../../services/adminBrowserFeedback";
@@ -31,7 +33,11 @@ import {
 } from "../../services/adminDashboardService";
 import { updateAdminCredentials } from "../../services/adminAuthService";
 import { updateAdminCustomerStatus } from "../../services/adminCustomerService";
-import { updateAdminEggHatchTime } from "../../services/adminEggService";
+import {
+  approveAdminEarlyHatch,
+  fetchAdminEarlyHatchEligible,
+  updateAdminEggHatchTime,
+} from "../../services/adminEggService";
 import {
   createAdminGiftAccount,
   deleteAdminGiftAccounts,
@@ -98,6 +104,15 @@ const MANAGEMENT_PAGES = [
     description: "Kiểm tra loại trứng, trạng thái ấp, thời gian mở và tài khoản được cấp.",
   },
   {
+    slug: "early-hatch",
+    icon: FaBolt,
+    label: "Duyệt sớm",
+    title: "Duyệt Trứng Sớm",
+    description: "Duyệt giảm 3 ngày ấp cho trứng đủ điều kiện.",
+    badgeLabel: "API",
+    isCustom: true,
+  },
+  {
     slug: "products",
     tableKey: "products",
     icon: FaCube,
@@ -115,7 +130,7 @@ const MANAGEMENT_PAGES = [
   },
 ].filter((page) => page.slug !== "egg-mappings");
 
-const MANAGEMENT_TABLE_KEYS = MANAGEMENT_PAGES.map((page) => page.tableKey);
+const MANAGEMENT_TABLE_KEYS = MANAGEMENT_PAGES.map((page) => page.tableKey).filter(Boolean);
 
 function getAdminPath(slug = "") {
   return slug ? `${ADMIN_BASE_PATH}/${slug}` : ADMIN_BASE_PATH;
@@ -168,7 +183,7 @@ function AdminManagementNav({ activeSlug, onNavigate, tableCounts }) {
           >
             <Icon className="admin-management-nav__icon" aria-hidden="true" />
             <span>{page.label}</span>
-            <strong>{tableCounts[page.tableKey] || 0}</strong>
+            <strong>{page.badgeLabel || tableCounts[page.tableKey] || 0}</strong>
           </Link>
         );
       })}
@@ -204,11 +219,17 @@ function findProductEggMappingRow(tables, record) {
   const poolId = normalizeComparable(
     record.gift_pool_id || record.pool_id || record.poolId
   );
+  const mappingsType = normalizeComparable(
+    record.mappingsType || record.mappings_type || record.eggType || record.egg_type || 1
+  );
 
   return (tables.productEggMappings || []).find(
     (mapping) =>
       normalizeComparable(mapping.kv_product_id) === productId &&
-      normalizeComparable(mapping.gift_pool_id) === poolId
+      normalizeComparable(mapping.gift_pool_id) === poolId &&
+      normalizeComparable(
+        mapping.mappingsType || mapping.mappings_type || mapping.egg_type || 1
+      ) === mappingsType
   );
 }
 
@@ -623,6 +644,26 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleFetchEarlyHatchEligible = async () => {
+    try {
+      return await fetchAdminEarlyHatchEligible(admin.authHeader);
+    } catch (fetchError) {
+      handleAuthError(fetchError);
+      throw fetchError;
+    }
+  };
+
+  const handleApproveEarlyHatch = async (eggId) => {
+    try {
+      await approveAdminEarlyHatch(eggId, admin.authHeader);
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+    } catch (approveError) {
+      handleAuthError(approveError);
+      throw approveError;
+    }
+  };
+
   const SidebarToggleIcon = isNavCollapsed ? FaChevronRight : FaChevronLeft;
 
   if (!admin) {
@@ -743,6 +784,13 @@ export default function AdminDashboardPage() {
               isRefreshing={adminTables.isLoadingRawData}
               metrics={visibleMetrics}
               onRefresh={handleReloadRawData}
+            />
+          ) : activeManagementPage.slug === "early-hatch" ? (
+            <AdminEarlyHatchPanel
+              authHeader={admin.authHeader}
+              isRefreshing={adminTables.isLoadingRawData}
+              onApproveEarlyHatch={handleApproveEarlyHatch}
+              onFetchEligible={handleFetchEarlyHatchEligible}
             />
           ) : (
             <AdminDataCrudPanel

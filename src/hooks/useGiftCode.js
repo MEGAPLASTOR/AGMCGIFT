@@ -30,31 +30,54 @@ function readStoredRedemptions() {
   }
 }
 
-function getStoredRedemption(eggId) {
-  return readStoredRedemptions()[eggId] || null;
+function getRedemptionStorageKey(orderId, eggType) {
+  return `${String(orderId || "").trim()}:${Number(eggType || 0)}`;
+}
+
+function getLegacyStoredRedemption(eggIds = []) {
+  const redemptions = readStoredRedemptions();
+
+  return eggIds
+    .map((eggId) => redemptions[String(eggId || "").trim()])
+    .find(
+      (redemption) => redemption?.reward || Array.isArray(redemption?.accounts)
+    ) || null;
+}
+
+function getStoredRedemption(orderId, eggType, eggIds = []) {
+  const redemptions = readStoredRedemptions();
+  const storageKey = getRedemptionStorageKey(orderId, eggType);
+
+  return redemptions[storageKey] || getLegacyStoredRedemption(eggIds);
 }
 
 function saveStoredRedemption(redemption) {
-  if (typeof window === "undefined" || !redemption?.eggId || !redemption?.reward) {
+  if (
+    typeof window === "undefined" ||
+    !redemption?.orderId ||
+    !Number.isFinite(Number(redemption?.eggType)) ||
+    (!redemption?.reward && !Array.isArray(redemption?.accounts))
+  ) {
     return;
   }
 
   const redemptions = readStoredRedemptions();
-  redemptions[redemption.eggId] = redemption;
+  redemptions[getRedemptionStorageKey(redemption.orderId, redemption.eggType)] =
+    redemption;
   window.localStorage.setItem(
     CLAIMED_REWARDS_STORAGE_KEY,
     JSON.stringify(redemptions)
   );
 }
 
-function getSavedOrApiReward(egg) {
-  const saved = getStoredRedemption(egg.eggId);
-
-  if (saved?.reward) {
-    return saved.reward;
+function getValidDate(value) {
+  if (!value) {
+    return null;
   }
 
-  return egg.account ? normalizeClaimEggResponse({ account: egg.account }) : null;
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime()) ? null : date;
 }
 
 function getEggReadyInfo(egg, fallbackDays) {
@@ -66,9 +89,116 @@ function getEggReadyInfo(egg, fallbackDays) {
 }
 
 function isEggReady(egg) {
-  if (!egg.hatchAt) return true;
+  if (!egg?.hatchAt) return true;
 
   return new Date(egg.hatchAt).getTime() <= Date.now();
+}
+
+function getGroupHatchAt(eggs) {
+  const hatchDates = eggs
+    .map((egg) => getValidDate(egg.hatchAt))
+    .filter(Boolean)
+    .sort((left, right) => right.getTime() - left.getTime());
+
+  return hatchDates[0]?.toISOString() || null;
+}
+
+function getGroupCreatedAt(eggs) {
+  const createdDates = eggs
+    .map((egg) => getValidDate(egg.createdAt))
+    .filter(Boolean)
+    .sort((left, right) => left.getTime() - right.getTime());
+
+  return createdDates[0]?.toISOString() || null;
+}
+
+function buildEggsByChoice(entry, eggs) {
+  const groups = eggs.reduce((map, egg) => {
+    if (!egg.choice) {
+      return map;
+    }
+
+    if (!map[egg.choice]) {
+      map[egg.choice] = {
+        choice: egg.choice,
+        eggType: egg.eggType,
+        eggTier: egg.eggTier,
+        eggIds: [],
+        eggs: [],
+        productCodes: [],
+        displayStatus: egg.displayStatus,
+      };
+    }
+
+    map[egg.choice].eggIds.push(egg.eggId);
+    map[egg.choice].eggs.push(egg);
+
+    if (egg.productCode) {
+      map[egg.choice].productCodes.push(egg.productCode);
+    }
+
+    return map;
+  }, {});
+
+  return Object.fromEntries(
+    Object.entries(groups).map(([choice, group]) => {
+      const savedRedemption = entry?.order?.id
+        ? getStoredRedemption(entry.order.id, group.eggType, group.eggIds)
+        : null;
+      const savedAccounts = Array.isArray(savedRedemption?.accounts)
+        ? savedRedemption.accounts
+        : savedRedemption?.reward
+          ? [savedRedemption.reward]
+          : [];
+      const apiAccounts = normalizeClaimEggResponse({
+        accounts: group.eggs.map((egg) => egg.account).filter(Boolean),
+      }).accounts;
+      const accounts = savedAccounts.length ? savedAccounts : apiAccounts;
+
+      return [
+        choice,
+        {
+          ...group,
+          eggCount: group.eggs.length,
+          eggIds: [...new Set(group.eggIds.filter(Boolean))],
+          productCodes: [...new Set(group.productCodes.filter(Boolean))],
+          hatchAt: getGroupHatchAt(group.eggs),
+          createdAt: getGroupCreatedAt(group.eggs),
+          requiresIncubation:
+            Number(group.eggType) === 2 ||
+            group.eggs.some((egg) => egg.requiresIncubation),
+          isClaimed:
+            Boolean(accounts.length || savedRedemption?.reward) ||
+            group.eggs.every((egg) => egg.isClaimed),
+          reward: savedRedemption?.reward || accounts[0] || null,
+          account:
+            savedRedemption?.account ||
+            savedRedemption?.reward ||
+            accounts[0] ||
+            null,
+          accounts,
+          message: savedRedemption?.message || "",
+          stuckCount: Number(savedRedemption?.stuckCount ?? 0),
+        },
+      ];
+    })
+  );
+}
+
+function withEggGroups(entry, eggs = entry?.eggs || []) {
+  if (!entry) {
+    return entry;
+  }
+
+  const nextEntry = {
+    ...entry,
+    eggs,
+  };
+
+  return {
+    ...nextEntry,
+    eggsByChoice: buildEggsByChoice(nextEntry, eggs),
+  };
 }
 
 function createBaseRedemption(selectedEntry, egg) {
@@ -83,21 +213,35 @@ function createBaseRedemption(selectedEntry, egg) {
     deliveryStatus: selectedEntry.order.deliveryStatus,
     productId: selectedEntry.product.id,
     productName: selectedEntry.product.tenSanPham,
-    eggId: egg.eggId,
+    productCodes: selectedEntry.product.productCodes || egg.productCodes || [],
+    eggId: egg.eggIds?.[0] || "",
+    eggIds: egg.eggIds || [],
     eggType: egg.eggType,
     eggTier: egg.eggTier,
     eggSlot: egg.slot,
+    eggCount: egg.eggCount,
     eggStatus: egg.displayStatus,
     redeemedAt: now,
   };
 }
 
 function createClaimedRedemption(selectedEntry, egg, choice, reward, delayDays) {
+  const primaryReward =
+    reward?.reward || reward?.account || reward?.accounts?.[0] || null;
+  const accounts = Array.isArray(reward?.accounts)
+    ? reward.accounts
+    : primaryReward
+      ? [primaryReward]
+      : [];
+
   return {
     ...createBaseRedemption(selectedEntry, egg),
     choice,
-    reward,
-    account: reward,
+    reward: primaryReward,
+    account: primaryReward,
+    accounts,
+    message: reward?.message || primaryReward?.ghiChu || "",
+    stuckCount: Number(reward?.stuckCount ?? 0),
     claimedAt: new Date().toISOString(),
     isReady: true,
     ...(choice === LUA_CHON_CHO_NHAN_THUONG_XIN
@@ -106,46 +250,35 @@ function createClaimedRedemption(selectedEntry, egg, choice, reward, delayDays) 
   };
 }
 
-function buildEggsByChoice(eggs) {
-  return eggs.reduce((map, egg) => {
-    if (!map[egg.choice]) {
-      map[egg.choice] = egg;
-    }
-
-    return map;
-  }, {});
-}
-
-function markEggClaimed(entry, eggId, reward) {
+function markEggClaimed(entry, eggType) {
   if (!entry) return entry;
 
   const eggs = entry.eggs.map((egg) =>
-    egg.eggId === eggId
-      ? { ...egg, isClaimed: true, account: reward, displayStatus: "CLAIMED" }
+    Number(egg.eggType) === Number(eggType)
+      ? { ...egg, isClaimed: true, displayStatus: "CLAIMED" }
       : egg
   );
 
-  return { ...entry, eggs, eggsByChoice: buildEggsByChoice(eggs) };
+  return withEggGroups(entry, eggs);
 }
 
 function withFallbackHatchAt(entry, delayDays) {
   const eggs = entry.eggs.map((egg) => {
-    if (egg.hatchAt || (egg.choice !== LUA_CHON_CHO_NHAN_THUONG_XIN && egg.eggType !== 2)) {
+    if (egg.hatchAt || Number(egg.eggType) !== 2) {
       return egg;
     }
 
     return {
       ...egg,
-      hatchAt: addDays(egg.createdAt || new Date().toISOString(), delayDays).toISOString(),
+      hatchAt: addDays(
+        egg.createdAt || new Date().toISOString(),
+        delayDays
+      ).toISOString(),
       requiresIncubation: true,
     };
   });
 
-  return {
-    ...entry,
-    eggs,
-    eggsByChoice: buildEggsByChoice(eggs),
-  };
+  return withEggGroups(entry, eggs);
 }
 
 export function useGiftCode(catalogData) {
@@ -173,57 +306,54 @@ export function useGiftCode(catalogData) {
     [selectedEntry]
   );
 
-  const checkCode = useCallback(async (inputCode) => {
-    const trimmedCode = inputCode.trim().toUpperCase();
+  const checkCode = useCallback(
+    async (inputCode) => {
+      const trimmedCode = inputCode.trim().toUpperCase();
 
-    if (!trimmedCode) {
-      setErrorMsg("Vui lòng nhập mã đơn hàng.");
-      setStatus(GIFT_CODE_STATUS.invalid);
-      return;
-    }
-    // console.log(inputCode, trimmedCode);
-
-    setIsChecking(true);
-    setErrorMsg("");
-    setSelectedEntry(null);
-    setRedemptionInfo(null);
-
-    try {
-      // Kiểm tra mã đơn qua /api/eggs/sync và nhận danh sách trứng hợp lệ.
-      const payload = await syncEggsByOrderCode(trimmedCode);
-      const matchedEntry = withFallbackHatchAt(
-        normalizeSyncEggResponse(payload, trimmedCode),
-        soNgayCho
-      );
-      
-      // console.log(payload);
-
-      const deliveryStatusError = getDeliveryStatusError(
-        matchedEntry.order.deliveryStatus
-      );
-
-      if (deliveryStatusError) {
-        setErrorMsg(deliveryStatusError);
+      if (!trimmedCode) {
+        setErrorMsg("Vui lòng nhập mã đơn hàng.");
         setStatus(GIFT_CODE_STATUS.invalid);
         return;
       }
 
-      if (!matchedEntry.eggs.length) {
-        setErrorMsg("Mã đơn hợp lệ nhưng chưa có trứng khả dụng.");
-        setStatus(GIFT_CODE_STATUS.invalid);
-        return;
-      }
+      setIsChecking(true);
+      setErrorMsg("");
+      setSelectedEntry(null);
+      setRedemptionInfo(null);
 
-      setSelectedEntry(matchedEntry);
-      setStatus(GIFT_CODE_STATUS.choosing);
-    } catch (error) {
-      // console.log(error);
-      setErrorMsg(getEggSyncErrorMessage(error));
-      setStatus(GIFT_CODE_STATUS.invalid);
-    } finally {
-      setIsChecking(false);
-    }
-  }, [soNgayCho]);
+      try {
+        const payload = await syncEggsByOrderCode(trimmedCode);
+        const matchedEntry = withFallbackHatchAt(
+          normalizeSyncEggResponse(payload, trimmedCode),
+          soNgayCho
+        );
+        const deliveryStatusError = getDeliveryStatusError(
+          matchedEntry.order.deliveryStatus
+        );
+
+        if (deliveryStatusError) {
+          setErrorMsg(deliveryStatusError);
+          setStatus(GIFT_CODE_STATUS.invalid);
+          return;
+        }
+
+        if (!matchedEntry.eggs.length) {
+          setErrorMsg("Mã đơn hợp lệ nhưng chưa có trứng khả dụng.");
+          setStatus(GIFT_CODE_STATUS.invalid);
+          return;
+        }
+
+        setSelectedEntry(matchedEntry);
+        setStatus(GIFT_CODE_STATUS.choosing);
+      } catch (error) {
+        setErrorMsg(getEggSyncErrorMessage(error));
+        setStatus(GIFT_CODE_STATUS.invalid);
+      } finally {
+        setIsChecking(false);
+      }
+    },
+    [soNgayCho]
+  );
 
   const claimReward = useCallback(
     async (choice) => {
@@ -239,26 +369,37 @@ export function useGiftCode(catalogData) {
       }
 
       const baseRedemption = createBaseRedemption(selectedEntry, selectedEgg);
-      if (selectedEgg.isClaimed) {
-        const reward = getSavedOrApiReward(selectedEgg);
+      const savedRedemption = getStoredRedemption(
+        selectedEntry.order.id,
+        selectedEgg.eggType,
+        selectedEgg.eggIds
+      );
+      const existingRedemption =
+        savedRedemption?.reward || savedRedemption?.accounts?.length
+          ? savedRedemption
+          : selectedEgg.reward || selectedEgg.accounts?.length
+            ? createClaimedRedemption(
+                selectedEntry,
+                selectedEgg,
+                choice,
+                selectedEgg,
+                soNgayCho
+              )
+            : null;
 
-        if (reward) {
-          setRedemptionInfo(
-            createClaimedRedemption(selectedEntry, selectedEgg, choice, reward, soNgayCho)
-          );
-          setErrorMsg("");
-          setStatus(
-            choice === LUA_CHON_NHAN_NGAY
-              ? GIFT_CODE_STATUS.claimedNow
-              : GIFT_CODE_STATUS.claimedLater
-          );
-          return;
-        }
+      if (existingRedemption) {
+        setRedemptionInfo(existingRedemption);
+        setErrorMsg("");
+        setStatus(
+          choice === LUA_CHON_NHAN_NGAY
+            ? GIFT_CODE_STATUS.claimedNow
+            : GIFT_CODE_STATUS.claimedLater
+        );
+        return;
       }
 
       if (
         choice === LUA_CHON_CHO_NHAN_THUONG_XIN &&
-        !selectedEgg.isClaimed &&
         (!selectedEgg.hatchAt || !isEggReady(selectedEgg))
       ) {
         setRedemptionInfo({
@@ -275,23 +416,22 @@ export function useGiftCode(catalogData) {
       setErrorMsg("");
 
       try {
-        // Mở trứng qua /api/eggs/claim bằng eggId đã chọn.
-        const claimPayload = await claimEggById(selectedEgg.eggId);
+        const claimPayload = await claimEggById(
+          selectedEntry.order.id,
+          selectedEgg.eggType
+        );
         const reward = normalizeClaimEggResponse(claimPayload);
-        const newRedemption = {
-          ...baseRedemption,
+        const newRedemption = createClaimedRedemption(
+          selectedEntry,
+          selectedEgg,
           choice,
           reward,
-          account: reward,
-          claimedAt: new Date().toISOString(),
-          ...(choice === LUA_CHON_CHO_NHAN_THUONG_XIN
-            ? getEggReadyInfo(selectedEgg, soNgayCho)
-            : {}),
-        };
+          soNgayCho
+        );
 
         saveStoredRedemption(newRedemption);
         setSelectedEntry((currentEntry) =>
-          markEggClaimed(currentEntry, selectedEgg.eggId, reward)
+          markEggClaimed(currentEntry, selectedEgg.eggType)
         );
         setRedemptionInfo(newRedemption);
         setStatus(
@@ -309,21 +449,29 @@ export function useGiftCode(catalogData) {
   );
 
   const claimReadyReward = useCallback(async () => {
-    if (!redemptionInfo?.eggId || isClaiming) return;
+    if (!redemptionInfo?.orderId || !redemptionInfo?.eggType || isClaiming) {
+      return;
+    }
 
     setIsClaiming(true);
     setErrorMsg("");
 
     try {
-      const claimPayload = await claimEggById(redemptionInfo.eggId);
+      const claimPayload = await claimEggById(
+        redemptionInfo.orderId,
+        redemptionInfo.eggType
+      );
       const reward = normalizeClaimEggResponse(claimPayload);
-      const eggId = redemptionInfo.eggId;
 
       setRedemptionInfo((current) => {
         const nextRedemption = {
           ...current,
-          reward,
-          account: reward,
+          reward: reward.reward || reward.account || reward.accounts?.[0] || null,
+          account:
+            reward.account || reward.reward || reward.accounts?.[0] || null,
+          accounts: reward.accounts || [],
+          message: reward.message || "",
+          stuckCount: Number(reward.stuckCount ?? 0),
           claimedAt: new Date().toISOString(),
           isReady: true,
         };
@@ -331,13 +479,15 @@ export function useGiftCode(catalogData) {
         saveStoredRedemption(nextRedemption);
         return nextRedemption;
       });
-      setSelectedEntry((currentEntry) => markEggClaimed(currentEntry, eggId, reward));
+      setSelectedEntry((currentEntry) =>
+        markEggClaimed(currentEntry, redemptionInfo.eggType)
+      );
     } catch (error) {
       setErrorMsg(getEggClaimErrorMessage(error));
     } finally {
       setIsClaiming(false);
     }
-  }, [isClaiming, redemptionInfo?.eggId]);
+  }, [isClaiming, redemptionInfo?.eggType, redemptionInfo?.orderId]);
 
   const reset = useCallback(() => {
     setStatus(GIFT_CODE_STATUS.idle);
@@ -360,14 +510,13 @@ export function useGiftCode(catalogData) {
     () => ({
       now: Boolean(
         choiceEggs[LUA_CHON_NHAN_NGAY]?.isClaimed ||
-          getStoredRedemption(choiceEggs[LUA_CHON_NHAN_NGAY]?.eggId)?.reward ||
-          (redemptionInfo?.choice === LUA_CHON_NHAN_NGAY && redemptionInfo?.reward)
+          (redemptionInfo?.choice === LUA_CHON_NHAN_NGAY &&
+            (redemptionInfo?.reward || redemptionInfo?.accounts?.length))
       ),
       later: Boolean(
         choiceEggs[LUA_CHON_CHO_NHAN_THUONG_XIN]?.isClaimed ||
-          getStoredRedemption(choiceEggs[LUA_CHON_CHO_NHAN_THUONG_XIN]?.eggId)?.reward ||
           (redemptionInfo?.choice === LUA_CHON_CHO_NHAN_THUONG_XIN &&
-            redemptionInfo?.reward)
+            (redemptionInfo?.reward || redemptionInfo?.accounts?.length))
       ),
     }),
     [choiceEggs, redemptionInfo]

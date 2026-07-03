@@ -6,6 +6,10 @@ function isReadyToOpen(egg) {
   return new Date(egg.hatchAt).getTime() <= Date.now();
 }
 
+function getEggCountLabel(egg) {
+  return egg?.eggCount ? ` (${egg.eggCount} trứng)` : "";
+}
+
 export function RewardChoicePage({
   code,
   productName,
@@ -33,18 +37,18 @@ export function RewardChoicePage({
         ? "Đang mở..."
         : "Nhận ngay";
   const instantDescription = instantOpened
-    ? "Trứng này đã mở, bấm để xem lại acc."
+    ? "Nhóm trứng này đã mở, bấm để xem lại acc."
     : !canClaimNow
-      ? "Không có trứng vàng cho mã này."
+      ? "Không có trứng thường cho mã này."
       : instantNeedsIncubation
-        ? "Trứng này cần chờ đủ cooldown trước khi mở."
-        : "Nhận acc ngay sau khi random.";
+        ? "Nhóm trứng này cần chờ đủ cooldown trước khi mở."
+        : "Mở toàn bộ trứng thường trong đơn và nhận acc ngay.";
   const delayedDescription = delayedOpened
-    ? "Trứng này đã mở, bấm để xem lại acc."
+    ? "Nhóm trứng này đã mở, bấm để xem lại acc."
     : !canClaimLater
       ? "Không có trứng ấp 15 ngày cho mã này."
       : delayedReady
-        ? "Hết cooldown, bấm mở để random phần thưởng."
+        ? "Hết cooldown, bấm mở để random toàn bộ phần thưởng của nhóm này."
         : "Đang ấp, chưa lộ trứng vàng hay kim cương.";
   const delayedActionLabel = delayedOpened
     ? "Xem acc"
@@ -65,8 +69,8 @@ export function RewardChoicePage({
       </div>
 
       <p className="panel-note">
-        Sản phẩm: <strong>{productName}</strong>. Mã này có thể nhận cả trứng mở ngay
-        và trứng bí ẩn 15 ngày nếu đơn có đủ trứng.
+        Sản phẩm: <strong>{productName}</strong>. Mỗi nút sẽ mở toàn bộ trứng cùng loại
+        trong đơn nếu mã có đủ trứng.
       </p>
 
       <div className="reward-egg-grid">
@@ -81,7 +85,10 @@ export function RewardChoicePage({
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>{instantNeedsIncubation ? "Trứng vàng đang ấp" : "Trứng vàng"}</strong>
+              <strong>
+                {instantNeedsIncubation ? "Trứng vàng đang ấp" : "Trứng thường"}
+                {getEggCountLabel(instantEgg)}
+              </strong>
               <span>{instantDescription}</span>
             </span>
             <em>{instantActionLabel}</em>
@@ -95,11 +102,16 @@ export function RewardChoicePage({
           onClick={onClaimLater}
         >
           <span className="reward-egg-card__image">
-            <span className="mystery-egg" aria-hidden="true">?</span>
+            <span className="mystery-egg" aria-hidden="true">
+              ?
+            </span>
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>{delayedOpened ? "Trứng đã mở" : "Trứng bí ẩn 15 ngày"}</strong>
+              <strong>
+                {delayedOpened ? "Trứng đã mở" : "Trứng bí ẩn 15 ngày"}
+                {getEggCountLabel(delayedEgg)}
+              </strong>
               <span>{delayedDescription}</span>
             </span>
             <em>{delayedActionLabel}</em>

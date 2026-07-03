@@ -133,10 +133,16 @@ export function normalizeEgg(rawEgg, index = 0, totalEggs = 0) {
   const egg = {
     eggId: rawEgg.eggId || rawEgg.id || rawEgg.egg_id,
     eggType: Number(rawEgg.eggType ?? rawEgg.egg_type ?? 0),
-    eggTier: rawEgg.eggTier || rawEgg.egg_tier || rawEgg.tier || rawEgg.giftPool?.tier || "",
+    eggTier:
+      rawEgg.eggTier ||
+      rawEgg.egg_tier ||
+      rawEgg.tier ||
+      rawEgg.giftPool?.tier ||
+      "",
     displayStatus: rawEgg.displayStatus || rawEgg.status || "Sẵn sàng",
     hatchAt: rawEgg.hatchAt || rawEgg.hatch_at || null,
     createdAt: rawEgg.createdAt || rawEgg.created_at || null,
+    productCode: rawEgg.productCode || rawEgg.product_code || rawEgg.code || "",
     slot: getEggSlot(rawEgg, index),
   };
   const requiresIncubation = hasCooldown(egg);

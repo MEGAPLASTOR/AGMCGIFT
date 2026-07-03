@@ -2,6 +2,7 @@ export const ADMIN_ENDPOINTS = {
   authCredentials: "/api/admin/auth/credentials",
   customers: "/api/admin/customers",
   eggs: "/api/admin/eggs",
+  eggsEarlyHatchEligible: "/api/admin/eggs/early-hatch/eligible",
   giftAccounts: "/api/admin/gift-accounts",
   giftAccountsBatchDelete: "/api/admin/gift-accounts/batch-delete",
   giftAccountsSingle: "/api/admin/gift-accounts/single",
@@ -42,4 +43,8 @@ export function getAdminProductEggMappingRatesEndpoint(productId) {
 
 export function getAdminEggHatchTimeEndpoint(id) {
   return `${ADMIN_ENDPOINTS.eggs}/${encodeURIComponent(id)}/hatch-time`;
+}
+
+export function getAdminEggEarlyHatchApprovalEndpoint(id) {
+  return `${ADMIN_ENDPOINTS.eggs}/${encodeURIComponent(id)}/reduce-hatch-time-manual`;
 }

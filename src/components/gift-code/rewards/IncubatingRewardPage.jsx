@@ -3,6 +3,14 @@ import { AccountRewardCard } from "./AccountRewardCard";
 import { CountdownTimer } from "./CountdownTimer";
 import { RewardTierEggBadge } from "./RewardTierEggBadge";
 
+function getRewardAccounts(redemptionInfo) {
+  return Array.isArray(redemptionInfo?.accounts) && redemptionInfo.accounts.length
+    ? redemptionInfo.accounts
+    : redemptionInfo?.reward
+      ? [redemptionInfo.reward]
+      : [];
+}
+
 export function IncubatingRewardPage({
   redemptionInfo,
   isClaiming = false,
@@ -12,8 +20,9 @@ export function IncubatingRewardPage({
   backLabel = "Quay lại xem trứng",
 }) {
   const [isCountdownComplete, setIsCountdownComplete] = useState(false);
+  const accounts = getRewardAccounts(redemptionInfo);
   const isReady = redemptionInfo.isReady || isCountdownComplete;
-  const hasReward = Boolean(redemptionInfo.reward || redemptionInfo.account);
+  const hasReward = accounts.length > 0;
   const eggName = "Trứng bí ẩn";
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
@@ -35,7 +44,9 @@ export function IncubatingRewardPage({
         {hasReward ? (
           <RewardTierEggBadge redemptionInfo={redemptionInfo} />
         ) : (
-          <span className="mystery-egg mystery-egg--small" aria-hidden="true">?</span>
+          <span className="mystery-egg mystery-egg--small" aria-hidden="true">
+            ?
+          </span>
         )}
       </div>
 
@@ -43,15 +54,28 @@ export function IncubatingRewardPage({
         <span>Code: {redemptionInfo.code}</span>
         <span>Sản phẩm: {redemptionInfo.productName}</span>
         <span>Ngày giờ mở: {redemptionInfo.rewardDateTime}</span>
+        {accounts.length > 1 ? <span>Số acc: {accounts.length}</span> : null}
       </div>
 
       {isReady ? (
         hasReward ? (
           <>
             <p className="message message--success">
-              {eggName} đã nở. Đây là phần thưởng của bạn.
+              {redemptionInfo.message || `${eggName} đã nở. Đây là phần thưởng của bạn.`}
             </p>
-            <AccountRewardCard reward={redemptionInfo.reward} />
+            <div className="account-reward-list">
+              {accounts.map((account, index) => (
+                <AccountRewardCard
+                  key={`${account.taiKhoan || account.username || "reward"}-${index}`}
+                  account={account}
+                  title={
+                    accounts.length > 1
+                      ? `Acc nhận được #${index + 1}`
+                      : "Acc nhận được"
+                  }
+                />
+              ))}
+            </div>
           </>
         ) : (
           <>

@@ -8,11 +8,14 @@ import { requestJson } from "../api/http/requestJson";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
-    throw new ApiRequestError("Vui lòng đăng nhập admin trước khi quản lý mapping sản phẩm.", {
-      status: 401,
-      payload: null,
-      endpoint,
-    });
+    throw new ApiRequestError(
+      "Vui lòng đăng nhập admin trước khi quản lý mapping sản phẩm.",
+      {
+        status: 401,
+        payload: null,
+        endpoint,
+      }
+    );
   }
 
   return authHeader;
@@ -22,6 +25,10 @@ function normalizeText(value) {
   return String(value || "").trim();
 }
 
+function normalizeMappingType(value) {
+  return Number(value) === 2 ? 2 : 1;
+}
+
 function getResponseRecord(payload) {
   return payload?.data || payload?.mapping || payload?.productEggMapping || payload;
 }
@@ -29,6 +36,12 @@ function getResponseRecord(payload) {
 function buildProductEggMappingPayload(record) {
   const productId = Number(record.productId || record.kvProductId || record.kv_product_id);
   const poolId = normalizeText(record.poolId || record.pool_id || record.gift_pool_id);
+  const mappingsType = normalizeMappingType(
+    record.mappingsType ||
+      record.mappings_type ||
+      record.eggType ||
+      record.egg_type
+  );
 
   if (!Number.isFinite(productId) || productId <= 0) {
     throw new Error("Vui lòng nhập kv_product_id hợp lệ.");
@@ -38,7 +51,7 @@ function buildProductEggMappingPayload(record) {
     throw new Error("Vui lòng nhập gift_pool_id.");
   }
 
-  return { productId, poolId };
+  return { productId, poolId, mappingsType };
 }
 
 function normalizeProductEggMapping(record, fallback = {}) {
@@ -59,13 +72,25 @@ function normalizeProductEggMapping(record, fallback = {}) {
     giftPool.id ||
     fallback.gift_pool_id ||
     "";
+  const mappingsType = normalizeMappingType(
+    source.mappingsType ||
+      source.mappings_type ||
+      source.eggType ||
+      source.egg_type ||
+      fallback.mappingsType ||
+      fallback.mappings_type ||
+      fallback.egg_type
+  );
 
   return {
-    id: source.id || fallback.id || `${productId}:${poolId}`,
+    id: source.id || fallback.id || `${productId}:${poolId}:${mappingsType}`,
     kv_product_id: String(productId),
     kv_variant_id: source.kv_variant_id || fallback.kv_variant_id || "",
-    egg_type: Number(source.eggType || source.egg_type || fallback.egg_type || 0),
+    mappings_type: mappingsType,
+    mappingsType,
+    egg_type: mappingsType,
     gift_pool_id: poolId,
+    poolId,
     egg_tier: source.eggTier || source.egg_tier || giftPool.tier || fallback.egg_tier || "",
     rate: Number(source.rate ?? source.ratePercent ?? source.rate_percent ?? fallback.rate ?? 0),
     created_at: source.createdAt || source.created_at || fallback.created_at || null,
@@ -87,6 +112,9 @@ export async function linkAdminProductEggMapping(record, authHeader) {
     ...record,
     kv_product_id: String(requestBody.productId),
     gift_pool_id: requestBody.poolId,
+    mappingsType: requestBody.mappingsType,
+    mappings_type: requestBody.mappingsType,
+    egg_type: requestBody.mappingsType,
   });
 }
 

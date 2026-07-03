@@ -456,6 +456,11 @@ input::placeholder {
   padding: 16px;
 }
 
+.account-reward-list {
+  display: grid;
+  gap: 14px;
+}
+
 .account-reward__head {
   display: flex;
   min-width: 0;

@@ -27,12 +27,25 @@ function createEggMap(eggs) {
 }
 
 function normalizeEggRows(root) {
-  const rows = getEggRows(root).slice(0, 2);
+  const rows = getEggRows(root);
 
   return rows
     .map((rawEgg, index) => normalizeEgg(rawEgg, index, rows.length))
     .filter((egg) => egg.eggId)
-    .sort((first, second) => first.slot - second.slot)
+    .sort((first, second) => {
+      const typeDiff = Number(first.eggType || 0) - Number(second.eggType || 0);
+
+      if (typeDiff) {
+        return typeDiff;
+      }
+
+      const productDiff = String(first.productCode || "").localeCompare(
+        String(second.productCode || ""),
+        "vi"
+      );
+
+      return productDiff || first.slot - second.slot;
+    });
 }
 
 export function normalizeSyncEggResponse(payload, orderCode) {
@@ -44,6 +57,15 @@ export function normalizeSyncEggResponse(payload, orderCode) {
   const product = root.product || firstOrderItem.product || {};
   const eggs = normalizeEggRows(root);
   const eggsByChoice = createEggMap(eggs);
+  const productCodes = [...new Set(eggs.map((egg) => egg.productCode).filter(Boolean))];
+  const productSummary = productCodes.length
+    ? productCodes.join(", ")
+    : root.productName ||
+      root.product_name ||
+      product.name ||
+      firstOrderItem.productName ||
+      firstOrderItem.product_name ||
+      "Đơn hàng quà tặng";
 
   return {
     product: {
@@ -54,14 +76,10 @@ export function normalizeSyncEggResponse(payload, orderCode) {
         product.kvProductId ||
         firstOrderItem.kvProductId ||
         firstOrderItem.kv_product_id ||
+        productCodes[0] ||
         "api-order-product",
-      tenSanPham:
-        root.productName ||
-        root.product_name ||
-        product.name ||
-        firstOrderItem.productName ||
-        firstOrderItem.product_name ||
-        "Đơn hàng quà tặng",
+      tenSanPham: productSummary,
+      productCodes,
     },
     order: {
       id: root.orderId || root.order_id || order.id || orderCode,
@@ -132,6 +150,8 @@ export function normalizeSyncEggResponse(payload, orderCode) {
       code: orderCode,
     },
     apiPayload: root,
+    totalType1Eggs: Number(root.totalType1Eggs ?? 0),
+    totalType2Eggs: Number(root.totalType2Eggs ?? 0),
     eggs,
     eggsByChoice,
   };

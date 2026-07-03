@@ -243,7 +243,9 @@ function normalizeProductEggMappings(products) {
   return products.flatMap((product) =>
     (product.mappings || []).map((mapping) => {
       const giftPool = mapping.giftPool || mapping.gift_pool || {};
-      const eggType = Number(mapping.eggType ?? mapping.egg_type ?? 0);
+      const mappingsType = Number(
+        mapping.mappingsType ?? mapping.mappings_type ?? mapping.eggType ?? mapping.egg_type ?? 1
+      );
       const productId =
         product.kvProductId || product.kv_product_id || product.productId || "";
       const poolId =
@@ -255,10 +257,12 @@ function normalizeProductEggMappings(products) {
         "";
 
       return {
-        id: mapping.id || `${productId}:${poolId || mapping.eggTier || eggType}`,
+        id: mapping.id || `${productId}:${poolId || mapping.eggTier || mappingsType}:${mappingsType}`,
         kv_product_id: String(productId),
         kv_variant_id: mapping.kvVariantId || mapping.kv_variant_id || "",
-        egg_type: eggType,
+        mappings_type: mappingsType,
+        mappingsType,
+        egg_type: mappingsType,
         gift_pool_id: poolId,
         egg_tier: mapping.eggTier || mapping.egg_tier || giftPool.tier || "",
         rate: Number(mapping.rate ?? mapping.ratePercent ?? mapping.rate_percent ?? 0),

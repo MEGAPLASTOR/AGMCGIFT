@@ -16,6 +16,10 @@ import { AdminClientPagination } from "./AdminClientPagination";
 import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
+const MAPPING_TYPE_OPTIONS = [
+  { value: 1, label: "Trứng thường (T1)" },
+  { value: 2, label: "Trứng ấp (T2)" },
+];
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -52,12 +56,32 @@ function getMappingProductId(mapping) {
   );
 }
 
+function getMappingType(mapping) {
+  return Number(
+    mapping?.mappingsType ??
+      mapping?.mappings_type ??
+      mapping?.eggType ??
+      mapping?.egg_type ??
+      1
+  ) === 2
+    ? 2
+    : 1;
+}
+
+function getMappingTypeLabel(mappingType) {
+  return Number(mappingType) === 2 ? "Trứng ấp (T2)" : "Trứng thường (T1)";
+}
+
+function getMappingTypeShortLabel(mappingType) {
+  return Number(mappingType) === 2 ? "T2" : "T1";
+}
+
 function getMappingId(mapping) {
   return (
     normalizeText(mapping?.id) ||
     `${getMappingProductId(mapping)}:${normalizeText(
       mapping?.gift_pool_id || mapping?.poolId
-    )}`
+    )}:${getMappingType(mapping)}`
   );
 }
 
@@ -98,13 +122,14 @@ function getMappingPoolLabel(mapping, poolById) {
   const poolId = normalizeText(mapping?.gift_pool_id || mapping?.poolId);
   const pool = poolById.get(poolId);
   const fallbackName = poolId || "Chưa chọn bể";
-  const tier = normalizeText(mapping?.egg_tier || pool?.tier);
+  const tier = normalizeText(mapping?.egg_tier || mapping?.eggTier || pool?.tier);
 
   return tier ? `${getPoolName(pool) || fallbackName} (Tier ${tier})` : fallbackName;
 }
 
-function buildMappingRecord(product, poolId) {
+function buildMappingRecord(product, poolId, mappingsType) {
   const productId = getProductId(product);
+  const mappingType = Number(mappingsType) === 2 ? 2 : 1;
 
   return {
     productId,
@@ -113,17 +138,33 @@ function buildMappingRecord(product, poolId) {
     poolId,
     pool_id: poolId,
     gift_pool_id: poolId,
+    mappingsType: mappingType,
+    mappings_type: mappingType,
+    egg_type: mappingType,
   };
 }
 
-function sortMappingsByPool(mappings) {
+function sortMappings(mappings) {
   return [...mappings].sort((left, right) => {
-    const leftTier = normalizeText(left.egg_tier || left.eggTier);
-    const rightTier = normalizeText(right.egg_tier || right.eggTier);
+    const typeDiff = getMappingType(left) - getMappingType(right);
+
+    if (typeDiff) {
+      return typeDiff;
+    }
+
+    const leftTier = normalizeText(left?.egg_tier || left?.eggTier);
+    const rightTier = normalizeText(right?.egg_tier || right?.eggTier);
     const tierDiff = leftTier.localeCompare(rightTier, "vi");
 
     return tierDiff || getMappingId(left).localeCompare(getMappingId(right), "vi");
   });
+}
+
+function getTypeGroupTotal(mappings, draftRates) {
+  return mappings.reduce(
+    (total, mapping) => total + Number(draftRates[getMappingId(mapping)] || 0),
+    0
+  );
 }
 
 export function AdminProductTablePanel({
@@ -141,6 +182,7 @@ export function AdminProductTablePanel({
   const [keyword, setKeyword] = useState("");
   const [selectedProductId, setSelectedProductId] = useState("");
   const [selectedPoolId, setSelectedPoolId] = useState("");
+  const [selectedMappingType, setSelectedMappingType] = useState(1);
   const [rateProductId, setRateProductId] = useState("");
   const [draftRates, setDraftRates] = useState({});
   const [isSaving, setIsSaving] = useState(false);
@@ -196,7 +238,7 @@ export function AdminProductTablePanel({
     });
 
     map.forEach((productMappings, productId) => {
-      map.set(productId, sortMappingsByPool(productMappings));
+      map.set(productId, sortMappings(productMappings));
     });
 
     return map;
@@ -212,6 +254,16 @@ export function AdminProductTablePanel({
   const rateProductMappings = rateProductId
     ? mappingsByProductId.get(rateProductId) || EMPTY_ROWS
     : EMPTY_ROWS;
+  const rateMappingsByType = useMemo(
+    () =>
+      Object.fromEntries(
+        MAPPING_TYPE_OPTIONS.map(({ value }) => [
+          value,
+          rateProductMappings.filter((mapping) => getMappingType(mapping) === value),
+        ])
+      ),
+    [rateProductMappings]
+  );
 
   const filteredProducts = useMemo(
     () =>
@@ -231,7 +283,7 @@ export function AdminProductTablePanel({
           productMappings
             .map(
               (mapping) =>
-                `${getMappingPoolLabel(
+                `${getMappingTypeLabel(getMappingType(mapping))} ${getMappingPoolLabel(
                   mapping,
                   poolById
                 )} ${formatRate(getMappingRate(mapping))}`
@@ -245,22 +297,25 @@ export function AdminProductTablePanel({
       }),
     [mappingsByProductId, normalizedKeyword, poolById, products]
   );
+
   const pagination = useAdminClientPagination(
     filteredProducts,
     `${keyword}|${products.length}|${mappings.length}`
   );
   const paginatedProducts = pagination.pageRows;
 
-  const openMappingModal = (product, mapping) => {
+  const openMappingModal = (product, mapping = null) => {
     const productId = getProductId(product);
 
     setSelectedProductId(productId);
-    setSelectedPoolId(mapping?.gift_pool_id || "");
+    setSelectedPoolId(normalizeText(mapping?.gift_pool_id || mapping?.poolId));
+    setSelectedMappingType(getMappingType(mapping));
   };
 
   const closeMappingModal = () => {
     setSelectedProductId("");
     setSelectedPoolId("");
+    setSelectedMappingType(1);
   };
 
   const saveMapping = async () => {
@@ -275,16 +330,17 @@ export function AdminProductTablePanel({
       const hasSamePool = selectedProductMappings.some(
         (mapping) =>
           normalizeKey(mapping.gift_pool_id || mapping.poolId) ===
-          normalizeKey(selectedPoolId)
+            normalizeKey(selectedPoolId) &&
+          getMappingType(mapping) === Number(selectedMappingType)
       );
 
       if (hasSamePool) {
-        showAdminAlert("Ánh xạ này đã tồn tại.");
+        showAdminAlert("Ánh xạ này đã tồn tại trong nhóm trứng đã chọn.");
         return;
       }
 
       const savedMapping = await onSaveProductEggMapping?.(
-        buildMappingRecord(selectedProduct, selectedPoolId)
+        buildMappingRecord(selectedProduct, selectedPoolId, selectedMappingType)
       );
 
       if (savedMapping) {
@@ -352,19 +408,30 @@ export function AdminProductTablePanel({
       ...mapping,
       rate: Number(draftRates[getMappingId(mapping)] ?? 0),
     }));
-    const totalRate = fallbackMappings.reduce(
-      (total, mapping) => total + getMappingRate(mapping),
-      0
-    );
 
     if (fallbackMappings.some((mapping) => !Number.isFinite(getMappingRate(mapping)))) {
       showAdminAlert("Tỉ lệ phải là số.");
       return;
     }
 
-    if (Math.abs(totalRate - 100) > 0.01) {
-      showAdminAlert("Tổng tỉ lệ phải bằng 100%.");
-      return;
+    for (const { value, label } of MAPPING_TYPE_OPTIONS) {
+      const groupMappings = fallbackMappings.filter(
+        (mapping) => getMappingType(mapping) === value
+      );
+
+      if (!groupMappings.length) {
+        continue;
+      }
+
+      const totalRate = groupMappings.reduce(
+        (total, mapping) => total + getMappingRate(mapping),
+        0
+      );
+
+      if (Math.abs(totalRate - 100) > 0.01) {
+        showAdminAlert(`${label} phải có tổng tỉ lệ bằng 100%.`);
+        return;
+      }
     }
 
     if (!confirmAdminAction("Xác nhận cập nhật tỉ lệ ánh xạ?")) {
@@ -378,9 +445,10 @@ export function AdminProductTablePanel({
         getProductId(rateProduct),
         fallbackMappings
       );
-      const rowsToSave = Array.isArray(savedMappings) && savedMappings.length
-        ? savedMappings
-        : fallbackMappings;
+      const rowsToSave =
+        Array.isArray(savedMappings) && savedMappings.length
+          ? savedMappings
+          : fallbackMappings;
 
       rowsToSave.forEach((mapping) => {
         onSaveRecord?.("productEggMappings", mapping);
@@ -474,22 +542,29 @@ export function AdminProductTablePanel({
                     <td>
                       {productMappings.length ? (
                         <div className="admin-product-mapping-list">
-                          {productMappings.map((mapping) => (
-                            <span
-                              className="admin-product-mapping-pill"
-                              key={getMappingId(mapping)}
-                            >
-                              <strong>{getMappingPoolLabel(mapping, poolById)}</strong>
-                              <small>{formatRate(getMappingRate(mapping))}</small>
-                              <button
-                                type="button"
-                                disabled={isSaving}
-                                onClick={() => deleteMapping(mapping)}
+                          {productMappings.map((mapping) => {
+                            const mappingType = getMappingType(mapping);
+
+                            return (
+                              <span
+                                className={`admin-product-mapping-pill ${
+                                  mappingType === 1 ? "is-egg-1" : "is-egg-2"
+                                }`}
+                                key={getMappingId(mapping)}
                               >
-                                <FaXmark aria-hidden="true" />
-                              </button>
-                            </span>
-                          ))}
+                                <em>{getMappingTypeShortLabel(mappingType)}</em>
+                                <strong>{getMappingPoolLabel(mapping, poolById)}</strong>
+                                <small>{formatRate(getMappingRate(mapping))}</small>
+                                <button
+                                  type="button"
+                                  disabled={isSaving}
+                                  onClick={() => deleteMapping(mapping)}
+                                >
+                                  <FaXmark aria-hidden="true" />
+                                </button>
+                              </span>
+                            );
+                          })}
                         </div>
                       ) : (
                         <span className="admin-product-no-mapping">
@@ -564,6 +639,21 @@ export function AdminProductTablePanel({
                   <input type="text" readOnly value={getProductName(selectedProduct)} />
                 </label>
                 <label>
+                  Nhóm trứng
+                  <select
+                    value={selectedMappingType}
+                    onChange={(event) =>
+                      setSelectedMappingType(Number(event.target.value) || 1)
+                    }
+                  >
+                    {MAPPING_TYPE_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
                   Bể quà tặng liên kết
                   <select
                     value={selectedPoolId}
@@ -612,9 +702,7 @@ export function AdminProductTablePanel({
             <div className="admin-product-mapping-editor">
               <div className="admin-record-editor__head">
                 <div>
-                  <strong id="admin-product-rate-title">
-                    Chỉnh Tỉ Lệ Ánh Xạ
-                  </strong>
+                  <strong id="admin-product-rate-title">Chỉnh Tỉ Lệ Ánh Xạ</strong>
                   <span>{getProductId(rateProduct)}</span>
                 </div>
                 <button
@@ -627,33 +715,52 @@ export function AdminProductTablePanel({
                 </button>
               </div>
 
-              <div className="admin-product-mapping-form">
-                {rateProductMappings.map((mapping) => {
-                  const mappingId = getMappingId(mapping);
+              <div className="admin-product-rate-groups">
+                {MAPPING_TYPE_OPTIONS.map(({ value, label }) => {
+                  const groupMappings = rateMappingsByType[value] || EMPTY_ROWS;
+
+                  if (!groupMappings.length) {
+                    return null;
+                  }
 
                   return (
-                    <label key={mappingId}>
-                      {getMappingPoolLabel(mapping, poolById)}
-                      <input
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="0.1"
-                        value={draftRates[mappingId] ?? ""}
-                        onChange={(event) =>
-                          setDraftRates((currentRates) => ({
-                            ...currentRates,
-                            [mappingId]: event.target.value,
-                          }))
-                        }
-                      />
-                    </label>
+                    <section className="admin-product-rate-group" key={value}>
+                      <div className="admin-product-rate-group__head">
+                        <strong>{label}</strong>
+                        <span>{formatRate(getTypeGroupTotal(groupMappings, draftRates))}</span>
+                      </div>
+
+                      <div className="admin-product-mapping-form">
+                        {groupMappings.map((mapping) => {
+                          const mappingId = getMappingId(mapping);
+
+                          return (
+                            <label key={mappingId}>
+                              {getMappingPoolLabel(mapping, poolById)}
+                              <input
+                                type="number"
+                                min="0"
+                                max="100"
+                                step="0.1"
+                                value={draftRates[mappingId] ?? ""}
+                                onChange={(event) =>
+                                  setDraftRates((currentRates) => ({
+                                    ...currentRates,
+                                    [mappingId]: event.target.value,
+                                  }))
+                                }
+                              />
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </section>
                   );
                 })}
               </div>
 
               <p className="admin-product-rate-total">
-                Tổng:{" "}
+                Tổng tất cả mapping:{" "}
                 {formatRate(
                   rateProductMappings.reduce(
                     (total, mapping) =>
