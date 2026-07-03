@@ -250,7 +250,7 @@ export default function AdminDashboardPage() {
   const navigate = useNavigate();
   const adminTables = useAdminDataTables(giftCatalogData);
   const { loadRawTables } = adminTables;
-  const { admin, error, handleAuthError, isLoggingIn, login, logout } =
+  const { admin, error, handleAuthError, isLoggingIn, login, loginWithToken, logout } =
     useAdminAuth(adminTables.tables);
   const [isNavCollapsed, setNavCollapsed] = useState(shouldCollapseAdminNav);
   const [isPasswordModalOpen, setPasswordModalOpen] = useState(false);
@@ -673,6 +673,7 @@ export default function AdminDashboardPage() {
           error={error}
           isLoading={isLoggingIn}
           onLogin={login}
+          onLoginWithToken={loginWithToken}
         />
       </main>
     );

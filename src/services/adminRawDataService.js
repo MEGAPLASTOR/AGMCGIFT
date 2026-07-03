@@ -188,6 +188,7 @@ function normalizeCustomers(customers) {
     successCount: Number(customer.successCount || customer.success_count || 0),
     returnStreak: Number(customer.returnStreak || customer.return_streak || 0),
     warningCount: Number(customer.warningCount || customer.warning_count || 0),
+    earlyHatchCredits: Number(customer.earlyHatchCredits || customer.early_hatch_credits || 0),
     createdAt: normalizeDate(customer.createdAt || customer.created_at),
     updatedAt: normalizeDate(customer.updatedAt || customer.updated_at),
   }));

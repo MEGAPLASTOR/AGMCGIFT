@@ -113,7 +113,57 @@ function hasAuthorizationError(result) {
   return (result?.__rawErrors || []).some(isAuthorizationError);
 }
 
+function parseUrlToken() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    // 1. Try search parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    let token = urlParams.get("jwt") || urlParams.get("token");
+
+    // 2. Try hash parameters
+    if (!token && window.location.hash) {
+      const hash = window.location.hash.substring(1); // remove '#'
+      const hashParams = new URLSearchParams(hash);
+      token = hashParams.get("jwt") || hashParams.get("token");
+
+      if (!token) {
+        const decodedHash = decodeURIComponent(hash).trim();
+        if (decodedHash.startsWith("jwt ")) {
+          token = decodedHash.replace(/^jwt\s+/, "").trim();
+        } else if (decodedHash.split(".").length === 3) {
+          token = decodedHash;
+        }
+      }
+    }
+
+    if (token && token.split(".").length === 3) {
+      return token;
+    }
+  } catch {
+    // Ignore errors
+  }
+
+  return null;
+}
+
 function readStoredAdminSessionResult() {
+  const urlToken = parseUrlToken();
+  if (urlToken) {
+    const payload = decodeJwtPayload(urlToken);
+    const session = {
+      accessToken: urlToken,
+      tokenType: "Bearer",
+      username: payload?.sub || "admin",
+      role: payload?.role || "ADMIN",
+    };
+
+    if (!isSessionExpired(session)) {
+      writeStoredAdminSession(session);
+      return { error: "", session };
+    }
+  }
+
   const session = readStoredAdminSession();
 
   if (!session) {
@@ -256,6 +306,40 @@ export function useAdminAuth(tables) {
     [requireRelogin]
   );
 
+  const loginWithToken = async (token) => {
+    if (!token || token.trim().split(".").length !== 3) {
+      setError("Token JWT không hợp lệ (phải có dạng xxx.yyy.zzz).");
+      return false;
+    }
+
+    setIsLoggingIn(true);
+    setError("");
+
+    try {
+      const trimmedToken = token.trim();
+      const payload = decodeJwtPayload(trimmedToken);
+      const nextSession = {
+        accessToken: trimmedToken,
+        tokenType: "Bearer",
+        username: payload?.sub || "admin",
+        role: payload?.role || "ADMIN",
+      };
+
+      if (isSessionExpired(nextSession)) {
+        throw new Error(SESSION_EXPIRED_MESSAGE);
+      }
+
+      writeStoredAdminSession(nextSession);
+      setSession(nextSession);
+      return true;
+    } catch (tokenError) {
+      setError(tokenError.message || "Không thể sử dụng token này.");
+      return false;
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
   return {
     admin,
     authHeader: admin?.authHeader || "",
@@ -263,6 +347,7 @@ export function useAdminAuth(tables) {
     handleAuthError,
     isLoggingIn,
     login,
+    loginWithToken,
     logout,
     requireRelogin,
   };

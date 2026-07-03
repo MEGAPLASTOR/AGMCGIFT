@@ -240,6 +240,7 @@ export function AdminCustomerTablePanel({
               <th>Tên Khách Hàng</th>
               <th>Trạng Thái</th>
               <th>Số Đơn Thành Công</th>
+              <th>Tín Dụng Duyệt Sớm</th>
               <th>Chuỗi Hoàn Hàng</th>
               <th>Số Lần Cảnh Báo</th>
               <th>Ngày Tạo</th>
@@ -266,6 +267,11 @@ export function AdminCustomerTablePanel({
                       </span>
                     </td>
                     <td>{getNumber(customer.successCount)}</td>
+                    <td>
+                      <span className="admin-early-hatch-credit">
+                        {getNumber(customer.earlyHatchCredits)}
+                      </span>
+                    </td>
                     <td>
                       <span
                         className={
@@ -297,7 +303,7 @@ export function AdminCustomerTablePanel({
               })
             ) : (
               <tr>
-                <td colSpan={8}>Không tìm thấy khách hàng phù hợp.</td>
+                <td colSpan={9}>Không tìm thấy khách hàng phù hợp.</td>
               </tr>
             )}
           </tbody>

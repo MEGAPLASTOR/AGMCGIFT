@@ -44,6 +44,7 @@ function normalizeCustomer(customer, fallback = {}) {
     successCount: Number(source.successCount || source.success_count || fallback.successCount || 0),
     returnStreak: Number(source.returnStreak || source.return_streak || fallback.returnStreak || 0),
     warningCount: Number(source.warningCount || source.warning_count || fallback.warningCount || 0),
+    earlyHatchCredits: Number(source.earlyHatchCredits ?? source.early_hatch_credits ?? fallback.earlyHatchCredits ?? 0),
     createdAt: normalizeDate(source.createdAt || source.created_at || fallback.createdAt),
     updatedAt: normalizeDate(source.updatedAt || source.updated_at || fallback.updatedAt),
   };
