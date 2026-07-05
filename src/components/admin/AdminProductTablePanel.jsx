@@ -507,7 +507,8 @@ export function AdminProductTablePanel({
               <th>SKU</th>
               <th>Tên Sản Phẩm</th>
               <th>Giá Gốc (VND)</th>
-              <th>Cấu Hình Ánh Xạ Trứng (Game Rules)</th>
+              <th>Trứng Thường (Loại 1)</th>
+              <th>Trứng Ấp (Loại 2)</th>
               <th>Hành Động</th>
             </tr>
           </thead>
@@ -517,6 +518,8 @@ export function AdminProductTablePanel({
                 const productId = getProductId(product);
                 const imageUrl = getProductImage(product);
                 const productMappings = mappingsByProductId.get(productId) || EMPTY_ROWS;
+                const type1Mappings = productMappings.filter((m) => getMappingType(m) === 1);
+                const type2Mappings = productMappings.filter((m) => getMappingType(m) === 2);
 
                 return (
                   <tr key={productId || getProductName(product)}>
@@ -540,36 +543,51 @@ export function AdminProductTablePanel({
                     </td>
                     <td>{formatCurrency(product.basePrice)}</td>
                     <td>
-                      {productMappings.length ? (
+                      {type1Mappings.length ? (
                         <div className="admin-product-mapping-list">
-                          {productMappings.map((mapping) => {
-                            const mappingType = getMappingType(mapping);
-
-                            return (
-                              <span
-                                className={`admin-product-mapping-pill ${
-                                  mappingType === 1 ? "is-egg-1" : "is-egg-2"
-                                }`}
-                                key={getMappingId(mapping)}
+                          {type1Mappings.map((mapping) => (
+                            <span
+                              className="admin-product-mapping-pill is-egg-1"
+                              key={getMappingId(mapping)}
+                            >
+                              <strong>{getMappingPoolLabel(mapping, poolById)}</strong>
+                              <small>{formatRate(getMappingRate(mapping))}</small>
+                              <button
+                                type="button"
+                                disabled={isSaving}
+                                onClick={() => deleteMapping(mapping)}
                               >
-                                <em>{getMappingTypeShortLabel(mappingType)}</em>
-                                <strong>{getMappingPoolLabel(mapping, poolById)}</strong>
-                                <small>{formatRate(getMappingRate(mapping))}</small>
-                                <button
-                                  type="button"
-                                  disabled={isSaving}
-                                  onClick={() => deleteMapping(mapping)}
-                                >
-                                  <FaXmark aria-hidden="true" />
-                                </button>
-                              </span>
-                            );
-                          })}
+                                <FaXmark aria-hidden="true" />
+                              </button>
+                            </span>
+                          ))}
                         </div>
                       ) : (
-                        <span className="admin-product-no-mapping">
-                          Chưa thiết lập (Không phát sinh trứng khi mua SP này)
-                        </span>
+                        <span className="admin-product-no-mapping">-</span>
+                      )}
+                    </td>
+                    <td>
+                      {type2Mappings.length ? (
+                        <div className="admin-product-mapping-list">
+                          {type2Mappings.map((mapping) => (
+                            <span
+                              className="admin-product-mapping-pill is-egg-2"
+                              key={getMappingId(mapping)}
+                            >
+                              <strong>{getMappingPoolLabel(mapping, poolById)}</strong>
+                              <small>{formatRate(getMappingRate(mapping))}</small>
+                              <button
+                                type="button"
+                                disabled={isSaving}
+                                onClick={() => deleteMapping(mapping)}
+                              >
+                                <FaXmark aria-hidden="true" />
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="admin-product-no-mapping">-</span>
                       )}
                     </td>
                     <td>
@@ -598,7 +616,7 @@ export function AdminProductTablePanel({
               })
             ) : (
               <tr>
-                <td colSpan={7}>Không tìm thấy sản phẩm phù hợp.</td>
+                <td colSpan={8}>Không tìm thấy sản phẩm phù hợp.</td>
               </tr>
             )}
           </tbody>
