@@ -182,6 +182,7 @@ input::placeholder {
 }
 
 .secondary-button {
+  margin-top: 14px;
   background: #ffffff;
   color: #17130a;
 }
