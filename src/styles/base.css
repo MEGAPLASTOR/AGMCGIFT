@@ -12,12 +12,13 @@
   box-sizing: border-box;
 }
 
-html {
+html,
+body {
   min-width: 320px;
+  overflow-x: hidden;
 }
 
 body {
-  min-width: 320px;
   min-height: 100vh;
   margin: 0;
   background:

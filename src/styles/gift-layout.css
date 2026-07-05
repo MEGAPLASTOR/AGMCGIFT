@@ -4,7 +4,7 @@
   grid-template-columns: minmax(0, 1fr);
   min-height: 100vh;
   place-items: center;
-  overflow-x: hidden;
+  overflow: visible;
   padding: 32px 92px 42px 32px;
 }
 
