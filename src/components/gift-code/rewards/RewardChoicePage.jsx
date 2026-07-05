@@ -82,12 +82,16 @@ export function RewardChoicePage({
         >
           <span className="reward-egg-card__image">
             <img src={eggInstantGold} alt="" />
+            {instantEgg?.eggCount > 0 && (
+              <span className="reward-egg-count-badge">
+                X{instantEgg.eggCount}
+              </span>
+            )}
           </span>
           <span className="reward-egg-card__content">
             <span>
               <strong>
                 {instantNeedsIncubation ? "Trứng vàng đang ấp" : "Trứng thường"}
-                {getEggCountLabel(instantEgg)}
               </strong>
               <span>{instantDescription}</span>
             </span>
@@ -105,12 +109,16 @@ export function RewardChoicePage({
             <span className="mystery-egg" aria-hidden="true">
               ?
             </span>
+            {delayedEgg?.eggCount > 0 && (
+              <span className="reward-egg-count-badge">
+                X{delayedEgg.eggCount}
+              </span>
+            )}
           </span>
           <span className="reward-egg-card__content">
             <span>
               <strong>
                 {delayedOpened ? "Trứng đã mở" : "Trứng bí ẩn 15 ngày"}
-                {getEggCountLabel(delayedEgg)}
               </strong>
               <span>{delayedDescription}</span>
             </span>
