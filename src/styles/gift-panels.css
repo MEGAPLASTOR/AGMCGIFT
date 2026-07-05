@@ -159,7 +159,6 @@ input::placeholder {
 .code-form button,
 .gift-panel > button,
 .secondary-button {
-  margin-top: 24px;
   min-height: 52px;
   border: 3px solid #17130a;
   border-radius: 8px;
@@ -172,6 +171,11 @@ input::placeholder {
     transform 160ms ease,
     box-shadow 160ms ease,
     background 160ms ease;
+}
+
+.gift-panel > button,
+.secondary-button {
+  margin-top: 24px;
 }
 
 .code-form button:hover,
