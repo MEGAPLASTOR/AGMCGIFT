@@ -23,19 +23,23 @@
 
 .panel-heading .eyebrow {
   display: inline-block;
-  background: #ffdede;
-  color: #b91c1c;
-  padding: 4px 10px;
+  background: linear-gradient(135deg, #ff4444, #cc0000);
+  color: #ffffff;
+  padding: 6px 14px;
   border-radius: 6px;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-  border: 1.5px solid #ffb3b3;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  border: 2px solid #17130a;
+  box-shadow: 2px 2px 0 #17130a;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .panel-heading h2 {
-  font-size: clamp(24px, 2.6vw, 34px) !important;
-  color: #111827;
+  font-size: clamp(28px, 3vw, 40px) !important;
+  color: #17130a;
+  text-shadow: 1px 1px 0 rgba(255, 213, 46, 0.5);
 }
 
 .panel-chip {
@@ -272,19 +276,35 @@ input::placeholder {
 
 .reward-egg-count-badge {
   position: absolute;
-  bottom: 8px;
-  right: 22%;
-  background: #ff3b30;
+  top: 10px;
+  right: 10px;
+  background: linear-gradient(135deg, #ff3b30, #e01010);
   color: #ffffff;
-  font-size: 16px;
-  font-weight: 900;
-  padding: 3px 10px;
+  font-size: 22px;
+  font-weight: 1000;
+  padding: 6px 16px;
   border: 3px solid #17130a;
   border-radius: 99px;
-  box-shadow: 3px 3px 0 #17130a;
+  box-shadow: 3px 3px 0 #17130a, 0 4px 12px rgba(255, 59, 48, 0.4);
   z-index: 10;
   user-select: none;
   font-family: inherit;
+  letter-spacing: 1px;
+  animation: badge-pop 400ms ease-out both;
+}
+
+@keyframes badge-pop {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .mystery-egg {

@@ -80,13 +80,13 @@ export function RewardChoicePage({
           disabled={isClaiming || !canClaimNow}
           onClick={onClaimNow}
         >
+          {instantEgg?.eggCount > 0 && (
+            <span className="reward-egg-count-badge">
+              X{instantEgg.eggCount}
+            </span>
+          )}
           <span className="reward-egg-card__image">
             <img src={eggInstantGold} alt="" />
-            {instantEgg?.eggCount > 0 && (
-              <span className="reward-egg-count-badge">
-                X{instantEgg.eggCount}
-              </span>
-            )}
           </span>
           <span className="reward-egg-card__content">
             <span>
@@ -105,15 +105,15 @@ export function RewardChoicePage({
           disabled={isClaiming || !canClaimLater}
           onClick={onClaimLater}
         >
+          {delayedEgg?.eggCount > 0 && (
+            <span className="reward-egg-count-badge">
+              X{delayedEgg.eggCount}
+            </span>
+          )}
           <span className="reward-egg-card__image">
             <span className="mystery-egg" aria-hidden="true">
               ?
             </span>
-            {delayedEgg?.eggCount > 0 && (
-              <span className="reward-egg-count-badge">
-                X{delayedEgg.eggCount}
-              </span>
-            )}
           </span>
           <span className="reward-egg-card__content">
             <span>
