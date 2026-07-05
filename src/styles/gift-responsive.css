@@ -3,7 +3,6 @@
     align-content: center;
     justify-items: center;
     overflow: visible;
-    overflow-x: hidden;
     padding: 18px 16px calc(34px + env(safe-area-inset-bottom));
   }
 
