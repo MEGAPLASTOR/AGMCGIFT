@@ -100,7 +100,7 @@ const MANAGEMENT_PAGES = [
     icon: FaUserGroup,
     label: "Khách hàng",
     title: "Quản lý khách hàng",
-    description: "Theo dõi trạng thái, đơn thành công, cảnh báo và return streak.",
+    description: "Theo dõi trạng thái, chuỗi VIP, số lần hoàn/hủy, cảnh báo và thời điểm mở khóa.",
   },
   {
     slug: "system-configs",

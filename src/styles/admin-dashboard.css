@@ -7291,6 +7291,14 @@
   font-weight: 800;
 }
 
+.admin-fraud-head p {
+  max-width: 560px;
+  margin: 6px 0 0;
+  color: #9ea9c9;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
 .admin-fraud-stats {
   display: flex;
   flex-wrap: wrap;
@@ -7408,6 +7416,11 @@
   color: #ffd87f;
 }
 
+.admin-customer-risk.is-locked {
+  background: rgba(255, 94, 94, 0.16);
+  color: #ffaaaa;
+}
+
 .admin-customer-row-actions {
   display: flex;
   align-items: center;
@@ -7416,6 +7429,16 @@
 
 .admin-customer-ban-button {
   min-width: 76px;
+}
+
+.admin-customer-ban-button.is-ban {
+  border-color: rgba(255, 94, 94, 0.42);
+  color: #ffaaaa;
+}
+
+.admin-customer-ban-button.is-unlock {
+  border-color: rgba(126, 231, 160, 0.36);
+  color: #a9f6c0;
 }
 
 .admin-fraud-modal {

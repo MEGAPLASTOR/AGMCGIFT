@@ -101,7 +101,7 @@ export function AdminSystemConfigPanel({
   useEffect(() => {
     loadConfigs({ silent: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [onFetchConfigs]);
+  }, []);
 
   const updateField = (field, value) => {
     setFormValues((currentValues) => ({
