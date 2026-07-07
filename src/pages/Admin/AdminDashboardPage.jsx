@@ -7,6 +7,7 @@ import {
   FaBoxesStacked,
   FaCartShopping,
   FaChartLine,
+  FaCircleInfo,
   FaChevronLeft,
   FaChevronRight,
   FaCube,
@@ -24,6 +25,7 @@ import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
 import { AdminEarlyHatchPanel } from "../../components/admin/AdminEarlyHatchPanel";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
+import { AdminSystemConfigPanel } from "../../components/admin/AdminSystemConfigPanel";
 import { showAdminAlert } from "../../services/adminBrowserFeedback";
 import { giftCatalogData } from "../../config/giftCatalogData";
 import { useAdminAuth } from "../../hooks/useAdminAuth";
@@ -39,6 +41,10 @@ import {
   fetchAdminEarlyHatchEligible,
   updateAdminEggHatchTime,
 } from "../../services/adminEggService";
+import {
+  fetchAdminSystemConfigs,
+  updateAdminSystemConfigs,
+} from "../../services/adminSystemConfigService";
 import {
   createAdminGiftAccount,
   deleteAdminGiftAccounts,
@@ -95,6 +101,15 @@ const MANAGEMENT_PAGES = [
     label: "Khách hàng",
     title: "Quản lý khách hàng",
     description: "Theo dõi trạng thái, đơn thành công, cảnh báo và return streak.",
+  },
+  {
+    slug: "system-configs",
+    icon: FaCircleInfo,
+    label: "Cấu hình",
+    title: "Cấu hình hệ thống",
+    description: "Cập nhật `BAN_DAY` và `PERMANENT_BAN` theo route admin mới.",
+    badgeLabel: "CFG",
+    isCustom: true,
   },
   {
     slug: "eggs",
@@ -665,6 +680,25 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleFetchSystemConfigs = async () => {
+    try {
+      return await fetchAdminSystemConfigs(admin.authHeader);
+    } catch (fetchError) {
+      handleAuthError(fetchError);
+      throw fetchError;
+    }
+  };
+
+  const handleUpdateSystemConfigs = async (configs) => {
+    try {
+      await updateAdminSystemConfigs(configs, admin.authHeader);
+      return await fetchAdminSystemConfigs(admin.authHeader);
+    } catch (updateError) {
+      handleAuthError(updateError);
+      throw updateError;
+    }
+  };
+
   const SidebarToggleIcon = isNavCollapsed ? FaChevronRight : FaChevronLeft;
 
   if (!admin) {
@@ -824,6 +858,12 @@ export default function AdminDashboardPage() {
               isRefreshing={adminTables.isLoadingRawData}
               metrics={visibleMetrics}
               onRefresh={handleReloadRawData}
+            />
+          ) : activeManagementPage.slug === "system-configs" ? (
+            <AdminSystemConfigPanel
+              isRefreshing={adminTables.isLoadingRawData}
+              onFetchConfigs={handleFetchSystemConfigs}
+              onUpdateConfigs={handleUpdateSystemConfigs}
             />
           ) : activeManagementPage.slug === "early-hatch" ? (
             <AdminEarlyHatchPanel

@@ -1,4 +1,5 @@
 import { normalizeEgg } from "./normalizeEgg";
+import { normalizeCustomerStatus } from "../../../utils/customerStatus";
 
 function getPayloadRoot(payload) {
   return payload?.data || payload?.result || payload || {};
@@ -99,7 +100,16 @@ export function normalizeSyncEggResponse(payload, orderCode) {
         order.customerCode ||
         order.customer_code ||
         "",
-      customerStatus: root.customerStatus || customer.status || "",
+      customerStatus: normalizeCustomerStatus(
+        root.customerStatus || customer.status || ""
+      ),
+      successCount: Number(
+        root.successCount ??
+          root.success_count ??
+          customer.successCount ??
+          customer.success_count ??
+          0
+      ),
       returnStreak: Number(
         root.returnStreak ??
           root.return_streak ??
@@ -107,6 +117,26 @@ export function normalizeSyncEggResponse(payload, orderCode) {
           customer.return_streak ??
           0
       ),
+      returnCount: Number(
+        root.returnCount ??
+          root.return_count ??
+          customer.returnCount ??
+          customer.return_count ??
+          0
+      ),
+      warningCount: Number(
+        root.warningCount ??
+          root.warning_count ??
+          customer.warningCount ??
+          customer.warning_count ??
+          0
+      ),
+      unbanAt:
+        root.unbanAt ||
+        root.unban_at ||
+        customer.unbanAt ||
+        customer.unban_at ||
+        null,
       deliveryStatus:
         root.deliveryStatus ||
         root.delivery_status ||

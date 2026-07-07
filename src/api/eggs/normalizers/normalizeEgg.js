@@ -85,10 +85,19 @@ function getEggAccount(rawEgg) {
 }
 
 function isClaimed(rawEgg, egg) {
-  const statusText = normalizeApiText(egg.displayStatus);
+  const statusText = normalizeApiText(egg.displayStatus).replace(/[_-]+/g, " ");
+
+  if (
+    statusText.includes("ready to claim") ||
+    statusText.includes("claimable") ||
+    statusText.includes("san sang")
+  ) {
+    return false;
+  }
 
   return (
-    statusText.includes("claim") ||
+    statusText === "claim" ||
+    statusText === "claimed" ||
     statusText.includes("hatched") ||
     statusText.includes("opened") ||
     statusText.includes("redeemed") ||

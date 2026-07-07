@@ -1,5 +1,23 @@
 import { getDeliveryStatusKind } from "../utils/getDeliveryStatusKind";
 import { normalizeApiText } from "../utils/normalizeApiText";
+import {
+  CUSTOMER_STATUS,
+  normalizeCustomerStatus,
+} from "../../../utils/customerStatus";
+
+function formatDateTime(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value);
+  }
+
+  return date.toLocaleString("vi-VN");
+}
 
 export function getDeliveryStatusError(deliveryStatus) {
   const deliveryKind = getDeliveryStatusKind(deliveryStatus);
@@ -36,9 +54,10 @@ export function getEggSyncErrorMessage(error) {
     );
   }
 
-  const customerStatus = normalizeApiText(
-    error.payload?.customerStatus || error.payload?.customer?.status
-  );
+  const rawCustomerStatus =
+    error.payload?.customerStatus || error.payload?.customer?.status || "";
+  const customerStatus = normalizeCustomerStatus(rawCustomerStatus, "");
+  const customerStatusText = normalizeApiText(rawCustomerStatus);
   const messageText = normalizeApiText(error.payload?.message || error.message);
   const orderStatus = normalizeApiText(
     [
@@ -53,20 +72,34 @@ export function getEggSyncErrorMessage(error) {
     error.payload?.deliveryStatus ?? error.payload?.delivery_status;
   const deliveryStatusError =
     rawDeliveryStatus === undefined ? "" : getDeliveryStatusError(rawDeliveryStatus);
+  const unbanAt =
+    error.payload?.unbanAt ||
+    error.payload?.unban_at ||
+    error.payload?.customer?.unbanAt ||
+    error.payload?.customer?.unban_at ||
+    null;
 
   if (deliveryStatusError) {
     return deliveryStatusError;
   }
 
   if (
-    Number(error.payload?.returnStreak || error.payload?.customer?.returnStreak || 0) >=
-      2 ||
-    customerStatus.includes("ban") ||
-    customerStatus.includes("khoa") ||
-    messageText.includes("vi pham") ||
-    messageText.includes("bi khoa")
+    customerStatus === CUSTOMER_STATUS.TEMP_BANNED ||
+    customerStatusText.includes("temp_banned")
   ) {
-    return "Tài khoản bị khóa do vi phạm chính sách.";
+    const formattedUnbanAt = formatDateTime(unbanAt);
+
+    return formattedUnbanAt
+      ? `Tài khoản đang bị tạm khóa đến ${formattedUnbanAt}. Vui lòng quay lại sau mốc này.`
+      : "Tài khoản đang bị tạm khóa. Vui lòng quay lại sau khi hết thời gian khóa.";
+  }
+
+  if (
+    customerStatus === CUSTOMER_STATUS.BANNED ||
+    customerStatusText.includes("banned") ||
+    (customerStatusText.includes("ban") && !customerStatusText.includes("temp"))
+  ) {
+    return "Tài khoản đã bị khóa vĩnh viễn do vi phạm chính sách.";
   }
 
   if (

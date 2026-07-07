@@ -11,6 +11,12 @@ function getRewardAccounts(redemptionInfo) {
       : [];
 }
 
+function getPositiveNumber(value) {
+  const number = Number(value || 0);
+
+  return Number.isFinite(number) && number > 0 ? number : 0;
+}
+
 export function IncubatingRewardPage({
   redemptionInfo,
   isClaiming = false,
@@ -55,6 +61,18 @@ export function IncubatingRewardPage({
         <span>Sản phẩm: {redemptionInfo.productName}</span>
         <span>Ngày giờ mở: {redemptionInfo.rewardDateTime}</span>
         {accounts.length > 1 ? <span>Số acc: {accounts.length}</span> : null}
+        {getPositiveNumber(redemptionInfo.totalCount) ? (
+          <span>Tổng trứng: {redemptionInfo.totalCount}</span>
+        ) : null}
+        {getPositiveNumber(redemptionInfo.claimedCount) ? (
+          <span>Đã mở: {redemptionInfo.claimedCount}</span>
+        ) : null}
+        {getPositiveNumber(redemptionInfo.hatchingCount) ? (
+          <span>Đang ấp: {redemptionInfo.hatchingCount}</span>
+        ) : null}
+        {getPositiveNumber(redemptionInfo.stuckCount) ? (
+          <span>Bị kẹt: {redemptionInfo.stuckCount}</span>
+        ) : null}
       </div>
 
       {isReady ? (
@@ -63,6 +81,11 @@ export function IncubatingRewardPage({
             <p className="message message--success">
               {redemptionInfo.message || `${eggName} đã nở. Đây là phần thưởng của bạn.`}
             </p>
+            {getPositiveNumber(redemptionInfo.stuckCount) ? (
+              <p className="message message--warning">
+                Có {redemptionInfo.stuckCount} trứng chưa mở được do thiếu tài khoản trong pool hoặc chưa có pool liên kết.
+              </p>
+            ) : null}
             <div className="account-reward-list">
               {accounts.map((account, index) => (
                 <AccountRewardCard

@@ -1,3 +1,5 @@
+import { CUSTOMER_STATUS_OPTIONS } from "../utils/customerStatus";
+
 export const orderFinancialStatusOptions = [
   { value: "paid", label: "paid" },
   { value: "pending", label: "pending" },
@@ -114,10 +116,12 @@ export const ADMIN_TABLES = [
       text("id", "ID", { required: true, wide: true }),
       text("customerCode", "Mã khách hàng", { required: true }),
       text("customerName", "Tên khách hàng", { wide: true }),
-      text("status", "Trạng thái"),
-      number("successCount", "Mua thành công"),
+      select("status", "Trạng thái", CUSTOMER_STATUS_OPTIONS),
+      number("successCount", "Chuỗi VIP"),
       number("returnStreak", "Chuỗi hoàn hàng"),
+      number("returnCount", "Tổng hoàn/hủy"),
       number("warningCount", "Số cảnh báo"),
+      dateTime("unbanAt", "Mở lại lúc", { nullable: true }),
       dateTime("createdAt", "Ngày tạo"),
       dateTime("updatedAt", "Ngày cập nhật"),
     ],

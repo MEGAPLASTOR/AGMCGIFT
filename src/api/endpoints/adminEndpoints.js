@@ -17,6 +17,7 @@ export const ADMIN_ENDPOINTS = {
   productEggMappingsBatchDelete: "/api/admin/product-egg-mappings/batch-delete",
   products: "/api/admin/products",
   productsSyncAll: "/api/admin/products/sync/all",
+  systemConfigs: "/api/admin/system-configs",
 };
 
 export function getAdminGiftPoolEndpoint(id) {

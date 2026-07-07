@@ -1,3 +1,9 @@
+import {
+  isBlockedCustomerStatus,
+  isPermanentlyBannedCustomerStatus,
+  isWarningCustomerStatus,
+} from "../utils/customerStatus";
+
 function countBy(items, getKey) {
   return items.reduce((result, item) => {
     const key = getKey(item) || "Unknown";
@@ -8,6 +14,18 @@ function countBy(items, getKey) {
 
 function normalizeStatus(value) {
   return String(value || "").trim().toLowerCase();
+}
+
+function isWarningCustomer(customer) {
+  return isWarningCustomerStatus(customer?.status);
+}
+
+function isBlockedCustomer(customer) {
+  return isBlockedCustomerStatus(customer?.status);
+}
+
+function isPermanentlyBannedCustomer(customer) {
+  return isPermanentlyBannedCustomerStatus(customer?.status);
 }
 
 function sum(items, getValue) {
@@ -438,17 +456,8 @@ function buildOperationalAlerts({
   const emptyPools = giftPools.filter(
     (pool) => !Number(poolAvailableCount[pool.id] || 0)
   ).length;
-  const warningCustomers = customers.filter(
-    (customer) =>
-      normalizeStatus(customer.status).includes("warning") ||
-      Number(customer.warningCount || 0) > 0 ||
-      Number(customer.returnStreak || 0) === 1
-  ).length;
-  const bannedCustomers = customers.filter(
-    (customer) =>
-      normalizeStatus(customer.status).includes("banned") ||
-      Number(customer.returnStreak || 0) >= 2
-  ).length;
+  const warningCustomers = customers.filter(isWarningCustomer).length;
+  const bannedCustomers = customers.filter(isBlockedCustomer).length;
   const lowStock = totalAccounts > 0 && percent(availableAccounts, totalAccounts) < 20;
 
   return [
@@ -518,17 +527,8 @@ export function buildAdminDashboard(tables) {
   const claimedEggs = eggs.filter((egg) =>
     ["hatched", "claimed", "opened"].includes(normalizeStatus(egg.status))
   );
-  const blockedCustomers = customers.filter(
-    (customer) =>
-      normalizeStatus(customer.status).includes("banned") ||
-      Number(customer.returnStreak || 0) >= 2
-  );
-  const warningCustomers = customers.filter(
-    (customer) =>
-      normalizeStatus(customer.status).includes("warning") ||
-      Number(customer.warningCount || 0) > 0 ||
-      Number(customer.returnStreak || 0) === 1
-  );
+  const blockedCustomers = customers.filter(isBlockedCustomer);
+  const warningCustomers = customers.filter(isWarningCustomer);
   const inventoryByTier = buildTierInventory(
     giftPools,
     giftAccounts,
@@ -545,14 +545,8 @@ export function buildAdminDashboard(tables) {
   return {
     summary: {
       totalCustomers: customers.length,
-      warningCustomers: customers.filter(
-        (customer) =>
-          normalizeStatus(customer.status).includes("warning") ||
-          Number(customer.warningCount || 0) > 0
-      ).length,
-      bannedCustomers: customers.filter(
-        (customer) => normalizeStatus(customer.status).includes("banned")
-      ).length,
+      warningCustomers: warningCustomers.length,
+      bannedCustomers: customers.filter(isPermanentlyBannedCustomer).length,
       totalOrders: orders.length,
       paidOrders: paidOrders.length,
       blockedOrders: blockedOrders.length,
@@ -675,7 +669,9 @@ export function buildAdminDashboard(tables) {
       status: customer.status,
       success: customer.successCount,
       returnStreak: customer.returnStreak,
+      returnCount: customer.returnCount,
       warning: customer.warningCount,
+      unbanAt: formatDateTime(customer.unbanAt),
       createdAt: formatDateTime(customer.createdAt),
       updatedAt: formatDateTime(customer.updatedAt),
     })),

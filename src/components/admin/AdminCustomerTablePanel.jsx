@@ -11,18 +11,16 @@ import {
   confirmAdminAction,
   showAdminAlert,
 } from "../../services/adminBrowserFeedback";
+import {
+  CUSTOMER_STATUS_OPTIONS,
+  getCustomerStatusLabel,
+  normalizeCustomerStatus,
+} from "../../utils/customerStatus";
 import { useAdminClientPagination } from "../../hooks/useAdminClientPagination";
 import { AdminClientPagination } from "./AdminClientPagination";
 import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
-const STATUS_OPTIONS = [
-  { value: "NEW", label: "NEW" },
-  { value: "WARNING", label: "WARNING (Cảnh báo gian lận/hoàn hàng)" },
-  { value: "BANNED", label: "BANNED (Khóa khách hàng)" },
-  { value: "TRUSTED_1", label: "TRUSTED_1" },
-  { value: "TRUSTED_2", label: "TRUSTED_2" },
-];
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -33,7 +31,7 @@ function normalizeKey(value) {
 }
 
 function normalizeStatus(value) {
-  return normalizeText(value || "NEW").toUpperCase();
+  return normalizeCustomerStatus(value);
 }
 
 function getCustomerId(customer) {
@@ -77,6 +75,32 @@ function formatDateTime(value) {
     .replace(",", "");
 }
 
+function toDateTimeLocalValue(value) {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return String(value).slice(0, 16);
+  }
+
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 16);
+}
+
+function fromDateTimeLocalValue(value) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  return Number.isNaN(date.getTime()) ? value : date.toISOString();
+}
+
 function customerMatchesKeyword(customer, keyword) {
   if (!keyword) {
     return true;
@@ -86,8 +110,12 @@ function customerMatchesKeyword(customer, keyword) {
     getCustomerCode(customer),
     getCustomerName(customer),
     customer?.status,
+    getCustomerStatusLabel(customer?.status),
     customer?.successCount,
     customer?.returnStreak,
+    customer?.returnCount,
+    customer?.warningCount,
+    customer?.unbanAt,
   ]
     .map(normalizeKey)
     .join(" ")
@@ -104,6 +132,9 @@ function getCustomerForm(customer) {
     status: normalizeStatus(customer?.status),
     successCount: getNumber(customer?.successCount),
     returnStreak: getNumber(customer?.returnStreak),
+    returnCount: getNumber(customer?.returnCount),
+    warningCount: getNumber(customer?.warningCount),
+    unbanAt: toDateTimeLocalValue(customer?.unbanAt),
   };
 }
 
@@ -123,7 +154,7 @@ export function AdminCustomerTablePanel({
   const normalizedKeyword = normalizeKey(keyword);
   const statusOptions = useMemo(
     () =>
-      mergeSelectOptions(STATUS_OPTIONS, customers.map((customer) => customer.status)),
+      mergeSelectOptions(CUSTOMER_STATUS_OPTIONS, customers.map((customer) => customer.status)),
     [customers]
   );
 
@@ -169,6 +200,9 @@ export function AdminCustomerTablePanel({
       status: normalizeStatus(formValues.status),
       successCount: getNumber(formValues.successCount),
       returnStreak: getNumber(formValues.returnStreak),
+      returnCount: getNumber(formValues.returnCount),
+      warningCount: getNumber(formValues.warningCount),
+      unbanAt: fromDateTimeLocalValue(formValues.unbanAt),
     };
 
     if (
@@ -206,7 +240,7 @@ export function AdminCustomerTablePanel({
           <span>Tìm kiếm</span>
           <input
             type="search"
-            placeholder="Tìm theo mã KH, tên KH..."
+            placeholder="Tìm theo mã KH, tên KH, status..."
             value={keyword}
             onChange={(event) => setKeyword(event.target.value)}
           />
@@ -239,10 +273,12 @@ export function AdminCustomerTablePanel({
               <th>Mã Khách Hàng</th>
               <th>Tên Khách Hàng</th>
               <th>Trạng Thái</th>
-              <th>Số Đơn Thành Công</th>
-              <th>Tín Dụng Duyệt Sớm</th>
+              <th>Chuỗi VIP</th>
+              <th>Tín Dụng Ấp Sớm</th>
               <th>Chuỗi Hoàn Hàng</th>
-              <th>Số Lần Cảnh Báo</th>
+              <th>Tổng Hoàn/Hủy</th>
+              <th>Tổng Cảnh Báo</th>
+              <th>Mở Lại Lúc</th>
               <th>Ngày Tạo</th>
               <th>Hành Động</th>
             </tr>
@@ -286,7 +322,9 @@ export function AdminCustomerTablePanel({
                         ) : null}
                       </span>
                     </td>
+                    <td>{getNumber(customer.returnCount)}</td>
                     <td>{getNumber(customer.warningCount)}</td>
+                    <td>{formatDateTime(customer.unbanAt)}</td>
                     <td>{formatDateTime(customer.createdAt || customer.created_at)}</td>
                     <td>
                       <button
@@ -303,7 +341,7 @@ export function AdminCustomerTablePanel({
               })
             ) : (
               <tr>
-                <td colSpan={9}>Không tìm thấy khách hàng phù hợp.</td>
+                <td colSpan={11}>Không tìm thấy khách hàng phù hợp.</td>
               </tr>
             )}
           </tbody>
@@ -346,13 +384,13 @@ export function AdminCustomerTablePanel({
                 >
                   {statusOptions.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {option.value} - {getCustomerStatusLabel(option.value)}
                     </option>
                   ))}
                 </select>
               </label>
               <label>
-                Số đơn mua thành công
+                Chuỗi mở VIP
                 <input
                   min="0"
                   type="number"
@@ -373,7 +411,28 @@ export function AdminCustomerTablePanel({
                   }
                 />
               </label>
+              <label>
+                Mở lại lúc
+                <input
+                  type="datetime-local"
+                  value={formValues.unbanAt}
+                  onChange={(event) => updateField("unbanAt", event.target.value)}
+                />
+              </label>
+              <label>
+                Tổng hoàn/hủy
+                <input type="number" readOnly value={formValues.returnCount} />
+              </label>
+              <label>
+                Tổng cảnh báo
+                <input type="number" readOnly value={formValues.warningCount} />
+              </label>
             </div>
+
+            <p className="admin-customer-form__note">
+              `returnCount` và `warningCount` là dữ liệu tích lũy từ backend, chỉ xem
+              và không chỉnh tay ở đây.
+            </p>
 
             <div className="admin-customer-modal__actions">
               <button

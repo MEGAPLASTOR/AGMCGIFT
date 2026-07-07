@@ -37,13 +37,13 @@ export function RewardChoicePage({
       ? "Không có trứng thường cho mã này."
       : instantNeedsIncubation
         ? "Nhóm trứng này cần chờ đủ cooldown trước khi mở."
-        : "Bấm mở để nhận toàn bộ acc của nhóm trứng này.";
+        : "Bấm mở để nhận acc theo số trứng backend mở được.";
   const delayedDescription = delayedOpened
     ? "Nhóm trứng này đã mở, bấm để xem lại acc."
     : !canClaimLater
       ? "Không có trứng ấp 15 ngày cho mã này."
       : delayedReady
-        ? "Hết cooldown, bấm mở để random toàn bộ phần thưởng của nhóm này."
+        ? "Hết cooldown, bấm mở để nhận acc theo số trứng backend mở được."
         : "Đang ấp, chưa lộ trứng vàng hay kim cương.";
   const delayedActionLabel = delayedOpened
     ? "Xem acc"

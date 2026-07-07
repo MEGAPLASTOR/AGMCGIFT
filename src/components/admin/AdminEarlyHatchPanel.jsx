@@ -198,7 +198,7 @@ export function AdminEarlyHatchPanel({
                   <tr key={row.key}>
                     <td>
                       <strong>{row.customerCode || "-"}</strong>
-                      <small>{row.successCount} đơn thành công</small>
+                      <small>Chuỗi VIP: {row.successCount}</small>
                     </td>
                     <td>
                       <strong>{row.orderCode || "-"}</strong>

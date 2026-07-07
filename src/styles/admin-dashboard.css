@@ -4870,6 +4870,18 @@
   color: #ffd966;
 }
 
+.admin-customer-status.is-normal {
+  border-color: rgba(130, 201, 147, 0.56);
+  background: rgba(130, 201, 147, 0.18);
+  color: #93e2a8;
+}
+
+.admin-customer-status.is-temp_banned {
+  border-color: rgba(255, 178, 107, 0.56);
+  background: rgba(255, 178, 107, 0.16);
+  color: #ffd5a5;
+}
+
 .admin-customer-status.is-banned {
   border-color: rgba(242, 139, 131, 0.56);
   background: rgba(242, 139, 131, 0.16);
@@ -5036,6 +5048,47 @@
   border-color: #82b4ff;
   background: #82b4ff;
   color: #07111f;
+}
+
+.admin-customer-form__note {
+  margin: 0;
+  padding: 0 20px;
+  color: #9aa7b8;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.admin-system-config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-system-config-card {
+  display: grid;
+  gap: 8px;
+  border: 1px solid rgba(130, 174, 244, 0.2);
+  border-radius: 12px;
+  background: rgba(12, 18, 32, 0.82);
+  padding: 16px;
+}
+
+.admin-system-config-card strong {
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.admin-system-config-card span,
+.admin-system-config-card small,
+.admin-system-config-note {
+  color: #9aa7b8;
+}
+
+.admin-system-config-note {
+  margin: 0 0 20px;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 .admin-fade-message {
@@ -7215,5 +7268,221 @@
 
   .admin-page:not(.admin-page--login) .admin-shell__content {
     padding: 0;
+  }
+}
+
+/* ponytail: customer fraud desk, last override for the API-backed ban flow. */
+.admin-fraud-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-fraud-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-fraud-head h2 {
+  margin: 0;
+  color: #f5f7ff;
+  font-size: 1.16rem;
+  font-weight: 800;
+}
+
+.admin-fraud-stats {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.admin-fraud-stats span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  border: 1px solid rgba(121, 144, 205, 0.26);
+  border-radius: 6px;
+  background: rgba(17, 23, 53, 0.72);
+  color: #aeb8d6;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.admin-fraud-stats b {
+  color: #ffffff;
+  font-size: 0.86rem;
+}
+
+.admin-page:not(.admin-page--login) .admin-customer-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px;
+}
+
+.admin-page:not(.admin-page--login) .admin-customer-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 340px;
+  max-width: 520px;
+  border: 1px solid rgba(121, 144, 205, 0.3);
+  border-radius: 6px;
+  background: #111735;
+  color: #9ea9c9;
+  padding: 0 12px;
+}
+
+.admin-page:not(.admin-page--login) .admin-customer-search input {
+  min-height: 38px;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+}
+
+.admin-page:not(.admin-page--login) .admin-customer-toolbar__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-page:not(.admin-page--login) .admin-customer-toolbar__actions select {
+  min-height: 38px;
+  min-width: 190px;
+}
+
+.admin-customer-table {
+  min-width: 1180px;
+}
+
+.admin-customer-table tr.is-customer-locked {
+  background: rgba(255, 94, 94, 0.045);
+}
+
+.admin-customer-status.is-normal,
+.admin-customer-status.is-new {
+  border-color: rgba(126, 231, 160, 0.36);
+  background: rgba(126, 231, 160, 0.12);
+  color: #a9f6c0;
+}
+
+.admin-customer-status.is-warning {
+  border-color: rgba(255, 202, 89, 0.42);
+  background: rgba(255, 202, 89, 0.14);
+  color: #ffd87f;
+}
+
+.admin-customer-status.is-temp_banned {
+  border-color: rgba(255, 149, 64, 0.48);
+  background: rgba(255, 149, 64, 0.16);
+  color: #ffbd85;
+}
+
+.admin-customer-status.is-banned {
+  border-color: rgba(255, 94, 94, 0.5);
+  background: rgba(255, 94, 94, 0.16);
+  color: #ffaaaa;
+}
+
+.admin-customer-risk {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(126, 231, 160, 0.12);
+  color: #a9f6c0;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 4px 8px;
+}
+
+.admin-customer-risk.is-warning {
+  background: rgba(255, 202, 89, 0.14);
+  color: #ffd87f;
+}
+
+.admin-customer-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-customer-ban-button {
+  min-width: 76px;
+}
+
+.admin-fraud-modal {
+  width: min(560px, calc(100vw - 28px));
+}
+
+.admin-fraud-modal .admin-customer-modal__head {
+  align-items: flex-start;
+}
+
+.admin-fraud-modal .admin-customer-modal__head h2 {
+  margin: 0;
+}
+
+.admin-fraud-customer-card {
+  display: grid;
+  gap: 5px;
+  margin: 16px 20px 0;
+  border: 1px solid rgba(121, 144, 205, 0.22);
+  border-radius: 6px;
+  background: rgba(17, 23, 53, 0.62);
+  padding: 14px;
+}
+
+.admin-fraud-customer-card span,
+.admin-fraud-customer-card em {
+  color: #9ea9c9;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.admin-fraud-customer-card strong {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.admin-fraud-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-top: 1px solid rgba(121, 144, 205, 0.16);
+  margin: 0 20px;
+  padding-top: 14px;
+}
+
+.admin-fraud-actions button {
+  min-height: 36px;
+}
+
+@media (max-width: 760px) {
+  .admin-fraud-head,
+  .admin-page:not(.admin-page--login) .admin-customer-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-fraud-stats,
+  .admin-page:not(.admin-page--login) .admin-customer-toolbar__actions {
+    justify-content: flex-start;
+  }
+
+  .admin-page:not(.admin-page--login) .admin-customer-search,
+  .admin-page:not(.admin-page--login) .admin-customer-toolbar__actions select,
+  .admin-page:not(.admin-page--login) .admin-customer-toolbar__actions button {
+    width: 100%;
+    max-width: none;
   }
 }

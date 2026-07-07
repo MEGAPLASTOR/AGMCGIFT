@@ -9,6 +9,12 @@ function getRewardAccounts(redemptionInfo) {
       : [];
 }
 
+function getPositiveNumber(value) {
+  const number = Number(value || 0);
+
+  return Number.isFinite(number) && number > 0 ? number : 0;
+}
+
 export function InstantRewardPage({
   redemptionInfo,
   onReset,
@@ -30,10 +36,27 @@ export function InstantRewardPage({
         <span>Code: {redemptionInfo.code}</span>
         <span>Sản phẩm: {redemptionInfo.productName}</span>
         {accounts.length > 1 ? <span>Số acc: {accounts.length}</span> : null}
+        {getPositiveNumber(redemptionInfo.totalCount) ? (
+          <span>Tổng trứng: {redemptionInfo.totalCount}</span>
+        ) : null}
+        {getPositiveNumber(redemptionInfo.claimedCount) ? (
+          <span>Đã mở: {redemptionInfo.claimedCount}</span>
+        ) : null}
+        {getPositiveNumber(redemptionInfo.hatchingCount) ? (
+          <span>Đang ấp: {redemptionInfo.hatchingCount}</span>
+        ) : null}
+        {getPositiveNumber(redemptionInfo.stuckCount) ? (
+          <span>Bị kẹt: {redemptionInfo.stuckCount}</span>
+        ) : null}
       </div>
 
       {redemptionInfo.message ? (
         <p className="message message--success">{redemptionInfo.message}</p>
+      ) : null}
+      {getPositiveNumber(redemptionInfo.stuckCount) ? (
+        <p className="message message--warning">
+          Có {redemptionInfo.stuckCount} trứng chưa mở được do thiếu tài khoản trong pool hoặc chưa có pool liên kết.
+        </p>
       ) : null}
 
       <div className="account-reward-list">

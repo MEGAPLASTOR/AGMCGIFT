@@ -1,6 +1,7 @@
 import { getAdminCustomerStatusEndpoint } from "../api/endpoints/adminEndpoints";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { requestJson } from "../api/http/requestJson";
+import { normalizeCustomerStatus } from "../utils/customerStatus";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
@@ -40,13 +41,41 @@ function normalizeCustomer(customer, fallback = {}) {
       fallback.customerName ||
       fallback.customer_name ||
       "",
-    status: source.status || fallback.status || "",
-    successCount: Number(source.successCount || source.success_count || fallback.successCount || 0),
-    returnStreak: Number(source.returnStreak || source.return_streak || fallback.returnStreak || 0),
-    warningCount: Number(source.warningCount || source.warning_count || fallback.warningCount || 0),
-    earlyHatchCredits: Number(source.earlyHatchCredits ?? source.early_hatch_credits ?? fallback.earlyHatchCredits ?? 0),
-    createdAt: normalizeDate(source.createdAt || source.created_at || fallback.createdAt),
-    updatedAt: normalizeDate(source.updatedAt || source.updated_at || fallback.updatedAt),
+    status: normalizeCustomerStatus(source.status || fallback.status),
+    successCount: Number(
+      source.successCount || source.success_count || fallback.successCount || 0
+    ),
+    returnStreak: Number(
+      source.returnStreak || source.return_streak || fallback.returnStreak || 0
+    ),
+    warningCount: Number(
+      source.warningCount || source.warning_count || fallback.warningCount || 0
+    ),
+    earlyHatchCredits: Number(
+      source.earlyHatchCredits ??
+        source.early_hatch_credits ??
+        fallback.earlyHatchCredits ??
+        0
+    ),
+    returnCount: Number(
+      source.returnCount ??
+        source.return_count ??
+        fallback.returnCount ??
+        fallback.return_count ??
+        0
+    ),
+    unbanAt: normalizeDate(
+      source.unbanAt ||
+        source.unban_at ||
+        fallback.unbanAt ||
+        fallback.unban_at
+    ),
+    createdAt: normalizeDate(
+      source.createdAt || source.created_at || fallback.createdAt
+    ),
+    updatedAt: normalizeDate(
+      source.updatedAt || source.updated_at || fallback.updatedAt
+    ),
   };
 }
 
@@ -55,7 +84,7 @@ function getResponseRecord(payload) {
 }
 
 function buildCustomerStatusPayload(record) {
-  const status = normalizeText(record.status).toUpperCase();
+  const status = normalizeCustomerStatus(record.status);
 
   if (!status) {
     throw new Error("Vui lòng nhập trạng thái khách hàng.");
@@ -65,6 +94,7 @@ function buildCustomerStatusPayload(record) {
     status,
     returnStreak: Number(record.returnStreak ?? record.return_streak ?? 0),
     successCount: Number(record.successCount ?? record.success_count ?? 0),
+    unbanAt: record.unbanAt || record.unban_at || null,
   };
 }
 

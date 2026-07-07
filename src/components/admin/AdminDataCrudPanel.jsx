@@ -37,6 +37,10 @@ import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
 import { AdminModalPortal } from "./AdminModalPortal";
 import { AdminGiftPoolTablePanel } from "./AdminGiftPoolTablePanel";
 import { AdminProductTablePanel } from "./AdminProductTablePanel";
+import {
+  CUSTOMER_STATUS,
+  getCustomerStatusLabel,
+} from "../../utils/customerStatus";
 
 const EMPTY_ROWS = [];
 const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
@@ -52,7 +56,15 @@ const ALWAYS_VISIBLE_TABLE_KEYS = new Set([
 const DEFAULT_TABLE_KEY = "giftAccounts";
 const PRIORITY_COLUMNS_BY_TABLE = {
   giftAccounts: ["username", "password", "tier", "platform", "status"],
-  customers: ["customerCode", "customerName", "status", "successCount", "warningCount"],
+  customers: [
+    "customerCode",
+    "customerName",
+    "status",
+    "successCount",
+    "returnCount",
+    "warningCount",
+    "unbanAt",
+  ],
   eggs: ["egg_type", "status", "hatch_at", "order_id", "account_id"],
   giftPools: ["pool_name", "tier", "created_at"],
   adminOrders: ["order_code", "status", "fulfillment_status", "delivered_at", "last_synced_at"],
@@ -89,8 +101,13 @@ const BOARD_CONFIG_BY_TABLE = {
   },
   customers: {
     field: "status",
-    fallbackValue: "NEW",
-    values: ["NEW", "TRUSTED_1", "TRUSTED_2", "WARNING", "BANNED"],
+    fallbackValue: CUSTOMER_STATUS.NORMAL,
+    values: [
+      CUSTOMER_STATUS.NORMAL,
+      CUSTOMER_STATUS.WARNING,
+      CUSTOMER_STATUS.TEMP_BANNED,
+      CUSTOMER_STATUS.BANNED,
+    ],
   },
   eggs: {
     field: "status",
@@ -197,13 +214,7 @@ function getBoardLabel(tableKey, fields, config, value) {
   }
 
   if (tableKey === "customers") {
-    const labels = {
-      ACTIVE: "Đang ổn",
-      WARNING: "Cảnh báo",
-      BANNED: "Bị khóa",
-    };
-
-    return labels[normalizeBoardValue(value).toUpperCase()] || normalizeBoardValue(value);
+    return getCustomerStatusLabel(value);
   }
 
   return getOptionLabel(fields, config.field, value);

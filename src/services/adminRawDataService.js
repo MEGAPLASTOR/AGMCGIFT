@@ -11,6 +11,7 @@ import {
   normalizeAdminGiftPool,
 } from "./adminGiftPoolService";
 import { normalizeApiText } from "../api/eggs/utils/normalizeApiText";
+import { normalizeCustomerStatus } from "../utils/customerStatus";
 
 const RAW_ENDPOINTS = [
   ["customers", ADMIN_ENDPOINTS.customers],
@@ -184,11 +185,13 @@ function normalizeCustomers(customers) {
       customer.customerCode || customer.customer_code || customer.code || "",
     customerName:
       customer.customerName || customer.customer_name || customer.name || "",
-    status: customer.status || "",
+    status: normalizeCustomerStatus(customer.status),
     successCount: Number(customer.successCount || customer.success_count || 0),
     returnStreak: Number(customer.returnStreak || customer.return_streak || 0),
     warningCount: Number(customer.warningCount || customer.warning_count || 0),
     earlyHatchCredits: Number(customer.earlyHatchCredits || customer.early_hatch_credits || 0),
+    returnCount: Number(customer.returnCount || customer.return_count || 0),
+    unbanAt: normalizeDate(customer.unbanAt || customer.unban_at),
     createdAt: normalizeDate(customer.createdAt || customer.created_at),
     updatedAt: normalizeDate(customer.updatedAt || customer.updated_at),
   }));
