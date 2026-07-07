@@ -165,9 +165,37 @@
     padding: 18px 14px 14px;
   }
 
+  .account-reward__ornament {
+    height: 164px;
+  }
+
+  .account-reward__aura {
+    width: min(94%, 340px);
+    height: 118px;
+  }
+
+  .account-reward__wings {
+    top: 24px;
+    width: min(100%, 520px);
+    height: 122px;
+  }
+
+  .account-reward__wing {
+    top: 14px;
+    height: 104px;
+    opacity: 0.58;
+  }
+
+  .account-reward__crest {
+    top: 8px;
+    width: 72px;
+    height: 76px;
+  }
+
   .account-reward::after {
-    width: 54px;
-    height: 54px;
+    top: 18px;
+    width: 44px;
+    height: 44px;
   }
 
   .account-reward__head,

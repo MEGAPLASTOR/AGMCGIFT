@@ -104,6 +104,15 @@ export function AccountRewardCard({
         tier ? ` account-reward--${tier.toLowerCase()}` : ""
       }`}
     >
+      <span className="account-reward__ornament" aria-hidden="true">
+        <span className="account-reward__aura" />
+        <span className="account-reward__wings">
+          <span className="account-reward__wing account-reward__wing--left" />
+          <span className="account-reward__wing account-reward__wing--right" />
+        </span>
+        <span className="account-reward__crest" />
+      </span>
+
       <div className="account-reward__head">
         <div className="account-reward__identity">
           <span className="account-reward__icon" aria-hidden="true">
