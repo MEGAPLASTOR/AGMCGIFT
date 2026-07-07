@@ -302,11 +302,6 @@ export function AdminGiftPoolTablePanel({
   );
   const paginatedPools = poolPagination.pageRows;
 
-  const poolAccountPagination = useAdminClientPagination(
-    currentPoolAccounts,
-    `${detailPoolId}|${currentPoolAccounts.length}`
-  );
-  const paginatedPoolAccounts = poolAccountPagination.pageRows;
 
   const selectedPool = useMemo(
     () => pools.find((pool) => getPoolId(pool) === detailPoolId) || null,
@@ -319,6 +314,12 @@ export function AdminGiftPoolTablePanel({
   const currentPoolAccounts = selectedPool
     ? poolAccountsByPoolId.get(getPoolId(selectedPool)) || EMPTY_ROWS
     : EMPTY_ROWS;
+
+  const poolAccountPagination = useAdminClientPagination(
+    currentPoolAccounts,
+    `${detailPoolId}|${currentPoolAccounts.length}`
+  );
+  const paginatedPoolAccounts = poolAccountPagination.pageRows;
   const currentPoolAccountIds = useMemo(
     () => currentPoolAccounts.map(getAccountId).filter(Boolean),
     [currentPoolAccounts]
