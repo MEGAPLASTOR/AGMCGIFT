@@ -159,11 +159,11 @@ function AdminManagementNav({ activeSlug, onNavigate, tableCounts }) {
     <nav
       className="admin-management-nav"
       id="admin-management-nav"
-      aria-label="Dieu huong quan tri"
+      aria-label="Điều hướng quản trị"
     >
       <Link
         className={overviewActive ? "is-active" : ""}
-        title="Tong quan"
+        title="Tổng quan"
         to={getAdminPath()}
         onClick={onNavigate}
       >
@@ -680,24 +680,20 @@ export default function AdminDashboardPage() {
     );
   }
 
-  const activePageTitle = isOverviewPage ? "Analytics" : activeManagementPage.title;
+  const activePageTitle = isOverviewPage ? "Phân tích" : activeManagementPage.title;
   const activePageDescription = isOverviewPage
-    ? "Theo doi don hang, ton kho, trung va hieu suat van hanh trong mot bo cuc moi."
+    ? "Theo dõi đơn hàng, tồn kho, trứng và hiệu suất vận hành."
     : activeManagementPage.description;
   const headerSearchText = isOverviewPage
-    ? "Tong quan doanh thu, ton kho, trung va giao acc"
+    ? "Tìm kiếm trong tổng quan"
     : `Module ${activeManagementPage.label}`;
-  const adminInitial = String(admin.full_name || admin.username || "A")
-    .trim()
-    .charAt(0)
-    .toUpperCase();
 
   return (
     <main className="admin-page">
       <header className="admin-header">
         <div className="admin-header__intro">
           <p className="admin-eyebrow">
-            ADMIN CONTROL / {isOverviewPage ? "overview" : activeManagementPage.slug}
+            QUẢN TRỊ / {isOverviewPage ? "tổng quan" : activeManagementPage.label}
           </p>
           <h1>{activePageTitle}</h1>
           <span>{activePageDescription}</span>
@@ -710,9 +706,6 @@ export default function AdminDashboardPage() {
           </div>
 
           <div className="admin-header__profile">
-            <div className="admin-header__avatar" aria-hidden="true">
-              {adminInitial}
-            </div>
             <div className="admin-header__identity">
               <strong>{admin.full_name}</strong>
               <small>
@@ -730,8 +723,8 @@ export default function AdminDashboardPage() {
           >
             <FaChartLine aria-hidden="true" />
             {adminTables.isLoadingRawData || isSyncingProducts
-              ? "Dang sync du lieu"
-              : "Live analytics"}
+              ? "Đang đồng bộ dữ liệu"
+              : "Phân tích trực tiếp"}
           </span>
 
           <div className="admin-header__action-buttons">
@@ -742,7 +735,7 @@ export default function AdminDashboardPage() {
               onClick={handleReloadRawData}
             >
               <FaRotateRight aria-hidden="true" />
-              {adminTables.isLoadingRawData ? "Dang tai du lieu" : "Tai lai du lieu"}
+              {adminTables.isLoadingRawData ? "Đang tải dữ liệu" : "Tải lại dữ liệu"}
             </button>
             <button
               type="button"
@@ -751,7 +744,7 @@ export default function AdminDashboardPage() {
               onClick={handleSyncProducts}
             >
               <FaBoxesStacked aria-hidden="true" />
-              {isSyncingProducts ? "Dang dong bo san pham" : "Dong bo san pham"}
+              {isSyncingProducts ? "Đang đồng bộ sản phẩm" : "Đồng bộ sản phẩm"}
             </button>
             <button
               type="button"
@@ -759,11 +752,11 @@ export default function AdminDashboardPage() {
               onClick={() => setPasswordModalOpen(true)}
             >
               <FaKey aria-hidden="true" />
-              Doi mat khau
+              Đổi mật khẩu
             </button>
             <button type="button" onClick={logout}>
               <FaRightFromBracket aria-hidden="true" />
-              Dang xuat
+              Đăng xuất
             </button>
           </div>
         </div>
@@ -800,12 +793,12 @@ export default function AdminDashboardPage() {
             aria-controls="admin-management-nav"
             aria-expanded={!isNavCollapsed}
             aria-label={
-              isNavCollapsed ? "Mo menu quan tri" : "Dong menu quan tri"
+              isNavCollapsed ? "Mở menu quản trị" : "Đóng menu quản trị"
             }
             onClick={handleToggleAdminNav}
           >
             <SidebarToggleIcon aria-hidden="true" />
-            <span>{isNavCollapsed ? "Mo rong" : "Thu gon"}</span>
+            <span>{isNavCollapsed ? "Mở rộng" : "Thu gọn"}</span>
           </button>
 
           <AdminManagementNav
@@ -819,7 +812,7 @@ export default function AdminDashboardPage() {
           <button
             type="button"
             className="admin-sidebar__scrim"
-            aria-label="Dong menu quan tri"
+            aria-label="Đóng menu quản trị"
             onClick={handleCloseAdminNav}
           />
         ) : null}
