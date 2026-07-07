@@ -1720,6 +1720,18 @@ export function AdminDataCrudPanel({
                   </option>
                 ))}
               </select>
+              <select
+                aria-label="Lọc tier tài khoản"
+                value={accountTierFilter}
+                onChange={(event) => setAccountTierFilter(event.target.value)}
+              >
+                <option value="">Mọi tier</option>
+                {accountTierOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
               <button type="button" onClick={startAdd}>
                 <FaPlus aria-hidden="true" />
                 Thêm tài khoản
