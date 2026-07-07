@@ -1,5 +1,5 @@
-import { EGG_CHOICES } from "../constants/eggChoices";
-import { normalizeApiText } from "../utils/normalizeApiText";
+import { EGG_CHOICES } from "../constants/eggChoices.js";
+import { normalizeApiText } from "../utils/normalizeApiText.js";
 
 function getRawEggSlot(rawEgg) {
   return Number(
