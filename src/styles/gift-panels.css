@@ -433,14 +433,14 @@ input::placeholder {
   display: grid;
   flex: 0 0 auto;
   width: 108px;
-  height: 108px;
+  height: 96px;
   place-items: center;
 }
 
 .reward-tier-egg::before {
   content: "";
   position: absolute;
-  inset: 8px 10px 14px;
+  inset: 8px 10px;
   border: 3px solid var(--tier-frame);
   border-radius: 36px;
   background:
@@ -465,27 +465,10 @@ input::placeholder {
 .reward-tier-egg img {
   position: relative;
   z-index: 1;
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 92%;
+  max-height: 92%;
   object-fit: contain;
   filter: drop-shadow(0 12px 14px rgba(23, 19, 10, 0.32));
-}
-
-.reward-tier-egg__label {
-  position: absolute;
-  bottom: -6px;
-  z-index: 2;
-  padding: 6px 12px;
-  border: 2px solid var(--tier-frame);
-  border-radius: 999px;
-  background: var(--tier-chip-bg);
-  box-shadow: 0 8px 16px rgba(23, 19, 10, 0.22);
-  color: var(--tier-chip-text);
-  font-size: 12px;
-  font-weight: 1000;
-  letter-spacing: 0.08em;
-  line-height: 1;
-  text-transform: uppercase;
 }
 
 .reward-tier-egg--s {
@@ -1055,16 +1038,10 @@ input::placeholder {
 
 .account-reward__identity {
   display: flex;
+  flex: 1 1 auto;
   min-width: 0;
   align-items: center;
   gap: 12px;
-}
-
-.account-reward__actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
 }
 
 .account-reward__icon {
@@ -1081,8 +1058,6 @@ input::placeholder {
   font-weight: 1000;
 }
 
-.account-reward__tier-chip,
-.account-reward__copy-all,
 .account-reward__copy {
   border: 1px solid transparent;
   border-radius: 999px;
@@ -1092,19 +1067,6 @@ input::placeholder {
   text-transform: uppercase;
 }
 
-.account-reward__tier-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 0 14px;
-  border-color: var(--account-frame-soft);
-  background: var(--account-chip-bg);
-  box-shadow: 0 10px 18px -14px var(--account-shadow);
-  color: var(--account-chip-text);
-}
-
-.account-reward__copy-all,
 .account-reward__copy {
   display: inline-flex;
   align-items: center;
@@ -1117,31 +1079,14 @@ input::placeholder {
     background-color 160ms ease;
 }
 
-.account-reward__copy-all {
-  min-height: 34px;
-  padding: 0 14px;
-  border-color: var(--account-frame);
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 10px 18px -14px var(--account-shadow);
-  color: var(--account-title);
-}
-
-.account-reward__copy-all:hover,
 .account-reward__copy:hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 18px -14px var(--account-shadow);
 }
 
-.account-reward__copy-all:focus-visible,
 .account-reward__copy:focus-visible {
   outline: 2px solid var(--account-frame);
   outline-offset: 2px;
-}
-
-.account-reward__copy-all:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-  transform: none;
 }
 
 .account-reward__summary > span {
@@ -1152,27 +1097,57 @@ input::placeholder {
   text-transform: uppercase;
 }
 
+.account-reward__summary {
+  display: grid;
+  gap: 4px;
+}
+
 .account-reward__summary strong {
   display: block;
   overflow-wrap: anywhere;
-  margin-top: 4px;
   color: var(--account-title);
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.38);
   font-size: 20px;
   font-weight: 1000;
 }
 
+.account-reward__platform {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  align-items: center;
+  border: 1px solid var(--account-field-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--account-kicker);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  padding: 5px 10px;
+  text-transform: uppercase;
+}
+
 .account-reward__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
   gap: 10px;
   margin: 0;
   position: relative;
   z-index: 1;
 }
 
+.account-reward__grid > .account-reward__field:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
 .account-reward__field {
+  display: grid;
+  align-content: start;
+  gap: 8px;
   min-width: 0;
+  min-height: 96px;
   border: 2px solid var(--account-field-border);
   border-radius: 16px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, var(--account-field-bg) 100%);
@@ -1182,7 +1157,7 @@ input::placeholder {
 
 .account-reward__field-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 10px;
 }
@@ -1197,10 +1172,11 @@ input::placeholder {
 
 .account-reward dd {
   overflow-wrap: anywhere;
-  margin: 4px 0 0;
+  margin: 0;
   color: var(--account-title);
   font-size: 18px;
   font-weight: 1000;
+  line-height: 1.35;
 }
 
 .account-reward__note {

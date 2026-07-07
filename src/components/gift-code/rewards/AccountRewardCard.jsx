@@ -47,17 +47,10 @@ async function copyText(value) {
   }
 }
 
-function buildRows(accountInfo, note, accountName, username, password) {
+function buildRows(note, username, password) {
   return [
-    {
-      key: "account-name",
-      label: "Tên acc",
-      value:
-        accountName && accountName !== accountInfo.platform ? accountName : "",
-    },
     { key: "username", label: "Tài khoản", value: username },
     { key: "password", label: "Mật khẩu", value: password },
-    { key: "platform", label: "Nền tảng", value: accountInfo.platform },
     { key: "note", label: "Ghi chú", value: note, full: true },
   ].filter((row) => row.value);
 }
@@ -73,8 +66,9 @@ export function AccountRewardCard({
   const username = accountInfo.taiKhoan || accountInfo.username;
   const password = accountInfo.matKhau || accountInfo.password;
   const tier = normalizeTier(accountInfo.tier);
+  const platform = String(accountInfo.platform || "").trim();
   const note = accountInfo.ghiChu || accountInfo.message;
-  const rows = buildRows(accountInfo, note, accountName, username, password);
+  const rows = buildRows(note, username, password);
 
   const handleCopy = async (label, value) => {
     const copied = await copyText(value);
@@ -110,13 +104,10 @@ export function AccountRewardCard({
           <div className="account-reward__summary">
             <span>{title}</span>
             <strong>{accountName || "Acc Blox Fruit"}</strong>
+            {platform ? (
+              <em className="account-reward__platform">{platform}</em>
+            ) : null}
           </div>
-        </div>
-
-        <div className="account-reward__actions">
-          {tier ? (
-            <span className="account-reward__tier-chip">Tier {tier}</span>
-          ) : null}
         </div>
       </div>
 

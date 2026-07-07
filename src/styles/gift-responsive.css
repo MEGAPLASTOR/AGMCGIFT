@@ -202,11 +202,6 @@
     align-items: flex-start;
   }
 
-  .account-reward__actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
-
   .reward-egg-card {
     min-height: 280px;
     padding: 14px;

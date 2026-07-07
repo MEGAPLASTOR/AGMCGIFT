@@ -55,12 +55,11 @@ export function RewardTierEggBadge({ redemptionInfo }) {
   return (
     <span
       className={`reward-tier-egg reward-tier-egg--${displayTier.toLowerCase()}`}
-      aria-label={`Trung ${diamondEgg ? "kim cuong" : "vang"} tier ${displayTier}`}
+      aria-label={`Trứng ${diamondEgg ? "kim cương" : "vàng"}`}
       role="img"
     >
       <span className="reward-tier-egg__shine" aria-hidden="true" />
       <img src={diamondEgg ? eggPremium15Days : eggInstantGold} alt="" />
-      <span className="reward-tier-egg__label">Tier {displayTier}</span>
     </span>
   );
 }

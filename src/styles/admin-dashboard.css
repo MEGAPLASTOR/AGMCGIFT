@@ -6681,3 +6681,174 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ponytail: final shell pass so the whole admin dashboard tracks the new analytics visual. */
+.admin-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "intro utility"
+    "actions actions";
+  gap: 16px 18px;
+}
+
+.admin-header__intro {
+  grid-area: intro;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.admin-header__utility {
+  grid-area: utility;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-header__search {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  width: min(360px, 100%);
+  border: 1px solid rgba(137, 160, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(12, 18, 37, 0.92);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  color: #8ea2c6;
+  padding: 0 16px;
+}
+
+.admin-header__search svg {
+  color: #dfe8f8;
+  flex: 0 0 auto;
+}
+
+.admin-header__search span {
+  color: #9fb2d8;
+  font-size: 0.82rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-header__profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  border: 1px solid rgba(137, 160, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(12, 18, 37, 0.94);
+  padding: 8px 10px 8px 8px;
+}
+
+.admin-header__avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #6ea8ff, #3f5bf6);
+  box-shadow: 0 10px 20px rgba(12, 18, 37, 0.28);
+  color: #f7fbff;
+  font-size: 0.9rem;
+  font-weight: 900;
+}
+
+.admin-header__identity {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-header__identity strong {
+  color: #eef4ff;
+  font-size: 0.9rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.admin-header__identity small {
+  color: #8ea2c6;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-header__actions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.admin-header__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 40px;
+  border: 1px solid rgba(118, 151, 255, 0.2);
+  border-radius: 999px;
+  background: rgba(12, 18, 37, 0.92);
+  color: #dfe8f8;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  padding: 0 14px;
+  text-transform: uppercase;
+}
+
+.admin-header__status.is-busy {
+  color: #ffd98a;
+  border-color: rgba(255, 181, 83, 0.26);
+}
+
+.admin-header__action-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-sidebar::before {
+  content: "AGMC Analytics";
+}
+
+.admin-sidebar::after {
+  content: "admin modules";
+}
+
+@media (max-width: 1120px) {
+  .admin-header {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "intro"
+      "utility"
+      "actions";
+  }
+
+  .admin-header__utility,
+  .admin-header__actions,
+  .admin-header__action-buttons {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-header__search,
+  .admin-header__profile,
+  .admin-header__action-buttons {
+    width: 100%;
+  }
+
+  .admin-header__search span,
+  .admin-header__identity strong,
+  .admin-header__identity small {
+    white-space: normal;
+  }
+}

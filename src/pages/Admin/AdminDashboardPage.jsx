@@ -14,6 +14,7 @@ import {
   FaKey,
   FaLayerGroup,
   FaLink,
+  FaMagnifyingGlass,
   FaRightFromBracket,
   FaRotateRight,
   FaUserGroup,
@@ -679,47 +680,92 @@ export default function AdminDashboardPage() {
     );
   }
 
+  const activePageTitle = isOverviewPage ? "Analytics" : activeManagementPage.title;
+  const activePageDescription = isOverviewPage
+    ? "Theo doi don hang, ton kho, trung va hieu suat van hanh trong mot bo cuc moi."
+    : activeManagementPage.description;
+  const headerSearchText = isOverviewPage
+    ? "Tong quan doanh thu, ton kho, trung va giao acc"
+    : `Module ${activeManagementPage.label}`;
+  const adminInitial = String(admin.full_name || admin.username || "A")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
+
   return (
     <main className="admin-page">
       <header className="admin-header">
-        <div>
-          <p className="admin-eyebrow">Anh Gà MC Gift Code Admin</p>
-          <h1>Dashboard vận hành gift code</h1>
-          <span>
-            Đăng nhập: {admin.full_name} / {admin.role}
-          </span>
+        <div className="admin-header__intro">
+          <p className="admin-eyebrow">
+            ADMIN CONTROL / {isOverviewPage ? "overview" : activeManagementPage.slug}
+          </p>
+          <h1>{activePageTitle}</h1>
+          <span>{activePageDescription}</span>
         </div>
+
+        <div className="admin-header__utility">
+          <div className="admin-header__search" aria-hidden="true">
+            <FaMagnifyingGlass aria-hidden="true" />
+            <span>{headerSearchText}</span>
+          </div>
+
+          <div className="admin-header__profile">
+            <div className="admin-header__avatar" aria-hidden="true">
+              {adminInitial}
+            </div>
+            <div className="admin-header__identity">
+              <strong>{admin.full_name}</strong>
+              <small>
+                @{admin.username} / {admin.role}
+              </small>
+            </div>
+          </div>
+        </div>
+
         <div className="admin-header__actions">
-          <button
-            type="button"
-            className="admin-light-button"
-            disabled={adminTables.isLoadingRawData}
-            onClick={handleReloadRawData}
+          <span
+            className={`admin-header__status${
+              adminTables.isLoadingRawData || isSyncingProducts ? " is-busy" : ""
+            }`}
           >
-            <FaRotateRight aria-hidden="true" />
-            {adminTables.isLoadingRawData ? "Đang tải dữ liệu" : "Tải lại dữ liệu"}
-          </button>
-          <button
-            type="button"
-            className="admin-light-button"
-            disabled={isSyncingProducts || adminTables.isLoadingRawData}
-            onClick={handleSyncProducts}
-          >
-            <FaBoxesStacked aria-hidden="true" />
-            {isSyncingProducts ? "Đang đồng bộ sản phẩm" : "Đồng bộ sản phẩm"}
-          </button>
-          <button
-            type="button"
-            className="admin-light-button"
-            onClick={() => setPasswordModalOpen(true)}
-          >
-            <FaKey aria-hidden="true" />
-            Đổi mật khẩu
-          </button>
-          <button type="button" onClick={logout}>
-            <FaRightFromBracket aria-hidden="true" />
-            Đăng xuất
-          </button>
+            <FaChartLine aria-hidden="true" />
+            {adminTables.isLoadingRawData || isSyncingProducts
+              ? "Dang sync du lieu"
+              : "Live analytics"}
+          </span>
+
+          <div className="admin-header__action-buttons">
+            <button
+              type="button"
+              className="admin-light-button"
+              disabled={adminTables.isLoadingRawData}
+              onClick={handleReloadRawData}
+            >
+              <FaRotateRight aria-hidden="true" />
+              {adminTables.isLoadingRawData ? "Dang tai du lieu" : "Tai lai du lieu"}
+            </button>
+            <button
+              type="button"
+              className="admin-light-button"
+              disabled={isSyncingProducts || adminTables.isLoadingRawData}
+              onClick={handleSyncProducts}
+            >
+              <FaBoxesStacked aria-hidden="true" />
+              {isSyncingProducts ? "Dang dong bo san pham" : "Dong bo san pham"}
+            </button>
+            <button
+              type="button"
+              className="admin-light-button"
+              onClick={() => setPasswordModalOpen(true)}
+            >
+              <FaKey aria-hidden="true" />
+              Doi mat khau
+            </button>
+            <button type="button" onClick={logout}>
+              <FaRightFromBracket aria-hidden="true" />
+              Dang xuat
+            </button>
+          </div>
         </div>
       </header>
 
