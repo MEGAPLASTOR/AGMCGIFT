@@ -302,6 +302,12 @@ export function AdminGiftPoolTablePanel({
   );
   const paginatedPools = poolPagination.pageRows;
 
+  const poolAccountPagination = useAdminClientPagination(
+    currentPoolAccounts,
+    `${detailPoolId}|${currentPoolAccounts.length}`
+  );
+  const paginatedPoolAccounts = poolAccountPagination.pageRows;
+
   const selectedPool = useMemo(
     () => pools.find((pool) => getPoolId(pool) === detailPoolId) || null,
     [detailPoolId, pools]
@@ -827,43 +833,38 @@ export function AdminGiftPoolTablePanel({
                     ))}
                   </select>
                 </label>
-                <button
-                  type="button"
-                  disabled={!candidateAccounts.length || isSaving}
-                  onClick={() => addAccountsToPool(candidateAccounts.map(getAccountId))}
-                >
-                  <FaPlus aria-hidden="true" />
-                  Thêm tất cả tier {selectedTier}
-                </button>
-                <label>
-                  Chọn account
-                  <select
-                    value={selectedAccountId}
-                    onChange={(event) => setSelectedAccountId(event.target.value)}
-                  >
-                    {candidateAccounts.length ? (
-                      candidateAccounts.map((account) => {
-                        const accountId = getAccountId(account);
 
-                        return (
-                          <option key={accountId} value={accountId}>
-                            {getAccountLabel(account)}
-                          </option>
-                        );
-                      })
-                    ) : (
-                      <option value="">Không còn account trống trong tier</option>
-                    )}
-                  </select>
+                <label>
+                  Số lượng{candidateAccounts.length ? ` (tối đa ${candidateAccounts.length})` : ""}
+                  <input
+                    type="number"
+                    min="1"
+                    max={candidateAccounts.length || 1}
+                    value={tierQuantity}
+                    disabled={!candidateAccounts.length || isSaving}
+                    onChange={(event) => setTierQuantity(event.target.value)}
+                  />
                 </label>
-                <button
-                  type="button"
-                  disabled={!selectedAccountId || isSaving}
-                  onClick={() => addAccountsToPool([selectedAccountId])}
-                >
-                  <FaPlus aria-hidden="true" />
-                  Thêm account
-                </button>
+
+                <div className="admin-gift-pool-add-actions">
+                  <button
+                    type="button"
+                    disabled={!candidateAccounts.length || isSaving}
+                    onClick={addAccountsByQuantity}
+                  >
+                    <FaPlus aria-hidden="true" />
+                    Thêm {tierQuantity || 0} acc tier {selectedTier}
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-light-button"
+                    disabled={!candidateAccounts.length || isSaving}
+                    onClick={() => addAccountsToPool(candidateAccounts.map(getAccountId))}
+                  >
+                    <FaPlus aria-hidden="true" />
+                    Thêm tất cả ({candidateAccounts.length})
+                  </button>
+                </div>
               </div>
 
               <div className="admin-gift-pool-bulk-actions">

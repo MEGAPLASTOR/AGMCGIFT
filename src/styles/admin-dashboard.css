@@ -3383,9 +3383,8 @@
   display: grid;
   grid-template-columns:
     minmax(130px, 0.65fr)
-    minmax(190px, 0.75fr)
-    minmax(300px, 1.35fr)
-    minmax(150px, 0.6fr);
+    minmax(150px, 0.5fr)
+    1fr;
   gap: 10px;
   align-items: end;
   border: 1px solid var(--admin-galaxy-line);
@@ -3403,10 +3402,18 @@
   text-transform: uppercase;
 }
 
-.admin-gift-pool-add-panel select {
+.admin-gift-pool-add-panel select,
+.admin-gift-pool-add-panel input[type="number"] {
   min-height: 36px;
   border-radius: 4px;
   padding: 7px 10px;
+}
+
+.admin-gift-pool-add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
 }
 
 .admin-gift-pool-add-panel button {
