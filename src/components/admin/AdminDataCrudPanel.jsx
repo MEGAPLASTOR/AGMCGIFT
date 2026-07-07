@@ -163,12 +163,26 @@ function getAccountTierValue(account) {
   return normalizeBoardValue(account?.tier).toUpperCase();
 }
 
+function getAssignedAtTimestamp(account) {
+  const raw = account?.assigned_at;
+
+  if (!raw) {
+    return 0;
+  }
+
+  const ts = new Date(raw).getTime();
+
+  return Number.isFinite(ts) ? ts : 0;
+}
+
 function sortGiftAccountRows(rows, lastChangedAccountId) {
   const lastChangedId = normalizeBoardValue(lastChangedAccountId);
 
   return [...rows].sort((first, second) => {
     const firstId = getRecordId(first, "giftAccounts");
     const secondId = getRecordId(second, "giftAccounts");
+
+    // Acc vừa đổi trạng thái luôn lên đầu
     const recentDiff =
       Number(secondId === lastChangedId) - Number(firstId === lastChangedId);
 
@@ -176,6 +190,15 @@ function sortGiftAccountRows(rows, lastChangedAccountId) {
       return recentDiff;
     }
 
+    // Sort theo ngày gán gần nhất (mới nhất lên đầu)
+    const assignedDiff =
+      getAssignedAtTimestamp(second) - getAssignedAtTimestamp(first);
+
+    if (assignedDiff !== 0) {
+      return assignedDiff;
+    }
+
+    // Tiebreaker: status rank → tier → username
     return (
       getAccountStatusRank(first.status) - getAccountStatusRank(second.status) ||
       getAccountTierValue(first).localeCompare(getAccountTierValue(second), "vi") ||
