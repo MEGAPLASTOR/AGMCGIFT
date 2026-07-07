@@ -47,7 +47,7 @@ async function copyText(value) {
   }
 }
 
-function buildRows(accountInfo, tier, note, accountName, username, password) {
+function buildRows(accountInfo, note, accountName, username, password) {
   return [
     {
       key: "account-name",
@@ -58,7 +58,6 @@ function buildRows(accountInfo, tier, note, accountName, username, password) {
     { key: "username", label: "Tài khoản", value: username },
     { key: "password", label: "Mật khẩu", value: password },
     { key: "platform", label: "Nền tảng", value: accountInfo.platform },
-    { key: "tier", label: "Tier", value: tier },
     { key: "note", label: "Ghi chú", value: note, full: true },
   ].filter((row) => row.value);
 }
@@ -75,17 +74,7 @@ export function AccountRewardCard({
   const password = accountInfo.matKhau || accountInfo.password;
   const tier = normalizeTier(accountInfo.tier);
   const note = accountInfo.ghiChu || accountInfo.message;
-  const rows = buildRows(
-    accountInfo,
-    tier,
-    note,
-    accountName,
-    username,
-    password
-  );
-  const copyAllText = rows
-    .map((row) => `${row.label}: ${row.value}`)
-    .join("\n");
+  const rows = buildRows(accountInfo, note, accountName, username, password);
 
   const handleCopy = async (label, value) => {
     const copied = await copyText(value);
@@ -128,14 +117,6 @@ export function AccountRewardCard({
           {tier ? (
             <span className="account-reward__tier-chip">Tier {tier}</span>
           ) : null}
-          <button
-            type="button"
-            className="account-reward__copy-all"
-            onClick={() => handleCopy("toàn bộ thông tin", copyAllText)}
-            disabled={!copyAllText}
-          >
-            Sao chép tất cả
-          </button>
         </div>
       </div>
 

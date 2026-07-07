@@ -166,24 +166,23 @@
   }
 
   .account-reward__ornament {
-    height: 164px;
+    height: 182px;
   }
 
   .account-reward__aura {
-    width: min(94%, 340px);
-    height: 118px;
+    width: min(112%, 440px);
+    height: 132px;
   }
 
   .account-reward__wings {
-    top: 24px;
-    width: min(100%, 520px);
-    height: 122px;
+    top: 14px;
+    width: min(138%, 660px);
+    height: 150px;
   }
 
   .account-reward__wing {
-    top: 14px;
-    height: 104px;
-    opacity: 0.58;
+    top: 10px;
+    height: 128px;
   }
 
   .account-reward__crest {
@@ -205,7 +204,7 @@
 
   .account-reward__actions {
     width: 100%;
-    justify-content: space-between;
+    justify-content: flex-end;
   }
 
   .reward-egg-card {
@@ -227,11 +226,6 @@
 
   .reward-egg-card__content em {
     justify-self: start;
-  }
-
-  .account-reward__copy-all {
-    flex: 1 1 auto;
-    justify-content: center;
   }
 
   .incubating-page__hero {

@@ -26,7 +26,6 @@ export default function GiftCodePage() {
   const {
     status,
     currentCode,
-    selectedEntry,
     redemptionInfo,
     errorMsg,
     daysToWait,
@@ -106,7 +105,6 @@ export default function GiftCodePage() {
           <div ref={actionSectionRef}>
             <RewardChoicePage
               code={currentCode}
-              productName={selectedEntry.product.tenSanPham}
               daysToWait={daysToWait}
               isClaiming={isClaiming}
               availableChoices={availableChoices}

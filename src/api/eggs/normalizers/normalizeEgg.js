@@ -88,8 +88,8 @@ function isClaimed(rawEgg, egg) {
   const statusText = normalizeApiText(egg.displayStatus);
 
   return (
-    Boolean(getEggAccount(rawEgg)) ||
     statusText.includes("claim") ||
+    statusText.includes("hatched") ||
     statusText.includes("opened") ||
     statusText.includes("redeemed") ||
     statusText.includes("da mo") ||

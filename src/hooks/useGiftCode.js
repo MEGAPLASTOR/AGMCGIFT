@@ -20,6 +20,14 @@ const LUA_CHON_NHAN_NGAY = EGG_CHOICES.instant;
 const LUA_CHON_CHO_NHAN_THUONG_XIN = EGG_CHOICES.delayed;
 const CLAIMED_REWARDS_STORAGE_KEY = "agmcGiftClaimedRewards";
 
+function hasRewardPayload(value) {
+  return Boolean(
+    value?.reward ||
+      value?.account ||
+      (Array.isArray(value?.accounts) && value.accounts.length)
+  );
+}
+
 function readStoredRedemptions() {
   if (typeof window === "undefined") return {};
 
@@ -56,7 +64,7 @@ function saveStoredRedemption(redemption) {
     typeof window === "undefined" ||
     !redemption?.orderId ||
     !Number.isFinite(Number(redemption?.eggType)) ||
-    (!redemption?.reward && !Array.isArray(redemption?.accounts))
+    !hasRewardPayload(redemption)
   ) {
     return;
   }
@@ -145,6 +153,7 @@ function buildEggsByChoice(entry, eggs) {
       const savedRedemption = entry?.order?.id
         ? getStoredRedemption(entry.order.id, group.eggType, group.eggIds)
         : null;
+      const savedHasReward = hasRewardPayload(savedRedemption);
       const savedAccounts = Array.isArray(savedRedemption?.accounts)
         ? savedRedemption.accounts
         : savedRedemption?.reward
@@ -153,7 +162,13 @@ function buildEggsByChoice(entry, eggs) {
       const apiAccounts = normalizeClaimEggResponse({
         accounts: group.eggs.map((egg) => egg.account).filter(Boolean),
       }).accounts;
-      const accounts = savedAccounts.length ? savedAccounts : apiAccounts;
+      const openedFromApi =
+        group.eggs.every((egg) => egg.isClaimed) && apiAccounts.length > 0;
+      const accounts = savedAccounts.length
+        ? savedAccounts
+        : openedFromApi
+          ? apiAccounts
+          : [];
 
       return [
         choice,
@@ -167,10 +182,12 @@ function buildEggsByChoice(entry, eggs) {
           requiresIncubation:
             Number(group.eggType) === 2 ||
             group.eggs.some((egg) => egg.requiresIncubation),
-          isClaimed:
-            Boolean(accounts.length || savedRedemption?.reward) ||
-            group.eggs.every((egg) => egg.isClaimed),
-          reward: savedRedemption?.reward || accounts[0] || null,
+          isClaimed: savedHasReward || openedFromApi,
+          reward:
+            savedRedemption?.reward ||
+            savedRedemption?.account ||
+            accounts[0] ||
+            null,
           account:
             savedRedemption?.account ||
             savedRedemption?.reward ||
@@ -375,9 +392,9 @@ export function useGiftCode(catalogData) {
         selectedEgg.eggIds
       );
       const existingRedemption =
-        savedRedemption?.reward || savedRedemption?.accounts?.length
+        hasRewardPayload(savedRedemption)
           ? savedRedemption
-          : selectedEgg.reward || selectedEgg.accounts?.length
+          : selectedEgg.isClaimed && hasRewardPayload(selectedEgg)
             ? createClaimedRedemption(
                 selectedEntry,
                 selectedEgg,

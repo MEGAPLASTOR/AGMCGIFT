@@ -57,4 +57,40 @@ assertEqual(
   "second egg in a pair should stay delayed"
 );
 
+const attachedAccountEgg = normalizeEgg(
+  {
+    id: "attached-account",
+    status: "ready",
+    account: {
+      username: "still-locked",
+    },
+  },
+  0,
+  1
+);
+
+assertEqual(
+  attachedAccountEgg.isClaimed,
+  false,
+  "ready egg with attached account payload should stay unopened"
+);
+
+const claimedEgg = normalizeEgg(
+  {
+    id: "claimed-egg",
+    status: "claimed",
+    account: {
+      username: "opened-user",
+    },
+  },
+  0,
+  1
+);
+
+assertEqual(
+  claimedEgg.isClaimed,
+  true,
+  "claimed egg should stay opened"
+);
+
 console.log("normalizeEgg choice check passed");

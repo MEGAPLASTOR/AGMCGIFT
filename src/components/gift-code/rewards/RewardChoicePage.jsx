@@ -6,13 +6,8 @@ function isReadyToOpen(egg) {
   return new Date(egg.hatchAt).getTime() <= Date.now();
 }
 
-function getEggCountLabel(egg) {
-  return egg?.eggCount ? ` (${egg.eggCount} trứng)` : "";
-}
-
 export function RewardChoicePage({
   code,
-  productName,
   daysToWait,
   isClaiming = false,
   availableChoices,
@@ -35,14 +30,14 @@ export function RewardChoicePage({
       ? `Ấp ${daysToWait} ngày`
       : isClaiming
         ? "Đang mở..."
-        : "Nhận ngay";
+        : "Mở trứng";
   const instantDescription = instantOpened
     ? "Nhóm trứng này đã mở, bấm để xem lại acc."
     : !canClaimNow
       ? "Không có trứng thường cho mã này."
       : instantNeedsIncubation
         ? "Nhóm trứng này cần chờ đủ cooldown trước khi mở."
-        : "Mở toàn bộ trứng thường trong đơn và nhận acc ngay.";
+        : "Bấm mở để nhận toàn bộ acc của nhóm trứng này.";
   const delayedDescription = delayedOpened
     ? "Nhóm trứng này đã mở, bấm để xem lại acc."
     : !canClaimLater
@@ -62,16 +57,11 @@ export function RewardChoicePage({
     <section className="gift-panel reward-choice-page">
       <div className="panel-heading">
         <div>
-          <p className="eyebrow">Mã đơn hợp lệ</p>
+          <p className="eyebrow eyebrow--success">Mã đơn hợp lệ</p>
           <h2>Chọn trứng muốn mở</h2>
         </div>
         <span className="panel-chip">{code}</span>
       </div>
-
-      <p className="panel-note">
-        Sản phẩm: <strong>{productName}</strong>. Mỗi nút sẽ mở toàn bộ trứng cùng loại
-        trong đơn nếu mã có đủ trứng.
-      </p>
 
       <div className="reward-egg-grid">
         <button
