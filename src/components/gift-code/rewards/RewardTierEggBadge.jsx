@@ -1,7 +1,14 @@
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
 import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 
-const DIAMOND_TIERS = new Set(["A", "B", "C"]);
+const TIER_PRIORITY = ["E", "D", "C", "B", "A"];
+const PREMIUM_TIERS = new Set(["A", "B", "C"]);
+
+function normalizeTier(value) {
+  const tier = String(value || "").trim().toUpperCase();
+
+  return TIER_PRIORITY.includes(tier) ? tier : "";
+}
 
 function getRewardTiers(redemptionInfo) {
   const rewards = [
@@ -10,25 +17,40 @@ function getRewardTiers(redemptionInfo) {
     redemptionInfo?.account,
   ].filter(Boolean);
 
-  return rewards
-    .map((reward) => String(reward?.tier || redemptionInfo?.eggTier || "").trim().toUpperCase())
-    .filter(Boolean);
+  const tiers = rewards.map((reward) => normalizeTier(reward?.tier)).filter(Boolean);
+
+  if (tiers.length) {
+    return tiers;
+  }
+
+  const fallbackTier = normalizeTier(redemptionInfo?.eggTier);
+
+  return fallbackTier ? [fallbackTier] : [];
+}
+
+function getDisplayTier(redemptionInfo) {
+  const tiers = getRewardTiers(redemptionInfo);
+
+  return [...TIER_PRIORITY]
+    .reverse()
+    .find((tier) => tiers.includes(tier)) || "E";
 }
 
 export function RewardTierEggBadge({ redemptionInfo }) {
-  const isDiamond = getRewardTiers(redemptionInfo).some((tier) =>
-    DIAMOND_TIERS.has(tier)
-  );
+  const displayTier = getDisplayTier(redemptionInfo);
+  const eggImage = PREMIUM_TIERS.has(displayTier)
+    ? eggPremium15Days
+    : eggInstantGold;
 
   return (
     <span
-      className={`reward-tier-egg reward-tier-egg--${
-        isDiamond ? "diamond" : "gold"
-      }`}
-      aria-label={isDiamond ? "Trứng kim cương" : "Trứng vàng"}
+      className={`reward-tier-egg reward-tier-egg--${displayTier.toLowerCase()}`}
+      aria-label={`Trung tier ${displayTier}`}
       role="img"
     >
-      <img src={isDiamond ? eggPremium15Days : eggInstantGold} alt="" />
+      <span className="reward-tier-egg__shine" aria-hidden="true" />
+      <img src={eggImage} alt="" />
+      <span className="reward-tier-egg__label">Tier {displayTier}</span>
     </span>
   );
 }

@@ -92,13 +92,29 @@ function getValidDate(...values) {
 }
 
 function formatDateTime(value) {
-  const date = getValidDate(value);
+  if (!value) return "-";
+
+  // 1. Ép chuỗi về chuẩn ISO 8601 UTC+0
+  let safeValue = value;
+  if (typeof value === 'string') {
+    // Nếu BE trả về khoảng trắng thay vì chữ T (vd: "2026-07-03 16:34:34"), chuyển nó thành chữ T
+    safeValue = safeValue.trim().replace(" ", "T");
+    // Thêm 'Z' để trình duyệt biết chắc chắn đây là giờ UTC+0
+    if (!safeValue.endsWith('Z')) {
+      safeValue += 'Z';
+    }
+  }
+
+  // 2. Chuyển thành Object Date (Giữ nguyên hàm của bạn)
+  const date = getValidDate(safeValue);
 
   if (!date) {
     return "-";
   }
 
+  // 3. Format với múi giờ cố định
   return new Intl.DateTimeFormat("vi-VN", {
+    timeZone: "Asia/Ho_Chi_Minh", // Luôn hiển thị giờ VN dù trình duyệt ở múi giờ nào
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -107,9 +123,8 @@ function formatDateTime(value) {
     hour12: false,
   })
     .format(date)
-    .replace(",", "");
+    .replace(",", ""); // Xóa dấu phẩy mặc định của Intl
 }
-
 function toDateTimeInputValue(value) {
   const date = getValidDate(value) || new Date();
 
