@@ -1318,6 +1318,7 @@ export function AdminDataCrudPanel({
         : nextRecord;
 
       onSaveRecord("giftAccounts", savedRecord);
+      setLastChangedAccountId(recordId);
 
       if (normalizeBoardValue(selectedRecordId) === normalizeBoardValue(recordId)) {
         setFormValues(normalizeRecordForForm(savedRecord, "giftAccounts"));
@@ -1343,6 +1344,14 @@ export function AdminDataCrudPanel({
     try {
       let record = buildRecordFromForm(formValues, tableKey);
       let shouldDeleteSelectedBeforeSave = false;
+      const previousGiftAccount =
+        isGiftAccountsTable && !isCreating
+          ? rows.find(
+              (row) =>
+                normalizeBoardValue(getRecordId(row, "giftAccounts")) ===
+                normalizeBoardValue(selectedRecordId)
+            )
+          : null;
 
       if (isGiftAccountsTable && isCreating && onCreateGiftAccount) {
         const payload = await onCreateGiftAccount(record);
@@ -1358,6 +1367,13 @@ export function AdminDataCrudPanel({
 
       if (isGiftAccountsTable && !isCreating && onUpdateGiftAccount) {
         record = await onUpdateGiftAccount(record, selectedRecordId);
+
+        if (
+          normalizeComparableValue(previousGiftAccount?.status) !==
+          normalizeComparableValue(record.status)
+        ) {
+          setLastChangedAccountId(getRecordId(record, "giftAccounts") || selectedRecordId);
+        }
       }
 
       if (isGiftPoolsTable) {
