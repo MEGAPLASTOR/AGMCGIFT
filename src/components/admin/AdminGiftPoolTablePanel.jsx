@@ -118,6 +118,10 @@ function accountMatchesTier(account, tier) {
   return normalizeTier(account?.tier) === normalizeTier(tier);
 }
 
+function isAvailableAccount(account) {
+  return normalizeText(account?.status).toLowerCase() === "available";
+}
+
 function getAccountLabel(account) {
   const accountId = getAccountId(account);
   const username = normalizeText(account?.username) || accountId || "account";
@@ -161,6 +165,7 @@ export function AdminGiftPoolTablePanel({
   const [detailPoolId, setDetailPoolId] = useState("");
   const [selectedTier, setSelectedTier] = useState(DEFAULT_POOL_TIER);
   const [selectedAccountId, setSelectedAccountId] = useState("");
+  const [tierQuantity, setTierQuantity] = useState("1");
   const [selectedPoolAccountIds, setSelectedPoolAccountIds] = useState([]);
   const [deletePoolId, setDeletePoolId] = useState("");
 
@@ -308,11 +313,6 @@ export function AdminGiftPoolTablePanel({
   const currentPoolAccounts = selectedPool
     ? poolAccountsByPoolId.get(getPoolId(selectedPool)) || EMPTY_ROWS
     : EMPTY_ROWS;
-  const poolAccountPagination = useAdminClientPagination(
-    currentPoolAccounts,
-    `${detailPoolId}|${selectedTier}|${currentPoolAccounts.length}`
-  );
-  const paginatedPoolAccounts = poolAccountPagination.pageRows;
   const currentPoolAccountIds = useMemo(
     () => currentPoolAccounts.map(getAccountId).filter(Boolean),
     [currentPoolAccounts]
@@ -322,8 +322,8 @@ export function AdminGiftPoolTablePanel({
     [selectedPoolAccountIds]
   );
   const allPoolAccountsSelected =
-    paginatedPoolAccounts.length > 0 &&
-    paginatedPoolAccounts.every((account) =>
+    currentPoolAccounts.length > 0 &&
+    currentPoolAccounts.every((account) =>
       selectedPoolAccountIdSet.has(getAccountId(account))
     );
   const candidateAccounts = useMemo(() => {
@@ -335,6 +335,7 @@ export function AdminGiftPoolTablePanel({
 
         return (
           accountId &&
+          isAvailableAccount(account) &&
           accountMatchesTier(account, selectedTier) &&
           !currentPoolAccountIdSet.has(accountId) &&
           !mappedAccountIds.has(accountId)
@@ -347,6 +348,22 @@ export function AdminGiftPoolTablePanel({
         )
       );
   }, [accounts, currentPoolAccountIds, mappedAccountIds, selectedTier]);
+
+  useEffect(() => {
+    setTierQuantity((currentQuantity) => {
+      if (!candidateAccounts.length) {
+        return "";
+      }
+
+      const parsedQuantity = Number.parseInt(currentQuantity, 10);
+
+      if (!Number.isFinite(parsedQuantity) || parsedQuantity < 1) {
+        return "1";
+      }
+
+      return String(Math.min(parsedQuantity, candidateAccounts.length));
+    });
+  }, [candidateAccounts.length]);
 
   useEffect(() => {
     if (!candidateAccounts.some((account) => getAccountId(account) === selectedAccountId)) {
@@ -377,7 +394,7 @@ export function AdminGiftPoolTablePanel({
 
     setDetailPoolId(getPoolId(pool));
     setSelectedTier(poolTier || tierOptions[0] || DEFAULT_POOL_TIER);
-    setSelectedAccountId("");
+    setTierQuantity("1");
     setSelectedPoolAccountIds([]);
   };
 
@@ -502,6 +519,25 @@ export function AdminGiftPoolTablePanel({
     }
   };
 
+  const addAccountsByQuantity = () => {
+    const requestedQuantity = Number.parseInt(tierQuantity, 10);
+
+    if (!candidateAccounts.length) {
+      return;
+    }
+
+    if (!Number.isFinite(requestedQuantity) || requestedQuantity < 1) {
+      showAdminAlert("Vui lòng nhập số lượng account hợp lệ.");
+      return;
+    }
+
+    addAccountsToPool(
+      candidateAccounts
+        .slice(0, Math.min(requestedQuantity, candidateAccounts.length))
+        .map(getAccountId)
+    );
+  };
+
   const togglePoolAccount = (accountId) => {
     setSelectedPoolAccountIds((currentIds) =>
       currentIds.includes(accountId)
@@ -512,7 +548,7 @@ export function AdminGiftPoolTablePanel({
 
   const toggleAllPoolAccounts = () => {
     setSelectedPoolAccountIds(
-      allPoolAccountsSelected ? [] : paginatedPoolAccounts.map(getAccountId).filter(Boolean)
+      allPoolAccountsSelected ? [] : currentPoolAccounts.map(getAccountId).filter(Boolean)
     );
   };
 

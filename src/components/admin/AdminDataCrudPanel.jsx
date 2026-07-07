@@ -131,6 +131,12 @@ const BOARD_CONFIG_BY_TABLE = {
     values: ["Paid", "Pending", "Cancel"],
   },
 };
+const ACCOUNT_STATUS_RANK = new Map(
+  BOARD_CONFIG_BY_TABLE.giftAccounts.values.map((status, index) => [
+    status,
+    index,
+  ])
+);
 
 const PRODUCT_MAPPING_LABELS = {
   mapped: "Đã mapping",
@@ -139,6 +145,46 @@ const PRODUCT_MAPPING_LABELS = {
 
 function normalizeBoardValue(value) {
   return String(value ?? "").trim();
+}
+
+function normalizeComparableValue(value) {
+  return normalizeBoardValue(value).toLowerCase();
+}
+
+function getAccountStatusRank(status) {
+  const normalizedStatus = normalizeComparableValue(status);
+
+  return ACCOUNT_STATUS_RANK.has(normalizedStatus)
+    ? ACCOUNT_STATUS_RANK.get(normalizedStatus)
+    : ACCOUNT_STATUS_RANK.size;
+}
+
+function getAccountTierValue(account) {
+  return normalizeBoardValue(account?.tier).toUpperCase();
+}
+
+function sortGiftAccountRows(rows, lastChangedAccountId) {
+  const lastChangedId = normalizeBoardValue(lastChangedAccountId);
+
+  return [...rows].sort((first, second) => {
+    const firstId = getRecordId(first, "giftAccounts");
+    const secondId = getRecordId(second, "giftAccounts");
+    const recentDiff =
+      Number(secondId === lastChangedId) - Number(firstId === lastChangedId);
+
+    if (recentDiff) {
+      return recentDiff;
+    }
+
+    return (
+      getAccountStatusRank(first.status) - getAccountStatusRank(second.status) ||
+      getAccountTierValue(first).localeCompare(getAccountTierValue(second), "vi") ||
+      normalizeBoardValue(first.username).localeCompare(
+        normalizeBoardValue(second.username),
+        "vi"
+      )
+    );
+  });
 }
 
 function getProductComparableId(product) {
@@ -880,6 +926,8 @@ export function AdminDataCrudPanel({
   const [draggingRecordId, setDraggingRecordId] = useState("");
   const [dragOverValue, setDragOverValue] = useState("");
   const [accountStatusFilter, setAccountStatusFilter] = useState("");
+  const [accountTierFilter, setAccountTierFilter] = useState("");
+  const [lastChangedAccountId, setLastChangedAccountId] = useState("");
   const [selectedAccountIds, setSelectedAccountIds] = useState(() => new Set());
   const [isImportingAccounts, setImportingAccounts] = useState(false);
   const accountImportInputRef = useRef(null);
@@ -947,16 +995,29 @@ export function AdminDataCrudPanel({
     [keyword, rows]
   );
   const accountRows = useMemo(() => {
-    if (!isGiftAccountsTable || !accountStatusFilter) {
+    if (!isGiftAccountsTable) {
       return filteredRows;
     }
 
-    return filteredRows.filter(
-      (row) =>
-        normalizeBoardValue(row.status).toLowerCase() ===
-        normalizeBoardValue(accountStatusFilter).toLowerCase()
-    );
-  }, [accountStatusFilter, filteredRows, isGiftAccountsTable]);
+    const statusFilter = normalizeComparableValue(accountStatusFilter);
+    const tierFilter = getAccountTierValue({ tier: accountTierFilter });
+    const visibleRows = filteredRows.filter((row) => {
+      const matchesStatus =
+        !statusFilter ||
+        normalizeComparableValue(row.status) === statusFilter;
+      const matchesTier = !tierFilter || getAccountTierValue(row) === tierFilter;
+
+      return matchesStatus && matchesTier;
+    });
+
+    return sortGiftAccountRows(visibleRows, lastChangedAccountId);
+  }, [
+    accountStatusFilter,
+    accountTierFilter,
+    filteredRows,
+    isGiftAccountsTable,
+    lastChangedAccountId,
+  ]);
   const accountStatusOptions = useMemo(
     () =>
       mergeSelectOptions(
@@ -966,9 +1027,18 @@ export function AdminDataCrudPanel({
       ),
     [fields, rows]
   );
+  const accountTierOptions = useMemo(
+    () =>
+      mergeSelectOptions(
+        getFieldOptions(fields, "tier"),
+        rows.map((row) => getAccountTierValue(row)),
+        (value) => `Tier ${normalizeBoardValue(value).toUpperCase()}`
+      ),
+    [fields, rows]
+  );
   const accountPagination = useAdminClientPagination(
     accountRows,
-    `${tableKey}|${keyword}|${accountStatusFilter}|${rows.length}`,
+    `${tableKey}|${keyword}|${accountStatusFilter}|${accountTierFilter}|${lastChangedAccountId}|${rows.length}`,
     ACCOUNT_DEFAULT_PAGE_SIZE
   );
   const recordPagination = useAdminClientPagination(
@@ -1023,6 +1093,8 @@ export function AdminDataCrudPanel({
     setTableKey(nextTableKey);
     setKeyword("");
     setAccountStatusFilter("");
+    setAccountTierFilter("");
+    setLastChangedAccountId("");
     setSelectedAccountIds(new Set());
     setSelectedRecordId("");
     setFormValues({});
@@ -1057,6 +1129,9 @@ export function AdminDataCrudPanel({
 
     const accountIds = new Set(rows.map((row) => getRecordId(row, "giftAccounts")));
 
+    setLastChangedAccountId((currentId) =>
+      currentId && !accountIds.has(currentId) ? "" : currentId
+    );
     setSelectedAccountIds((currentIds) => {
       const nextIds = new Set(
         [...currentIds].filter((accountId) => accountIds.has(accountId))
