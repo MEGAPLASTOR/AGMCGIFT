@@ -386,7 +386,7 @@ function AccountExcelGuide({ onDownloadTemplate }) {
         <li>
           File tải lên bắt buộc phải đúng cấu trúc các cột:
           <b> Username, Password, Platform, Tier </b>
-          (A, B, C, D, E,...), và <b>Token</b> (nếu có).
+          (S, A, B, C, D, E,...), và <b>Token</b> (nếu có).
         </li>
         <li>Chỉ hỗ trợ định dạng Excel 2007 trở lên (mở rộng .xlsx).</li>
         <li>

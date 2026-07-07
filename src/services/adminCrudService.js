@@ -40,12 +40,12 @@ export const eggStatusOptions = [
 ];
 
 const poolTierOptions = [
+  { value: "S", label: "S" },
   { value: "A", label: "A" },
   { value: "B", label: "B" },
   { value: "C", label: "C" },
   { value: "D", label: "D" },
   { value: "E", label: "E" },
-  { value: "F", label: "F" },
 ];
 
 export const accountStatusOptions = [

@@ -16,7 +16,7 @@ import { AdminClientPagination } from "./AdminClientPagination";
 import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
-const TIER_ORDER = ["A", "B", "C", "D", "E", "F"];
+const TIER_ORDER = ["S", "A", "B", "C", "D", "E"];
 
 function normalizeText(value) {
   return String(value ?? "").trim();
