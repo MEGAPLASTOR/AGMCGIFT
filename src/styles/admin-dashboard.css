@@ -6346,15 +6346,6 @@
   gap: 8px;
 }
 
-.admin-analytics-pro__intro p {
-  margin: 0;
-  color: #7d93ba;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .admin-analytics-pro__intro div {
   display: grid;
   gap: 4px;
@@ -6760,32 +6751,6 @@
   gap: 12px;
 }
 
-.admin-header__search {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 44px;
-  width: min(360px, 100%);
-  border: 1px solid rgba(137, 160, 255, 0.16);
-  border-radius: 999px;
-  background: rgba(12, 18, 37, 0.92);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  color: #8ea2c6;
-  padding: 0 16px;
-}
-
-.admin-header__search svg {
-  color: #dfe8f8;
-  flex: 0 0 auto;
-}
-
-.admin-header__search span {
-  color: #9fb2d8;
-  font-size: 0.82rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
 .admin-header__profile {
   display: inline-flex;
   align-items: center;
@@ -6880,13 +6845,11 @@
 }
 
 @media (max-width: 760px) {
-  .admin-header__search,
   .admin-header__profile,
   .admin-header__action-buttons {
     width: 100%;
   }
 
-  .admin-header__search span,
   .admin-header__identity strong,
   .admin-header__identity small {
     white-space: normal;
@@ -6963,22 +6926,6 @@
 .admin-page:not(.admin-page--login) .admin-header__utility {
   align-items: center;
   gap: 14px;
-}
-
-.admin-page:not(.admin-page--login) .admin-header__search {
-  min-height: 32px;
-  width: min(420px, 42vw);
-  border-color: transparent;
-  border-radius: 999px;
-  background: #111735;
-  color: #c8d1f2;
-  padding-inline: 14px;
-}
-
-.admin-page:not(.admin-page--login) .admin-header__search span {
-  color: #c8d1f2;
-  font-size: 0.78rem;
-  font-weight: 800;
 }
 
 .admin-page:not(.admin-page--login) .admin-header__profile {
@@ -7249,7 +7196,6 @@
     justify-content: flex-start;
   }
 
-  .admin-page:not(.admin-page--login) .admin-header__search,
   .admin-page:not(.admin-page--login) .admin-header__profile,
   .admin-page:not(.admin-page--login) .admin-header__action-buttons {
     width: 100%;

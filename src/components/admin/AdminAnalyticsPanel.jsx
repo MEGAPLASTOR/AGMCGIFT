@@ -636,7 +636,6 @@ export function AdminAnalyticsPanel({
   return (
     <section className="admin-analytics admin-analytics-pro">
       <div className="admin-analytics-pro__intro">
-        <p>YOU ARE HERE &gt; AGMC &gt; Dashboard &gt; Analytics</p>
         <div>
           <h2>Analytics</h2>
           <span>

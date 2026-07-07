@@ -15,7 +15,6 @@ import {
   FaKey,
   FaLayerGroup,
   FaLink,
-  FaMagnifyingGlass,
   FaRightFromBracket,
   FaRotateRight,
   FaUserGroup,
@@ -718,9 +717,6 @@ export default function AdminDashboardPage() {
   const activePageDescription = isOverviewPage
     ? "Theo dõi đơn hàng, tồn kho, trứng và hiệu suất vận hành."
     : activeManagementPage.description;
-  const headerSearchText = isOverviewPage
-    ? "Tìm kiếm trong tổng quan"
-    : `Module ${activeManagementPage.label}`;
 
   return (
     <main className="admin-page">
@@ -734,11 +730,6 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="admin-header__utility">
-          <div className="admin-header__search" aria-hidden="true">
-            <FaMagnifyingGlass aria-hidden="true" />
-            <span>{headerSearchText}</span>
-          </div>
-
           <div className="admin-header__profile">
             <div className="admin-header__identity">
               <strong>{admin.full_name}</strong>
