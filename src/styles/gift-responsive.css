@@ -161,6 +161,25 @@
     grid-template-columns: 1fr;
   }
 
+  .account-reward {
+    padding: 18px 14px 14px;
+  }
+
+  .account-reward::after {
+    width: 54px;
+    height: 54px;
+  }
+
+  .account-reward__head,
+  .account-reward__identity {
+    align-items: flex-start;
+  }
+
+  .account-reward__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .reward-egg-card {
     min-height: 280px;
     padding: 14px;
@@ -180,6 +199,11 @@
 
   .reward-egg-card__content em {
     justify-self: start;
+  }
+
+  .account-reward__copy-all {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 
   .incubating-page__hero {

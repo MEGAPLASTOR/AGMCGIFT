@@ -2,7 +2,7 @@ import { EGG_CHOICES } from "../../../api/eggs";
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
 import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 
-const TIER_PRIORITY = ["E", "D", "C", "B", "A"];
+const TIER_PRIORITY = ["E", "D", "C", "B", "A", "S"];
 
 function normalizeTier(value) {
   const tier = String(value || "").trim().toUpperCase();

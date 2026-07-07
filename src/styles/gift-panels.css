@@ -203,7 +203,7 @@ input::placeholder {
 
 .account-reward dt {
   display: block;
-  color: #6d5300;
+  color: var(--account-kicker, #6d5300);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
@@ -484,49 +484,58 @@ input::placeholder {
   text-transform: uppercase;
 }
 
+.reward-tier-egg--s {
+  --tier-shell-top: #fef9c3;
+  --tier-shell-bottom: #60a5fa;
+  --tier-frame: #c084fc;
+  --tier-glow: rgba(192, 132, 252, 0.44);
+  --tier-chip-bg: linear-gradient(135deg, #f8fafc, #f59e0b);
+  --tier-chip-text: #5b21b6;
+}
+
 .reward-tier-egg--a {
-  --tier-shell-top: #fff3b0;
-  --tier-shell-bottom: #f59e0b;
-  --tier-frame: #7c2d12;
-  --tier-glow: rgba(245, 158, 11, 0.42);
-  --tier-chip-bg: linear-gradient(135deg, #92400e, #fbbf24);
-  --tier-chip-text: #fffdf5;
-}
-
-.reward-tier-egg--b {
-  --tier-shell-top: #dbeafe;
-  --tier-shell-bottom: #2563eb;
-  --tier-frame: #1e3a8a;
-  --tier-glow: rgba(37, 99, 235, 0.36);
-  --tier-chip-bg: linear-gradient(135deg, #1d4ed8, #60a5fa);
-  --tier-chip-text: #eff6ff;
-}
-
-.reward-tier-egg--c {
-  --tier-shell-top: #dcfce7;
-  --tier-shell-bottom: #16a34a;
-  --tier-frame: #166534;
-  --tier-glow: rgba(22, 163, 74, 0.32);
-  --tier-chip-bg: linear-gradient(135deg, #166534, #4ade80);
-  --tier-chip-text: #f0fdf4;
-}
-
-.reward-tier-egg--d {
-  --tier-shell-top: #fbe7c2;
-  --tier-shell-bottom: #b45309;
-  --tier-frame: #7c2d12;
-  --tier-glow: rgba(180, 83, 9, 0.28);
-  --tier-chip-bg: linear-gradient(135deg, #92400e, #d97706);
+  --tier-shell-top: #ffedd5;
+  --tier-shell-bottom: #ef4444;
+  --tier-frame: #9a3412;
+  --tier-glow: rgba(239, 68, 68, 0.42);
+  --tier-chip-bg: linear-gradient(135deg, #7f1d1d, #f97316);
   --tier-chip-text: #fff7ed;
 }
 
+.reward-tier-egg--b {
+  --tier-shell-top: #fef3c7;
+  --tier-shell-bottom: #d97706;
+  --tier-frame: #92400e;
+  --tier-glow: rgba(245, 158, 11, 0.38);
+  --tier-chip-bg: linear-gradient(135deg, #78350f, #fbbf24);
+  --tier-chip-text: #fffbeb;
+}
+
+.reward-tier-egg--c {
+  --tier-shell-top: #f5d0fe;
+  --tier-shell-bottom: #9333ea;
+  --tier-frame: #6b21a8;
+  --tier-glow: rgba(168, 85, 247, 0.36);
+  --tier-chip-bg: linear-gradient(135deg, #581c87, #c084fc);
+  --tier-chip-text: #faf5ff;
+}
+
+.reward-tier-egg--d {
+  --tier-shell-top: #dbeafe;
+  --tier-shell-bottom: #2563eb;
+  --tier-frame: #1d4ed8;
+  --tier-glow: rgba(96, 165, 250, 0.34);
+  --tier-chip-bg: linear-gradient(135deg, #1e3a8a, #60a5fa);
+  --tier-chip-text: #eff6ff;
+}
+
 .reward-tier-egg--e {
-  --tier-shell-top: #e5e7eb;
-  --tier-shell-bottom: #475569;
-  --tier-frame: #1e293b;
-  --tier-glow: rgba(71, 85, 105, 0.24);
-  --tier-chip-bg: linear-gradient(135deg, #334155, #64748b);
-  --tier-chip-text: #f8fafc;
+  --tier-shell-top: #dcfce7;
+  --tier-shell-bottom: #16a34a;
+  --tier-frame: #166534;
+  --tier-glow: rgba(34, 197, 94, 0.3);
+  --tier-chip-bg: linear-gradient(135deg, #14532d, #4ade80);
+  --tier-chip-text: #f0fdf4;
 }
 
 .countdown {
@@ -615,88 +624,187 @@ input::placeholder {
 }
 
 .account-reward {
-  --account-frame: #17130a;
-  --account-shadow: #ffd52e;
-  --account-bg-top: #ffffff;
-  --account-bg-bottom: #fff8dc;
-  --account-field-bg: #fffbe8;
-  --account-field-border: rgba(23, 19, 10, 0.14);
-  --account-icon-bg: #ffd52e;
-  --account-icon-text: #17130a;
-  --account-kicker: #6d5300;
-  --account-title: #17130a;
+  --account-frame: #92400e;
+  --account-frame-soft: rgba(251, 191, 36, 0.34);
+  --account-shadow: rgba(245, 158, 11, 0.34);
+  --account-bg-top: #fff9e7;
+  --account-bg-bottom: #fff0b8;
+  --account-field-bg: rgba(255, 251, 235, 0.9);
+  --account-field-border: rgba(146, 64, 14, 0.18);
+  --account-icon-bg: linear-gradient(135deg, #f59e0b, #fde68a);
+  --account-icon-text: #7c2d12;
+  --account-kicker: #92400e;
+  --account-title: #3f2208;
+  --account-jewel-top: #fff7ae;
+  --account-jewel-bottom: #f59e0b;
+  --account-jewel-frame: rgba(120, 53, 15, 0.72);
+  --account-glow-aura: rgba(245, 158, 11, 0.2);
+  --account-chip-bg: linear-gradient(135deg, rgba(120, 53, 15, 0.92), rgba(245, 158, 11, 0.92));
+  --account-chip-text: #fff8dc;
   min-width: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   border: 3px solid var(--account-frame);
-  border-radius: 8px;
-  background: linear-gradient(180deg, var(--account-bg-top) 0%, var(--account-bg-bottom) 100%);
-  box-shadow: 0 7px 0 var(--account-shadow);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, var(--account-glow-aura) 0, transparent 34%),
+    radial-gradient(circle at bottom left, var(--account-glow-aura) 0, transparent 28%),
+    linear-gradient(180deg, var(--account-bg-top) 0%, var(--account-bg-bottom) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.64),
+    0 18px 36px -22px var(--account-shadow);
   margin: 16px 0;
-  padding: 16px;
+  padding: 22px 18px 18px;
+}
+
+.account-reward::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid var(--account-frame-soft);
+  border-radius: 14px;
+  pointer-events: none;
+}
+
+.account-reward::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  z-index: 0;
+  width: 68px;
+  height: 68px;
+  border: 2px solid var(--account-jewel-frame);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.86) 0 14%, transparent 15%),
+    linear-gradient(135deg, var(--account-jewel-top) 0%, var(--account-jewel-bottom) 100%);
+  box-shadow:
+    inset 0 -10px 18px rgba(23, 19, 10, 0.18),
+    0 0 0 8px rgba(255, 255, 255, 0.12),
+    0 18px 32px -18px var(--account-shadow);
+  opacity: 0.88;
+}
+
+.account-reward--s {
+  --account-frame: #c084fc;
+  --account-frame-soft: rgba(255, 255, 255, 0.32);
+  --account-shadow: rgba(125, 211, 252, 0.46);
+  --account-bg-top: #fff9d7;
+  --account-bg-bottom: #dbeafe;
+  --account-field-bg: rgba(255, 255, 255, 0.9);
+  --account-field-border: rgba(192, 132, 252, 0.24);
+  --account-icon-bg: linear-gradient(135deg, #f8fafc, #93c5fd);
+  --account-icon-text: #6b21a8;
+  --account-kicker: #7c3aed;
+  --account-title: #312e81;
+  --account-jewel-top: #fef9c3;
+  --account-jewel-bottom: #60a5fa;
+  --account-jewel-frame: rgba(192, 132, 252, 0.82);
+  --account-glow-aura: rgba(96, 165, 250, 0.22);
+  --account-chip-bg: linear-gradient(135deg, rgba(79, 70, 229, 0.92), rgba(251, 191, 36, 0.92));
+  --account-chip-text: #fefce8;
 }
 
 .account-reward--a {
-  --account-frame: #7c2d12;
-  --account-shadow: #f59e0b;
-  --account-bg-top: #fffdf3;
-  --account-bg-bottom: #ffefb3;
-  --account-field-bg: #fff8dd;
-  --account-field-border: rgba(180, 83, 9, 0.2);
-  --account-icon-bg: linear-gradient(135deg, #f59e0b, #fcd34d);
-  --account-icon-text: #fffdf5;
-  --account-kicker: #92400e;
+  --account-frame: #9a3412;
+  --account-frame-soft: rgba(251, 146, 60, 0.34);
+  --account-shadow: rgba(239, 68, 68, 0.46);
+  --account-bg-top: #fff0e6;
+  --account-bg-bottom: #fecaca;
+  --account-field-bg: rgba(255, 247, 237, 0.88);
+  --account-field-border: rgba(154, 52, 18, 0.24);
+  --account-icon-bg: linear-gradient(135deg, #ef4444, #fb923c);
+  --account-icon-text: #fff7ed;
+  --account-kicker: #c2410c;
   --account-title: #7c2d12;
+  --account-jewel-top: #fdba74;
+  --account-jewel-bottom: #dc2626;
+  --account-jewel-frame: rgba(127, 29, 29, 0.82);
+  --account-glow-aura: rgba(239, 68, 68, 0.22);
+  --account-chip-bg: linear-gradient(135deg, rgba(127, 29, 29, 0.94), rgba(249, 115, 22, 0.94));
+  --account-chip-text: #fff7ed;
 }
 
 .account-reward--b {
-  --account-frame: #1e3a8a;
-  --account-shadow: #60a5fa;
-  --account-bg-top: #f8fbff;
-  --account-bg-bottom: #dbeafe;
-  --account-field-bg: #eff6ff;
-  --account-field-border: rgba(37, 99, 235, 0.18);
-  --account-icon-bg: linear-gradient(135deg, #2563eb, #60a5fa);
-  --account-icon-text: #eff6ff;
-  --account-kicker: #1d4ed8;
-  --account-title: #1e3a8a;
+  --account-frame: #a16207;
+  --account-frame-soft: rgba(251, 191, 36, 0.32);
+  --account-shadow: rgba(245, 158, 11, 0.42);
+  --account-bg-top: #fff8db;
+  --account-bg-bottom: #fde68a;
+  --account-field-bg: rgba(255, 251, 235, 0.88);
+  --account-field-border: rgba(161, 98, 7, 0.22);
+  --account-icon-bg: linear-gradient(135deg, #f59e0b, #fcd34d);
+  --account-icon-text: #78350f;
+  --account-kicker: #a16207;
+  --account-title: #78350f;
+  --account-jewel-top: #fde68a;
+  --account-jewel-bottom: #d97706;
+  --account-jewel-frame: rgba(120, 53, 15, 0.8);
+  --account-glow-aura: rgba(245, 158, 11, 0.2);
+  --account-chip-bg: linear-gradient(135deg, rgba(120, 53, 15, 0.94), rgba(245, 158, 11, 0.94));
+  --account-chip-text: #fffbeb;
 }
 
 .account-reward--c {
-  --account-frame: #166534;
-  --account-shadow: #4ade80;
-  --account-bg-top: #f7fff8;
-  --account-bg-bottom: #dcfce7;
-  --account-field-bg: #f0fdf4;
-  --account-field-border: rgba(22, 163, 74, 0.18);
-  --account-icon-bg: linear-gradient(135deg, #16a34a, #4ade80);
-  --account-icon-text: #f0fdf4;
-  --account-kicker: #15803d;
-  --account-title: #166534;
+  --account-frame: #7e22ce;
+  --account-frame-soft: rgba(216, 180, 254, 0.28);
+  --account-shadow: rgba(168, 85, 247, 0.44);
+  --account-bg-top: #fdf4ff;
+  --account-bg-bottom: #e9d5ff;
+  --account-field-bg: rgba(250, 245, 255, 0.9);
+  --account-field-border: rgba(126, 34, 206, 0.18);
+  --account-icon-bg: linear-gradient(135deg, #a855f7, #d8b4fe);
+  --account-icon-text: #581c87;
+  --account-kicker: #7e22ce;
+  --account-title: #581c87;
+  --account-jewel-top: #e9d5ff;
+  --account-jewel-bottom: #9333ea;
+  --account-jewel-frame: rgba(88, 28, 135, 0.84);
+  --account-glow-aura: rgba(168, 85, 247, 0.18);
+  --account-chip-bg: linear-gradient(135deg, rgba(88, 28, 135, 0.94), rgba(192, 132, 252, 0.94));
+  --account-chip-text: #faf5ff;
 }
 
 .account-reward--d {
-  --account-frame: #9a3412;
-  --account-shadow: #fb923c;
-  --account-bg-top: #fffaf5;
-  --account-bg-bottom: #fed7aa;
-  --account-field-bg: #fff7ed;
-  --account-field-border: rgba(234, 88, 12, 0.18);
-  --account-icon-bg: linear-gradient(135deg, #ea580c, #fb923c);
-  --account-icon-text: #fff7ed;
-  --account-kicker: #c2410c;
-  --account-title: #9a3412;
+  --account-frame: #1d4ed8;
+  --account-frame-soft: rgba(147, 197, 253, 0.28);
+  --account-shadow: rgba(37, 99, 235, 0.4);
+  --account-bg-top: #eff6ff;
+  --account-bg-bottom: #bfdbfe;
+  --account-field-bg: rgba(248, 250, 252, 0.9);
+  --account-field-border: rgba(29, 78, 216, 0.18);
+  --account-icon-bg: linear-gradient(135deg, #3b82f6, #bfdbfe);
+  --account-icon-text: #1e3a8a;
+  --account-kicker: #2563eb;
+  --account-title: #1e3a8a;
+  --account-jewel-top: #dbeafe;
+  --account-jewel-bottom: #2563eb;
+  --account-jewel-frame: rgba(30, 64, 175, 0.82);
+  --account-glow-aura: rgba(96, 165, 250, 0.18);
+  --account-chip-bg: linear-gradient(135deg, rgba(30, 64, 175, 0.94), rgba(96, 165, 250, 0.94));
+  --account-chip-text: #eff6ff;
 }
 
 .account-reward--e {
-  --account-frame: #334155;
-  --account-shadow: #94a3b8;
-  --account-bg-top: #fbfcfe;
-  --account-bg-bottom: #e2e8f0;
-  --account-field-bg: #f8fafc;
-  --account-field-border: rgba(51, 65, 85, 0.16);
-  --account-icon-bg: linear-gradient(135deg, #475569, #94a3b8);
-  --account-icon-text: #f8fafc;
-  --account-kicker: #475569;
-  --account-title: #1e293b;
+  --account-frame: #166534;
+  --account-frame-soft: rgba(74, 222, 128, 0.24);
+  --account-shadow: rgba(34, 197, 94, 0.36);
+  --account-bg-top: #ecfdf5;
+  --account-bg-bottom: #bbf7d0;
+  --account-field-bg: rgba(240, 253, 244, 0.9);
+  --account-field-border: rgba(22, 101, 52, 0.18);
+  --account-icon-bg: linear-gradient(135deg, #22c55e, #86efac);
+  --account-icon-text: #14532d;
+  --account-kicker: #15803d;
+  --account-title: #14532d;
+  --account-jewel-top: #dcfce7;
+  --account-jewel-bottom: #16a34a;
+  --account-jewel-frame: rgba(20, 83, 45, 0.84);
+  --account-glow-aura: rgba(74, 222, 128, 0.16);
+  --account-chip-bg: linear-gradient(135deg, rgba(20, 83, 45, 0.94), rgba(74, 222, 128, 0.94));
+  --account-chip-text: #f0fdf4;
 }
 
 .account-reward-list {
@@ -708,8 +816,26 @@ input::placeholder {
   display: flex;
   min-width: 0;
   align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 14px;
+}
+
+.account-reward__identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.account-reward__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .account-reward__icon {
@@ -726,7 +852,70 @@ input::placeholder {
   font-weight: 1000;
 }
 
-.account-reward__head span:not(.account-reward__icon) {
+.account-reward__tier-chip,
+.account-reward__copy-all,
+.account-reward__copy {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.account-reward__tier-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-color: var(--account-frame-soft);
+  background: var(--account-chip-bg);
+  box-shadow: 0 10px 18px -14px var(--account-shadow);
+  color: var(--account-chip-text);
+}
+
+.account-reward__copy-all,
+.account-reward__copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.account-reward__copy-all {
+  min-height: 34px;
+  padding: 0 14px;
+  border-color: var(--account-frame);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 10px 18px -14px var(--account-shadow);
+  color: var(--account-title);
+}
+
+.account-reward__copy-all:hover,
+.account-reward__copy:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 18px -14px var(--account-shadow);
+}
+
+.account-reward__copy-all:focus-visible,
+.account-reward__copy:focus-visible {
+  outline: 2px solid var(--account-frame);
+  outline-offset: 2px;
+}
+
+.account-reward__copy-all:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}
+
+.account-reward__summary > span {
   display: block;
   color: var(--account-kicker);
   font-size: 12px;
@@ -734,7 +923,7 @@ input::placeholder {
   text-transform: uppercase;
 }
 
-.account-reward__head strong {
+.account-reward__summary strong {
   display: block;
   overflow-wrap: anywhere;
   margin-top: 4px;
@@ -748,20 +937,39 @@ input::placeholder {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
+  position: relative;
+  z-index: 1;
 }
 
-.account-reward__grid div {
+.account-reward__field {
   min-width: 0;
   border: 2px solid var(--account-field-border);
-  border-radius: 8px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, var(--account-field-bg) 100%);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, var(--account-field-bg) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   padding: 12px;
+}
+
+.account-reward__field-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.account-reward__copy {
+  min-height: 28px;
+  padding: 0 10px;
+  border-color: var(--account-field-border);
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--account-kicker);
 }
 
 .account-reward dd {
   overflow-wrap: anywhere;
   margin: 4px 0 0;
-  color: #17130a;
+  color: var(--account-title);
+  font-size: 18px;
   font-weight: 1000;
 }
 
