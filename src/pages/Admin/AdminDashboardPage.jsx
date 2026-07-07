@@ -215,15 +215,36 @@ function normalizeComparable(value) {
 }
 
 function findGiftAccountRow(tables, record) {
+  const recordId = normalizeComparable(record.id);
   const username = normalizeComparable(record.username);
   const platform = normalizeComparable(record.platform || "blox-fruit");
   const tier = normalizeComparable(record.tier);
+  const accounts = tables.giftAccounts || [];
 
-  return (tables.giftAccounts || []).find(
+  if (recordId) {
+    const accountById = accounts.find(
+      (account) => normalizeComparable(account.id) === recordId
+    );
+
+    if (accountById) {
+      return accountById;
+    }
+  }
+
+  const matchedAccounts = accounts.filter(
     (account) =>
       normalizeComparable(account.username) === username &&
-      normalizeComparable(account.platform || "blox-fruit") === platform &&
-      (!tier || normalizeComparable(account.tier) === tier)
+      normalizeComparable(account.platform || "blox-fruit") === platform
+  );
+
+  if (!matchedAccounts.length) {
+    return null;
+  }
+
+  return (
+    matchedAccounts.find(
+      (account) => !tier || normalizeComparable(account.tier) === tier
+    ) || matchedAccounts[0]
   );
 }
 
@@ -508,7 +529,7 @@ export default function AdminDashboardPage() {
       const rawTables = await loadRawTables(admin.authHeader);
       handleAuthError(rawTables);
 
-      return findGiftAccountRow(rawTables, record) || payload;
+      return findGiftAccountRow(rawTables, { ...record, id }) || payload;
     } catch (updateError) {
       handleAuthError(updateError);
       throw updateError;
