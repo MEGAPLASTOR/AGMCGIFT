@@ -7130,6 +7130,47 @@
   color: #f2f5ff;
 }
 
+@media (min-width: 901px) {
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) {
+    grid-template-columns: 74px minmax(0, 1fr);
+  }
+
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) .admin-sidebar {
+    width: 74px;
+    overflow-x: hidden;
+    padding: 54px 8px 18px;
+  }
+
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) .admin-sidebar::before {
+    content: "AG";
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-weight: 800;
+  }
+
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) .admin-sidebar__toggle {
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) .admin-management-nav a {
+    justify-content: center;
+    min-height: 42px;
+    padding: 9px 0;
+  }
+
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) .admin-management-nav span,
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) .admin-management-nav strong {
+    display: none;
+  }
+
+  .admin-page:not(.admin-page--login):has(.admin-shell.is-nav-collapsed) .admin-management-nav__icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
 @media (max-width: 900px) {
   .admin-page:not(.admin-page--login) {
     display: block;
