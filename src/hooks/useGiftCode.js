@@ -15,6 +15,11 @@ import {
   getDelayedRewardInfo,
   getRewardInfoFromTargetDate,
 } from "../utils/rewardDate";
+import {
+  CUSTOMER_STATUS,
+  isTempBannedCustomerStatus,
+  isPermanentlyBannedCustomerStatus,
+} from "../utils/customerStatus";
 
 const LUA_CHON_NHAN_NGAY = EGG_CHOICES.instant;
 const LUA_CHON_CHO_NHAN_THUONG_XIN = EGG_CHOICES.delayed;
@@ -334,6 +339,7 @@ export function useGiftCode(catalogData) {
   const [status, setStatus] = useState(GIFT_CODE_STATUS.idle);
   const [selectedEntry, setSelectedEntry] = useState(null);
   const [redemptionInfo, setRedemptionInfo] = useState(null);
+  const [banInfo, setBanInfo] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
   const [isChecking, setIsChecking] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -369,6 +375,7 @@ export function useGiftCode(catalogData) {
       setErrorMsg("");
       setSelectedEntry(null);
       setRedemptionInfo(null);
+      setBanInfo(null);
 
       try {
         const payload = await syncEggsByOrderCode(trimmedCode);
@@ -376,6 +383,22 @@ export function useGiftCode(catalogData) {
           normalizeSyncEggResponse(payload, trimmedCode),
           soNgayCho
         );
+
+        const customerStatus = matchedEntry.order.customerStatus;
+        const unbanAt = matchedEntry.order.unbanAt;
+
+        if (isTempBannedCustomerStatus(customerStatus)) {
+          setBanInfo({ type: CUSTOMER_STATUS.TEMP_BANNED, unbanAt });
+          setStatus(GIFT_CODE_STATUS.tempBanned);
+          return;
+        }
+
+        if (isPermanentlyBannedCustomerStatus(customerStatus)) {
+          setBanInfo({ type: CUSTOMER_STATUS.BANNED, unbanAt: null });
+          setStatus(GIFT_CODE_STATUS.banned);
+          return;
+        }
+
         const deliveryStatusError = getDeliveryStatusError(
           matchedEntry.order.deliveryStatus
         );
@@ -546,6 +569,7 @@ export function useGiftCode(catalogData) {
     setStatus(GIFT_CODE_STATUS.idle);
     setSelectedEntry(null);
     setRedemptionInfo(null);
+    setBanInfo(null);
     setErrorMsg("");
     setIsChecking(false);
     setIsClaiming(false);
@@ -584,6 +608,7 @@ export function useGiftCode(catalogData) {
     selectedEntry,
     currentCode: selectedEntry?.code.code || "",
     redemptionInfo,
+    banInfo,
     errorMsg,
     daysToWait: soNgayCho,
     choiceEggs,

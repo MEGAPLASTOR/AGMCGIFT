@@ -4,4 +4,7 @@ export const GIFT_CODE_STATUS = {
   choosing: "choosing",
   claimedNow: "claimed_now",
   claimedLater: "claimed_later",
+  tempBanned: "temp_banned",
+  banned: "banned",
 };
+
