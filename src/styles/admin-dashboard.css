@@ -5990,6 +5990,19 @@
   color: var(--admin-pro-text);
 }
 
+.admin-page select,
+.admin-panel.admin-modal select {
+  color-scheme: dark;
+}
+
+.admin-page select option,
+.admin-page select optgroup,
+.admin-panel.admin-modal select option,
+.admin-panel.admin-modal select optgroup {
+  background: #0f1833;
+  color: #eef4ff;
+}
+
 .admin-page input::placeholder,
 .admin-panel.admin-modal input::placeholder {
   color: #8094b7;
