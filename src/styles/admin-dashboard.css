@@ -215,7 +215,7 @@
   inset: 0;
   z-index: 100;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   overflow-y: auto;
   background: rgba(23, 19, 10, 0.62);
@@ -3299,9 +3299,6 @@
 .admin-panel.admin-gift-pool-detail-modal {
   width: min(1240px, calc(100vw - 48px)) !important;
   max-width: calc(100vw - 48px) !important;
-  min-height: min(760px, calc(100vh - 48px));
-  max-height: calc(100vh - 48px);
-  overflow-y: auto;
   padding: 18px;
 }
 
@@ -3443,7 +3440,6 @@
 }
 
 .admin-gift-pool-account-wrap {
-  max-height: min(58vh, 620px);
   overflow: auto;
 }
 
