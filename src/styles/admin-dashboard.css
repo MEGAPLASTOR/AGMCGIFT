@@ -5810,3 +5810,360 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ponytail: blue nebula admin skin and expanded account table sit last to beat legacy layers. */
+:root {
+  --admin-pro-bg: #070d1d;
+  --admin-pro-bg-2: #101935;
+  --admin-pro-surface: rgba(16, 24, 47, 0.94);
+  --admin-pro-surface-strong: #162246;
+  --admin-pro-surface-soft: #0d1630;
+  --admin-pro-border: rgba(126, 159, 255, 0.2);
+  --admin-pro-border-strong: rgba(153, 218, 255, 0.36);
+  --admin-pro-text: #eef4ff;
+  --admin-pro-muted: #94a8cb;
+  --admin-pro-muted-strong: #dbe7ff;
+  --admin-pro-accent: #79a5ff;
+  --admin-pro-accent-strong: #9fdcff;
+  --admin-pro-accent-soft: rgba(121, 165, 255, 0.18);
+  --admin-pro-success: #73dfc0;
+  --admin-pro-warning: #f7cf78;
+  --admin-pro-danger: #ff9f9f;
+  --admin-pro-shadow: 0 28px 72px rgba(3, 8, 20, 0.52);
+  --admin-pro-shadow-soft: 0 18px 42px rgba(3, 8, 20, 0.32);
+}
+
+.admin-page {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(121, 165, 255, 0.24), transparent 24%),
+    radial-gradient(circle at 84% 10%, rgba(143, 109, 255, 0.18), transparent 26%),
+    radial-gradient(circle at 68% 62%, rgba(92, 214, 255, 0.1), transparent 28%),
+    linear-gradient(140deg, rgba(255, 255, 255, 0.03), transparent 42%),
+    linear-gradient(180deg, var(--admin-pro-bg) 0%, var(--admin-pro-bg-2) 52%, #070b18 100%);
+  background-attachment: fixed;
+  color: var(--admin-pro-text);
+  position: relative;
+}
+
+.admin-header,
+.admin-login-card,
+.admin-panel,
+.admin-dark-panel,
+.admin-dark-stat,
+.admin-table-wrap,
+.admin-dark-table-wrap,
+.admin-account-toolbar,
+.admin-product-toolbar,
+.admin-gift-pool-toolbar,
+.admin-egg-toolbar,
+.admin-customer-toolbar,
+.admin-crud-toolbar,
+.admin-pool-toolbar {
+  background:
+    linear-gradient(180deg, rgba(18, 28, 56, 0.96), rgba(9, 16, 33, 0.97)),
+    rgba(9, 16, 33, 0.97);
+  border-color: var(--admin-pro-border);
+  box-shadow: var(--admin-pro-shadow-soft);
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-header::after,
+.admin-login-card::after,
+.admin-panel::after,
+.admin-dark-panel::after,
+.admin-dark-stat::after,
+.admin-account-toolbar::after,
+.admin-product-toolbar::after,
+.admin-gift-pool-toolbar::after,
+.admin-egg-toolbar::after,
+.admin-customer-toolbar::after,
+.admin-crud-toolbar::after,
+.admin-pool-toolbar::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(159, 220, 255, 0.82),
+    rgba(121, 165, 255, 0.42),
+    transparent 78%
+  );
+  pointer-events: none;
+}
+
+.admin-header {
+  background:
+    radial-gradient(circle at top right, rgba(121, 165, 255, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(21, 31, 61, 0.98), rgba(9, 15, 31, 0.98));
+}
+
+.admin-header h1,
+.admin-login-card h1,
+.admin-panel h2,
+.admin-dark-analytics__titlebar h2,
+.admin-dark-panel h3 {
+  color: #f5f9ff;
+  letter-spacing: 0.01em;
+}
+
+.admin-eyebrow {
+  color: #8fc9ff;
+  letter-spacing: 0.12em;
+}
+
+.admin-header span,
+.admin-login-card p,
+.admin-panel__head span,
+.admin-metric span,
+.admin-metric small,
+.admin-dark-stat span,
+.admin-dark-stat small,
+.admin-dark-panel h3,
+.admin-pagination__summary,
+.admin-pagination__size span,
+.admin-pagination__actions strong {
+  color: var(--admin-pro-muted);
+}
+
+.admin-shell {
+  gap: 26px;
+}
+
+.admin-sidebar__toggle,
+.admin-sidebar__mobile-toggle,
+.admin-management-nav a {
+  border-color: rgba(125, 155, 255, 0.18);
+  background:
+    linear-gradient(180deg, rgba(17, 27, 52, 0.94), rgba(9, 16, 33, 0.96)),
+    rgba(9, 16, 33, 0.96);
+}
+
+.admin-management-nav a {
+  min-height: 58px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 24px rgba(5, 10, 24, 0.2);
+}
+
+.admin-management-nav a:hover,
+.admin-sidebar__toggle:hover,
+.admin-sidebar__mobile-toggle:hover {
+  border-color: rgba(159, 220, 255, 0.32);
+  background:
+    linear-gradient(180deg, rgba(28, 41, 74, 0.98), rgba(13, 21, 40, 0.98)),
+    rgba(13, 21, 40, 0.98);
+}
+
+.admin-management-nav a.is-active {
+  border-color: rgba(159, 220, 255, 0.42);
+  background:
+    linear-gradient(180deg, rgba(73, 111, 226, 0.4), rgba(18, 28, 57, 0.96)),
+    rgba(18, 28, 57, 0.96);
+  box-shadow:
+    inset 0 0 0 1px rgba(159, 220, 255, 0.12),
+    0 16px 34px rgba(24, 52, 128, 0.26);
+}
+
+.admin-management-nav__icon,
+.admin-management-nav a.is-active .admin-management-nav__icon {
+  color: #99d8ff;
+}
+
+.admin-management-nav strong {
+  background: rgba(121, 165, 255, 0.14);
+  color: #dbe7ff;
+}
+
+.admin-management-nav a.is-active strong {
+  background: linear-gradient(180deg, #a6e1ff, #78baff);
+  color: #081426;
+}
+
+.admin-page input,
+.admin-page select,
+.admin-panel.admin-modal input,
+.admin-panel.admin-modal select {
+  background: linear-gradient(180deg, rgba(13, 22, 45, 0.98), rgba(9, 15, 31, 0.98));
+  border-color: rgba(128, 155, 238, 0.2);
+  color: var(--admin-pro-text);
+}
+
+.admin-page input::placeholder,
+.admin-panel.admin-modal input::placeholder {
+  color: #8094b7;
+}
+
+.admin-page input:focus-visible,
+.admin-page select:focus-visible,
+.admin-panel.admin-modal input:focus-visible,
+.admin-panel.admin-modal select:focus-visible {
+  border-color: rgba(159, 220, 255, 0.42);
+  box-shadow: 0 0 0 4px rgba(93, 148, 255, 0.14);
+}
+
+.admin-header button,
+.admin-light-button,
+.admin-mini-button,
+.admin-crud-toolbar button,
+.admin-crud-actions button,
+.admin-file-button,
+.admin-password-form button,
+.admin-modal-close,
+.admin-pool-toolbar button,
+.admin-pool-editor__actions button,
+.admin-dark-orders__toolbar button {
+  background: linear-gradient(180deg, rgba(27, 39, 74, 0.98), rgba(13, 20, 39, 0.98));
+  border-color: rgba(122, 153, 242, 0.22);
+  color: var(--admin-pro-muted-strong);
+}
+
+.admin-header button:hover,
+.admin-light-button:hover,
+.admin-mini-button:hover,
+.admin-crud-toolbar button:hover,
+.admin-crud-actions button:hover,
+.admin-file-button:hover,
+.admin-password-form button:hover,
+.admin-modal-close:hover,
+.admin-pool-toolbar button:hover,
+.admin-pool-editor__actions button:hover,
+.admin-dark-orders__toolbar button:hover {
+  border-color: rgba(159, 220, 255, 0.34);
+  background: linear-gradient(180deg, rgba(35, 49, 90, 0.98), rgba(15, 24, 47, 0.98));
+}
+
+.admin-login-form button,
+.admin-password-form button,
+.admin-crud-toolbar button:not(.admin-light-button):not(.admin-danger-button),
+.admin-account-toolbar__actions button:not(.admin-light-button):not(.admin-danger-button),
+.admin-crud-actions button:not(.admin-light-button):not(.admin-danger-button),
+.admin-product-toolbar__actions button:first-child,
+.admin-gift-pool-create-button,
+.admin-gift-pool-add-panel button,
+.admin-customer-modal__actions button:not(.admin-light-button),
+.admin-egg-toolbar__actions button:not(.admin-light-button) {
+  background: linear-gradient(180deg, #9fdcff, #6f8fff 62%, #5c74ff);
+  border-color: rgba(189, 231, 255, 0.34);
+  box-shadow: 0 14px 28px rgba(47, 90, 218, 0.24);
+  color: #071427;
+}
+
+.admin-danger-button {
+  border-color: rgba(255, 159, 159, 0.38) !important;
+  background: linear-gradient(180deg, rgba(92, 35, 53, 0.82), rgba(58, 21, 33, 0.88)) !important;
+  color: #ffe0e0 !important;
+}
+
+.admin-panel__head,
+.admin-early-hatch-panel__head,
+.admin-dark-analytics__titlebar {
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(159, 220, 255, 0.08);
+}
+
+.admin-dark-stat,
+.admin-metric,
+.admin-dark-panel {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    var(--admin-pro-shadow-soft);
+}
+
+.admin-dark-stat:nth-child(4n + 1),
+.admin-metric:nth-child(4n + 1) {
+  border-color: rgba(130, 180, 255, 0.32);
+}
+
+.admin-dark-stat:nth-child(4n + 2),
+.admin-metric:nth-child(4n + 2) {
+  border-color: rgba(115, 223, 192, 0.28);
+}
+
+.admin-dark-stat:nth-child(4n + 3),
+.admin-metric:nth-child(4n + 3) {
+  border-color: rgba(247, 207, 120, 0.28);
+}
+
+.admin-dark-stat strong,
+.admin-metric strong {
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(121, 165, 255, 0.16);
+}
+
+.admin-table-wrap,
+.admin-dark-table-wrap {
+  background: linear-gradient(180deg, rgba(8, 13, 27, 0.78), rgba(10, 16, 31, 0.94));
+  border-radius: 18px;
+}
+
+.admin-table th,
+.admin-dark-orders-table th {
+  background: linear-gradient(180deg, rgba(38, 55, 99, 0.9), rgba(18, 27, 49, 0.96));
+  color: #dbe7ff;
+  letter-spacing: 0.06em;
+}
+
+.admin-table td,
+.admin-dark-orders-table td {
+  background: rgba(7, 12, 24, 0.24);
+  border-color: rgba(130, 153, 214, 0.1);
+  color: var(--admin-pro-text);
+}
+
+.admin-table tbody tr:nth-child(even) td,
+.admin-dark-orders-table tbody tr:nth-child(even) td {
+  background: rgba(10, 16, 31, 0.42);
+}
+
+.admin-table tbody tr:hover td,
+.admin-dark-orders-table tbody tr:hover td,
+.admin-account-table__row:hover td,
+.admin-account-table__row:focus-visible td,
+.admin-record-table__row:hover td,
+.admin-record-table__row:focus-visible td {
+  background: rgba(121, 165, 255, 0.12);
+}
+
+.admin-account-toolbar,
+.admin-product-toolbar,
+.admin-gift-pool-toolbar,
+.admin-egg-toolbar,
+.admin-customer-toolbar,
+.admin-crud-toolbar,
+.admin-dark-orders__toolbar {
+  border-radius: 20px;
+}
+
+.admin-account-toolbar,
+.admin-product-toolbar,
+.admin-gift-pool-toolbar,
+.admin-egg-toolbar,
+.admin-customer-toolbar {
+  margin-bottom: 0;
+}
+
+.admin-account-table-wrap,
+.admin-egg-table-wrap,
+.admin-product-table-wrap,
+.admin-gift-pool-table-wrap,
+.admin-dark-table-wrap {
+  border-color: rgba(126, 159, 255, 0.16);
+}
+
+.admin-account-table-wrap.is-expanded {
+  max-height: none;
+  overflow-y: visible;
+}
+
+.admin-pagination {
+  border-top-color: rgba(159, 220, 255, 0.08);
+}
+
+@media (max-width: 900px) {
+  .admin-account-table-wrap.is-expanded {
+    overflow: auto;
+  }
+}

@@ -2,9 +2,15 @@ import { useEffect, useMemo, useState } from "react";
 
 const DEFAULT_PAGE_SIZE = 20;
 
-export function useAdminClientPagination(rows, resetKey = "") {
+export function useAdminClientPagination(
+  rows,
+  resetKey = "",
+  initialPageSize = DEFAULT_PAGE_SIZE
+) {
+  const resolvedInitialPageSize =
+    Number(initialPageSize) > 0 ? Number(initialPageSize) : DEFAULT_PAGE_SIZE;
   const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const [pageSize, setPageSize] = useState(resolvedInitialPageSize);
   const totalItems = rows.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
   const startIndex = totalItems ? (page - 1) * pageSize + 1 : 0;

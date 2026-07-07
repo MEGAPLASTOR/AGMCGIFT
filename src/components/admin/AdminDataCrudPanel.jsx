@@ -79,6 +79,7 @@ const ACCOUNT_FORM_FIELD_ORDER = [
   "status",
   "token",
 ];
+const ACCOUNT_DEFAULT_PAGE_SIZE = 100;
 
 const BOARD_CONFIG_BY_TABLE = {
   giftAccounts: {
@@ -391,6 +392,7 @@ function AccountExcelGuide({ onDownloadTemplate }) {
 }
 
 function AdminGiftAccountTable({
+  isExpanded = false,
   isSaving,
   onDelete,
   onEdit,
@@ -405,7 +407,11 @@ function AdminGiftAccountTable({
     rows.every((row) => selectedAccountIds.has(getRecordId(row, "giftAccounts")));
 
   return (
-    <div className="admin-table-wrap admin-account-table-wrap">
+    <div
+      className={`admin-table-wrap admin-account-table-wrap${
+        isExpanded ? " is-expanded" : ""
+      }`}
+    >
       <table className="admin-table admin-account-table">
         <thead>
           <tr>
@@ -951,7 +957,8 @@ export function AdminDataCrudPanel({
   );
   const accountPagination = useAdminClientPagination(
     accountRows,
-    `${tableKey}|${keyword}|${accountStatusFilter}|${rows.length}`
+    `${tableKey}|${keyword}|${accountStatusFilter}|${rows.length}`,
+    ACCOUNT_DEFAULT_PAGE_SIZE
   );
   const recordPagination = useAdminClientPagination(
     filteredRows,
@@ -1674,6 +1681,7 @@ export function AdminDataCrudPanel({
         <div className="admin-dnd-wrap">
           {isGiftAccountsTable ? (
             <AdminGiftAccountTable
+              isExpanded={accountPagination.pageSize >= ACCOUNT_DEFAULT_PAGE_SIZE}
               isSaving={isSaving}
               rows={paginatedAccountRows}
               selectedAccountIds={selectedAccountIds}
