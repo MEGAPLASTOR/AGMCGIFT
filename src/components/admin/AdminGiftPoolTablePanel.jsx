@@ -702,6 +702,7 @@ export function AdminGiftPoolTablePanel({
                     type="text"
                     placeholder="Nháº­p tÃªn bá»ƒ quÃ "
                     value={poolForm.pool_name}
+                    {...{ placeholder: "Nhập tên bể quà" }}
                     onChange={(event) =>
                       updatePoolField("pool_name", event.target.value)
                     }
