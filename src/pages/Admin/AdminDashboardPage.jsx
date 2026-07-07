@@ -504,7 +504,11 @@ export default function AdminDashboardPage() {
 
   const handleUpdateGiftAccount = async (record, id) => {
     try {
-      return await updateAdminGiftAccount(id, record, admin.authHeader);
+      const payload = await updateAdminGiftAccount(id, record, admin.authHeader);
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+
+      return findGiftAccountRow(rawTables, record) || payload;
     } catch (updateError) {
       handleAuthError(updateError);
       throw updateError;

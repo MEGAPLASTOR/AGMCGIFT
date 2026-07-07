@@ -42,12 +42,15 @@ function buildGiftAccountPayload(record) {
 }
 
 function buildGiftAccountUpdatePayload(record) {
+  const tier = normalizeTier(record.tier);
+
   return {
     username: normalizeText(record.username),
     password: String(record.password || ""),
     platform: normalizeText(record.platform || "blox-fruit"),
     status: normalizeText(record.status || "AVAILABLE").toUpperCase(),
     token: normalizeText(record.token),
+    ...(tier ? { tier } : {}),
   };
 }
 
