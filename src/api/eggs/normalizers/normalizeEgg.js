@@ -104,22 +104,26 @@ function getChoice(rawEgg, egg, index, totalEggs) {
     return explicitChoice;
   }
 
-  if (hasExplicitSlot(rawEgg)) {
-    if (egg.slot === 1) {
-      return EGG_CHOICES.instant;
-    }
-
-    if (egg.slot === 2) {
-      return EGG_CHOICES.delayed;
-    }
-  }
-
   if (Number(egg.eggType) === 1) {
     return EGG_CHOICES.instant;
   }
 
   if (Number(egg.eggType) === 2) {
     return EGG_CHOICES.delayed;
+  }
+
+  if (hasCooldown(egg)) {
+    return EGG_CHOICES.delayed;
+  }
+
+  if (hasExplicitSlot(rawEgg)) {
+    if (egg.slot === 1) {
+      return EGG_CHOICES.instant;
+    }
+
+    if (egg.slot === 2 && totalEggs > 1) {
+      return EGG_CHOICES.delayed;
+    }
   }
 
   if (totalEggs > 1) {
