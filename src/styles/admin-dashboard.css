@@ -3290,8 +3290,8 @@
 }
 
 .admin-panel.admin-gift-pool-modal {
-  width: min(640px, calc(100vw - 48px)) !important;
-  max-width: calc(100vw - 48px) !important;
+  width: min(760px, calc(100vw - 32px)) !important;
+  max-width: calc(100vw - 32px) !important;
   max-height: calc(100vh - 48px);
   overflow-y: auto;
 }
@@ -3306,11 +3306,51 @@
 }
 
 .admin-gift-pool-form-grid {
-  grid-template-columns: minmax(0, 1.4fr) minmax(150px, 0.6fr);
+  grid-template-columns: minmax(0, 1.9fr) minmax(170px, 0.8fr);
+  gap: 16px;
+  align-items: end;
+}
+
+.admin-panel.admin-gift-pool-modal .admin-record-editor--modal {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+}
+
+.admin-panel.admin-gift-pool-modal .admin-record-editor__head {
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.admin-panel.admin-gift-pool-modal .admin-record-editor__head > div {
+  flex: 1 1 auto;
+}
+
+.admin-gift-pool-form-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.admin-gift-pool-form-field--tier {
+  width: 100%;
+  max-width: 180px;
+  justify-self: end;
+}
+
+.admin-gift-pool-form-field input,
+.admin-gift-pool-form-field select {
+  width: 100%;
 }
 
 .admin-gift-pool-modal-actions {
-  justify-content: flex-end;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.admin-gift-pool-modal-actions button {
+  width: 100%;
 }
 
 .admin-gift-pool-detail {
@@ -3472,6 +3512,11 @@
   .admin-gift-pool-form-grid,
   .admin-gift-pool-add-panel {
     grid-template-columns: 1fr;
+  }
+
+  .admin-gift-pool-form-field--tier {
+    max-width: none;
+    justify-self: stretch;
   }
 
   .admin-gift-pool-add-panel button {

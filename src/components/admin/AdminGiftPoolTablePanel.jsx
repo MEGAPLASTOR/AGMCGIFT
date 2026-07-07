@@ -16,7 +16,7 @@ import { AdminClientPagination } from "./AdminClientPagination";
 import { AdminModalPortal } from "./AdminModalPortal";
 
 const EMPTY_ROWS = [];
-const TIER_ORDER = ["A", "B", "C", "D", "E"];
+const TIER_ORDER = ["A", "B", "C", "D", "E", "F"];
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -711,17 +711,18 @@ export function AdminGiftPoolTablePanel({
               </div>
 
               <div className="admin-form-grid admin-gift-pool-form-grid">
-                <label>
+                <label className="admin-gift-pool-form-field admin-gift-pool-form-field--name">
                   Tên bể quà
                   <input
                     type="text"
+                    placeholder="Nháº­p tÃªn bá»ƒ quÃ "
                     value={poolForm.pool_name}
                     onChange={(event) =>
                       updatePoolField("pool_name", event.target.value)
                     }
                   />
                 </label>
-                <label>
+                <label className="admin-gift-pool-form-field admin-gift-pool-form-field--tier">
                   Tier
                   <select
                     value={poolForm.tier}

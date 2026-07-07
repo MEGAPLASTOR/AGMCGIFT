@@ -14,7 +14,7 @@ const EGG_CHART_COLORS = {
   cancelled: "#ff8a80",
 };
 
-const TIER_ORDER = ["A", "B", "C", "D", "E"];
+const TIER_ORDER = ["A", "B", "C", "D", "E", "F"];
 const RANGE_OPTIONS = ["day", "week", "month"];
 const CHART_SERIES = [
   {

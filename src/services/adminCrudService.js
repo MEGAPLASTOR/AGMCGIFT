@@ -44,6 +44,8 @@ const poolTierOptions = [
   { value: "B", label: "B" },
   { value: "C", label: "C" },
   { value: "D", label: "D" },
+  { value: "E", label: "E" },
+  { value: "F", label: "F" },
 ];
 
 export const accountStatusOptions = [
