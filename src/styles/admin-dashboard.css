@@ -6097,6 +6097,7 @@
 .admin-dark-table-wrap {
   background: linear-gradient(180deg, rgba(8, 13, 27, 0.78), rgba(10, 16, 31, 0.94));
   border-radius: 18px;
+  overflow-x: auto;
 }
 
 .admin-table th,
@@ -6155,6 +6156,7 @@
 
 .admin-account-table-wrap.is-expanded {
   max-height: none;
+  overflow-x: auto;
   overflow-y: visible;
 }
 
