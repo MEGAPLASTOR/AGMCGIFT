@@ -12,6 +12,7 @@ import {
 } from "./adminGiftPoolService";
 import { normalizeApiText } from "../api/eggs/utils/normalizeApiText";
 import { normalizeCustomerStatus } from "../utils/customerStatus";
+import { normalizePoolTier } from "../utils/poolTier";
 
 const RAW_ENDPOINTS = [
   ["customers", ADMIN_ENDPOINTS.customers],
@@ -268,7 +269,9 @@ function normalizeProductEggMappings(products) {
         mappingsType,
         egg_type: mappingsType,
         gift_pool_id: poolId,
-        egg_tier: mapping.eggTier || mapping.egg_tier || giftPool.tier || "",
+        egg_tier: normalizePoolTier(
+          mapping.eggTier || mapping.egg_tier || giftPool.tier
+        ),
         rate: Number(mapping.rate ?? mapping.ratePercent ?? mapping.rate_percent ?? 0),
         created_at: normalizeDate(mapping.createdAt || mapping.created_at),
         updated_at: normalizeDate(mapping.updatedAt || mapping.updated_at),

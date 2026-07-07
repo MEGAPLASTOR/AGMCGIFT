@@ -1,3 +1,9 @@
+import {
+  DEFAULT_POOL_TIER,
+  formatPoolTierList,
+  normalizePoolTier,
+} from "../utils/poolTier";
+
 const ACCOUNT_IMPORT_ALIASES = {
   id: ["id", "account_id", "gift_account_id"],
   username: ["username", "user", "tai_khoan", "account", "ten_tai_khoan"],
@@ -252,8 +258,13 @@ function getCell(row, index) {
 }
 
 function normalizeTier(value) {
-  const tier = String(value || "A").trim().toUpperCase();
-  return ["A", "B", "C", "D"].includes(tier) ? tier : "";
+  const tier = String(value ?? "").trim();
+
+  if (!tier) {
+    return DEFAULT_POOL_TIER;
+  }
+
+  return normalizePoolTier(tier);
 }
 
 export function mapAccountImportRows(rows) {
@@ -286,7 +297,9 @@ export function mapAccountImportRows(rows) {
     const tier = normalizeTier(getCell(row, indexMap.tier));
 
     if (!tier) {
-      throw new Error("Tier trong file chỉ được dùng A, B, C hoặc D.");
+      throw new Error(
+        `Tier trong file chỉ được dùng ${formatPoolTierList(", ")}.`
+      );
     }
 
     accounts.push({

@@ -5,6 +5,7 @@ import {
 } from "../api/endpoints/adminEndpoints";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { requestJson } from "../api/http/requestJson";
+import { normalizePoolTier } from "../utils/poolTier";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
@@ -91,7 +92,12 @@ function normalizeProductEggMapping(record, fallback = {}) {
     egg_type: mappingsType,
     gift_pool_id: poolId,
     poolId,
-    egg_tier: source.eggTier || source.egg_tier || giftPool.tier || fallback.egg_tier || "",
+    egg_tier: normalizePoolTier(
+      source.eggTier ||
+        source.egg_tier ||
+        giftPool.tier ||
+        fallback.egg_tier
+    ),
     rate: Number(source.rate ?? source.ratePercent ?? source.rate_percent ?? fallback.rate ?? 0),
     created_at: source.createdAt || source.created_at || fallback.created_at || null,
     updated_at: source.updatedAt || source.updated_at || fallback.updated_at || null,

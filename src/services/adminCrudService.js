@@ -1,4 +1,8 @@
 import { CUSTOMER_STATUS_OPTIONS } from "../utils/customerStatus";
+import {
+  DEFAULT_POOL_TIER,
+  POOL_TIER_OPTIONS,
+} from "../utils/poolTier";
 
 export const orderFinancialStatusOptions = [
   { value: "paid", label: "paid" },
@@ -37,15 +41,6 @@ export const eggStatusOptions = [
   { value: "ready", label: "ready" },
   { value: "locked", label: "locked" },
   { value: "invalidated", label: "invalidated" },
-];
-
-const poolTierOptions = [
-  { value: "S", label: "S" },
-  { value: "A", label: "A" },
-  { value: "B", label: "B" },
-  { value: "C", label: "C" },
-  { value: "D", label: "D" },
-  { value: "E", label: "E" },
 ];
 
 export const accountStatusOptions = [
@@ -204,7 +199,7 @@ export const ADMIN_TABLES = [
         valueType: "number",
       }),
       text("gift_pool_id", "ID kho quà", { required: true }),
-      select("egg_tier", "Hạng quà", poolTierOptions),
+      select("egg_tier", "Hạng quà", POOL_TIER_OPTIONS),
       dateTime("created_at", "Ngày tạo"),
       dateTime("updated_at", "Ngày cập nhật"),
     ],
@@ -216,7 +211,7 @@ export const ADMIN_TABLES = [
     fields: [
       text("id", "ID", { required: true, wide: true }),
       text("pool_name", "Tên kho quà", { required: true, wide: true }),
-      select("tier", "Hạng kho", poolTierOptions),
+      select("tier", "Hạng kho", POOL_TIER_OPTIONS),
       dateTime("created_at", "Ngày tạo"),
     ],
   },
@@ -228,7 +223,7 @@ export const ADMIN_TABLES = [
       text("id", "ID", { required: true, wide: true }),
       text("username", "Tên tài khoản", { required: true }),
       text("password", "Mật khẩu", { required: true }),
-      select("tier", "Tier", poolTierOptions, { defaultValue: "A" }),
+      select("tier", "Tier", POOL_TIER_OPTIONS, { defaultValue: DEFAULT_POOL_TIER }),
       select("status", "Trạng thái", accountStatusOptions),
       text("platform", "Nền tảng", { defaultValue: "blox-fruit" }),
       text("token", "Token", { wide: true }),

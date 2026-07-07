@@ -109,7 +109,7 @@ export function AdminAccountImportPanel({
     >
       <div>
         <strong>Nhập account từ Excel</strong>
-        <span>Cột bắt buộc: username, password. Có thể thêm tier A/B/C/D, platform, token.</span>
+        <span>Cột bắt buộc: username, password. Có thể thêm tier S/A/B/C/D/E, platform, token.</span>
       </div>
       <label className="admin-file-button">
         {isImporting ? "Đang nhập..." : "Chọn file"}

@@ -4,6 +4,7 @@ import {
 } from "../api/endpoints/adminEndpoints";
 import { ApiRequestError } from "../api/http/ApiRequestError";
 import { requestJson } from "../api/http/requestJson";
+import { formatPoolTierList, normalizePoolTier } from "../utils/poolTier";
 
 function requireAuthHeader(authHeader, endpoint) {
   if (!authHeader) {
@@ -26,8 +27,7 @@ function normalizeDate(value) {
 }
 
 function normalizeTier(value) {
-  const tier = normalizeText(value || "A").toUpperCase();
-  return ["A", "B", "C", "D"].includes(tier) ? tier : "";
+  return normalizePoolTier(value);
 }
 
 function normalizeAccountStatus(value) {
@@ -72,7 +72,7 @@ export function normalizeAdminGiftAccount(account) {
     username: account.username || "",
     password: account.password || "",
     status: normalizeAccountStatus(account.status),
-    tier: account.tier || "",
+    tier: normalizeTier(account.tier),
     platform: account.platform || "",
     token: account.token || "",
     created_at: normalizeDate(account.createdAt || account.created_at),
@@ -95,7 +95,7 @@ export function normalizeAdminGiftPool(pool, fallback = {}) {
       fallback.poolName ||
       fallback.pool_name ||
       "",
-    tier: source.tier || fallback.tier || "",
+    tier: normalizeTier(source.tier || fallback.tier),
     created_at: normalizeDate(source.createdAt || source.created_at || fallback.created_at),
     accounts: Array.isArray(accounts) ? accounts.map(normalizeAdminGiftAccount) : [],
   };
@@ -128,7 +128,9 @@ function buildGiftPoolPayload(record) {
   }
 
   if (!tier) {
-    throw new Error("Tier bể quà chỉ được dùng A, B, C hoặc D.");
+    throw new Error(
+      `Tier bể quà chỉ được dùng ${formatPoolTierList(", ")}.`
+    );
   }
 
   return { poolName, tier };

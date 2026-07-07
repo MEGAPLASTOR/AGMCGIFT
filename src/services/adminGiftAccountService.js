@@ -9,6 +9,7 @@ import { postJson } from "../api/http/postJson";
 import { readResponsePayload } from "../api/http/readResponsePayload";
 import { requestJson } from "../api/http/requestJson";
 import { normalizeAdminGiftAccount } from "./adminGiftPoolService";
+import { formatPoolTierList, normalizePoolTier } from "../utils/poolTier";
 
 function requireAuthHeader(authHeader) {
   if (!authHeader) {
@@ -27,8 +28,7 @@ function normalizeText(value) {
 }
 
 function normalizeTier(value) {
-  const tier = normalizeText(value || "A").toUpperCase();
-  return ["A", "B", "C", "D"].includes(tier) ? tier : "";
+  return normalizePoolTier(value);
 }
 
 function buildGiftAccountPayload(record) {
@@ -63,7 +63,9 @@ export async function createAdminGiftAccount(record, authHeader) {
   }
 
   if (!payload.tier) {
-    throw new Error("Tier tài khoản chỉ được dùng A, B, C hoặc D.");
+    throw new Error(
+      `Tier tài khoản chỉ được dùng ${formatPoolTierList(", ")}.`
+    );
   }
 
   return postJson(ADMIN_ENDPOINTS.giftAccountsSingle, payload, {

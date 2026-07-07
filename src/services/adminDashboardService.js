@@ -3,6 +3,7 @@ import {
   isPermanentlyBannedCustomerStatus,
   isWarningCustomerStatus,
 } from "../utils/customerStatus";
+import { normalizePoolTier } from "../utils/poolTier";
 
 function countBy(items, getKey) {
   return items.reduce((result, item) => {
@@ -358,7 +359,11 @@ function buildTierInventory(giftPools, giftAccounts, poolAccountMappings) {
   );
 
   const ensureTierRow = (tierValue) => {
-    const tier = String(tierValue || "Unknown").trim().toUpperCase() || "UNKNOWN";
+    const tier = normalizePoolTier(tierValue);
+
+    if (!tier) {
+      return null;
+    }
 
     if (!tierRows.has(tier)) {
       tierRows.set(tier, {
@@ -376,11 +381,20 @@ function buildTierInventory(giftPools, giftAccounts, poolAccountMappings) {
   };
 
   giftPools.forEach((pool) => {
-    ensureTierRow(pool.tier).pools += 1;
+    const row = ensureTierRow(pool.tier);
+
+    if (row) {
+      row.pools += 1;
+    }
   });
 
   giftAccounts.forEach((account) => {
     const row = ensureTierRow(account.tier);
+
+    if (!row) {
+      return;
+    }
+
     const accountId = String(account.id || "").trim();
     const status = normalizeStatus(account.status);
 
@@ -627,7 +641,7 @@ export function buildAdminDashboard(tables) {
       eggStatus: countBy(eggs, (egg) => egg.status),
       eggType: countBy(eggs, (egg) => egg.egg_type),
       accountStatus: countBy(giftAccounts, (account) => account.status),
-      poolTier: countBy(giftPools, (pool) => pool.tier),
+      poolTier: countBy(giftPools, (pool) => normalizePoolTier(pool.tier) || "Invalid"),
       logAction: countBy(eggOpeningLogs, (log) => log.action_type),
     },
     workflow: [
@@ -706,7 +720,7 @@ export function buildAdminDashboard(tables) {
     }),
     poolRows: giftPools.slice(0, 12).map((pool) => ({
       pool: pool.pool_name,
-      tier: pool.tier,
+      tier: normalizePoolTier(pool.tier) || "-",
       accounts: poolAccountCount[pool.id] || 0,
       available: poolAvailableCount[pool.id] || 0,
       createdAt: formatDateTime(pool.created_at),
@@ -720,7 +734,7 @@ export function buildAdminDashboard(tables) {
     accountRows: giftAccounts.slice(0, 12).map((account) => ({
       username: account.username,
       platform: account.platform || "-",
-      tier: account.tier || "-",
+      tier: normalizePoolTier(account.tier) || "-",
       status: account.status,
       token: account.token || "-",
       assignedAt: formatDateTime(account.assigned_at),

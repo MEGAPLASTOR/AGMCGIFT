@@ -11,10 +11,15 @@ import {
 } from "react-icons/fa6";
 import { showAdminAlert } from "../../services/adminBrowserFeedback";
 import { AdminModalPortal } from "./AdminModalPortal";
+import {
+  DEFAULT_POOL_TIER,
+  POOL_TIERS,
+  normalizePoolTier,
+} from "../../utils/poolTier";
 
 const EMPTY_ROWS = [];
 const UNASSIGNED_POOL_ID = "__unassigned__";
-const POOL_TIER_OPTIONS = ["A", "B", "C", "D"];
+const POOL_TIER_OPTIONS = POOL_TIERS;
 
 function normalizeText(value) {
   return String(value ?? "").trim();
@@ -58,14 +63,14 @@ function getMappingId(mapping) {
 function createPoolForm(pool) {
   return {
     pool_name: getPoolName(pool),
-    tier: normalizeText(pool?.tier || "A").toUpperCase(),
+    tier: normalizePoolTier(pool?.tier, DEFAULT_POOL_TIER),
   };
 }
 
 function createEmptyPoolForm() {
   return {
     pool_name: "",
-    tier: "A",
+    tier: DEFAULT_POOL_TIER,
   };
 }
 
@@ -187,7 +192,7 @@ function PoolAccountTable({
                     <span>{accountId || "no-id"}</span>
                   </td>
                   <td>
-                    <em>{normalizeText(account.tier || "-")}</em>
+                    <em>{normalizePoolTier(account.tier) || "-"}</em>
                   </td>
                   <td>
                     <small className="admin-pool-status-pill">{status}</small>
@@ -445,7 +450,7 @@ export function AdminGiftPoolDragPanel({
     const record = {
       pool_name: normalizeText(poolForm.pool_name),
       poolName: normalizeText(poolForm.pool_name),
-      tier: normalizeText(poolForm.tier || "A").toUpperCase(),
+      tier: normalizePoolTier(poolForm.tier, DEFAULT_POOL_TIER),
     };
 
     if (!record.pool_name) {
@@ -463,7 +468,7 @@ export function AdminGiftPoolDragPanel({
         ...record,
         ...savedPool,
         pool_name: getPoolName(savedPool) || record.pool_name,
-        tier: normalizeText(savedPool?.tier || record.tier),
+        tier: normalizePoolTier(savedPool?.tier || record.tier, DEFAULT_POOL_TIER),
       };
       const nextPoolId = getPoolId(nextPool) || selectedPoolId;
 
@@ -767,7 +772,7 @@ export function AdminGiftPoolDragPanel({
                       >
                         <td>
                           <span className="admin-pool-tier-pill">
-                            Tier {normalizeText(pool.tier || "-")}
+                            Tier {normalizePoolTier(pool.tier) || "-"}
                           </span>
                         </td>
                         <td>

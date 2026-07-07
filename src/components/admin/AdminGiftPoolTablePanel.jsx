@@ -14,16 +14,21 @@ import {
 import { useAdminClientPagination } from "../../hooks/useAdminClientPagination";
 import { AdminClientPagination } from "./AdminClientPagination";
 import { AdminModalPortal } from "./AdminModalPortal";
+import {
+  DEFAULT_POOL_TIER,
+  POOL_TIERS,
+  normalizePoolTier,
+} from "../../utils/poolTier";
 
 const EMPTY_ROWS = [];
-const TIER_ORDER = ["S", "A", "B", "C", "D", "E"];
+const TIER_ORDER = POOL_TIERS;
 
 function normalizeText(value) {
   return String(value ?? "").trim();
 }
 
 function normalizeTier(value) {
-  return normalizeText(value || "A").toUpperCase();
+  return normalizePoolTier(value);
 }
 
 function getPoolId(pool) {
@@ -64,14 +69,14 @@ function createPoolAccountMapping(poolId, accountId) {
 function createEmptyPoolForm() {
   return {
     pool_name: "",
-    tier: "A",
+    tier: DEFAULT_POOL_TIER,
   };
 }
 
 function createPoolForm(pool) {
   return {
     pool_name: getPoolName(pool),
-    tier: normalizeTier(pool?.tier),
+    tier: normalizeTier(pool?.tier) || DEFAULT_POOL_TIER,
   };
 }
 
@@ -154,7 +159,7 @@ export function AdminGiftPoolTablePanel({
   const [poolForm, setPoolForm] = useState(createEmptyPoolForm);
   const [isPoolModalOpen, setPoolModalOpen] = useState(false);
   const [detailPoolId, setDetailPoolId] = useState("");
-  const [selectedTier, setSelectedTier] = useState("A");
+  const [selectedTier, setSelectedTier] = useState(DEFAULT_POOL_TIER);
   const [selectedAccountId, setSelectedAccountId] = useState("");
   const [selectedPoolAccountIds, setSelectedPoolAccountIds] = useState([]);
   const [deletePoolId, setDeletePoolId] = useState("");
@@ -275,27 +280,7 @@ export function AdminGiftPoolTablePanel({
     return ids;
   }, [poolAccountsByPoolId]);
 
-  const tierOptions = useMemo(() => {
-    const tiers = new Set(TIER_ORDER);
-
-    pools.forEach((pool) => {
-      const tier = normalizeTier(pool?.tier);
-
-      if (tier) {
-        tiers.add(tier);
-      }
-    });
-
-    accounts.forEach((account) => {
-      const tier = normalizeTier(account?.tier);
-
-      if (tier) {
-        tiers.add(tier);
-      }
-    });
-
-    return [...tiers];
-  }, [accounts, pools]);
+  const tierOptions = TIER_ORDER;
 
   const filteredPools = useMemo(
     () =>
@@ -391,7 +376,7 @@ export function AdminGiftPoolTablePanel({
     const poolTier = normalizeTier(pool?.tier);
 
     setDetailPoolId(getPoolId(pool));
-    setSelectedTier(poolTier || tierOptions[0] || "A");
+    setSelectedTier(poolTier || tierOptions[0] || DEFAULT_POOL_TIER);
     setSelectedAccountId("");
     setSelectedPoolAccountIds([]);
   };

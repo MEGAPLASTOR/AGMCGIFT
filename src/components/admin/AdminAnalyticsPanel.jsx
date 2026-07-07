@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaMagnifyingGlass, FaRotateRight } from "react-icons/fa6";
 import { getDeliveryStatusKind } from "../../api/eggs/utils/getDeliveryStatusKind";
+import { POOL_TIERS, normalizePoolTier } from "../../utils/poolTier";
 
 const ORDER_CHART_COLORS = {
   success: "#ff7a29",
@@ -14,7 +15,7 @@ const EGG_CHART_COLORS = {
   cancelled: "#ff8a80",
 };
 
-const TIER_ORDER = ["S", "A", "B", "C", "D", "E"];
+const TIER_ORDER = POOL_TIERS;
 const RANGE_OPTIONS = ["day", "week", "month"];
 const CHART_SERIES = [
   {
@@ -205,14 +206,11 @@ function getEggStatusRows(counts = {}, summary = {}) {
 
 function getTierRows(inventoryByTier = []) {
   const rowByTier = new Map(
-    inventoryByTier.map((row) => [normalizeText(row.tier).toUpperCase(), row])
+    inventoryByTier
+      .map((row) => [normalizePoolTier(row.tier), row])
+      .filter(([tier]) => tier)
   );
-  const tiers = [
-    ...TIER_ORDER,
-    ...inventoryByTier
-      .map((row) => normalizeText(row.tier).toUpperCase())
-      .filter((tier) => tier && !TIER_ORDER.includes(tier)),
-  ];
+  const tiers = TIER_ORDER;
 
   return tiers.map((tier) => {
     const row = rowByTier.get(tier) || {};
