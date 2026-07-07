@@ -615,13 +615,88 @@ input::placeholder {
 }
 
 .account-reward {
+  --account-frame: #17130a;
+  --account-shadow: #ffd52e;
+  --account-bg-top: #ffffff;
+  --account-bg-bottom: #fff8dc;
+  --account-field-bg: #fffbe8;
+  --account-field-border: rgba(23, 19, 10, 0.14);
+  --account-icon-bg: #ffd52e;
+  --account-icon-text: #17130a;
+  --account-kicker: #6d5300;
+  --account-title: #17130a;
   min-width: 0;
-  border: 3px solid #17130a;
+  border: 3px solid var(--account-frame);
   border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 7px 0 #ffd52e;
+  background: linear-gradient(180deg, var(--account-bg-top) 0%, var(--account-bg-bottom) 100%);
+  box-shadow: 0 7px 0 var(--account-shadow);
   margin: 16px 0;
   padding: 16px;
+}
+
+.account-reward--a {
+  --account-frame: #7c2d12;
+  --account-shadow: #f59e0b;
+  --account-bg-top: #fffdf3;
+  --account-bg-bottom: #ffefb3;
+  --account-field-bg: #fff8dd;
+  --account-field-border: rgba(180, 83, 9, 0.2);
+  --account-icon-bg: linear-gradient(135deg, #f59e0b, #fcd34d);
+  --account-icon-text: #fffdf5;
+  --account-kicker: #92400e;
+  --account-title: #7c2d12;
+}
+
+.account-reward--b {
+  --account-frame: #1e3a8a;
+  --account-shadow: #60a5fa;
+  --account-bg-top: #f8fbff;
+  --account-bg-bottom: #dbeafe;
+  --account-field-bg: #eff6ff;
+  --account-field-border: rgba(37, 99, 235, 0.18);
+  --account-icon-bg: linear-gradient(135deg, #2563eb, #60a5fa);
+  --account-icon-text: #eff6ff;
+  --account-kicker: #1d4ed8;
+  --account-title: #1e3a8a;
+}
+
+.account-reward--c {
+  --account-frame: #166534;
+  --account-shadow: #4ade80;
+  --account-bg-top: #f7fff8;
+  --account-bg-bottom: #dcfce7;
+  --account-field-bg: #f0fdf4;
+  --account-field-border: rgba(22, 163, 74, 0.18);
+  --account-icon-bg: linear-gradient(135deg, #16a34a, #4ade80);
+  --account-icon-text: #f0fdf4;
+  --account-kicker: #15803d;
+  --account-title: #166534;
+}
+
+.account-reward--d {
+  --account-frame: #9a3412;
+  --account-shadow: #fb923c;
+  --account-bg-top: #fffaf5;
+  --account-bg-bottom: #fed7aa;
+  --account-field-bg: #fff7ed;
+  --account-field-border: rgba(234, 88, 12, 0.18);
+  --account-icon-bg: linear-gradient(135deg, #ea580c, #fb923c);
+  --account-icon-text: #fff7ed;
+  --account-kicker: #c2410c;
+  --account-title: #9a3412;
+}
+
+.account-reward--e {
+  --account-frame: #334155;
+  --account-shadow: #94a3b8;
+  --account-bg-top: #fbfcfe;
+  --account-bg-bottom: #e2e8f0;
+  --account-field-bg: #f8fafc;
+  --account-field-border: rgba(51, 65, 85, 0.16);
+  --account-icon-bg: linear-gradient(135deg, #475569, #94a3b8);
+  --account-icon-text: #f8fafc;
+  --account-kicker: #475569;
+  --account-title: #1e293b;
 }
 
 .account-reward-list {
@@ -643,17 +718,17 @@ input::placeholder {
   width: 42px;
   height: 42px;
   place-items: center;
-  border: 3px solid #17130a;
+  border: 3px solid var(--account-frame);
   border-radius: 8px;
-  background: #ffd52e;
-  color: #17130a;
+  background: var(--account-icon-bg);
+  color: var(--account-icon-text);
   font-size: 13px;
   font-weight: 1000;
 }
 
 .account-reward__head span:not(.account-reward__icon) {
   display: block;
-  color: #6d5300;
+  color: var(--account-kicker);
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
@@ -663,6 +738,7 @@ input::placeholder {
   display: block;
   overflow-wrap: anywhere;
   margin-top: 4px;
+  color: var(--account-title);
   font-size: 20px;
   font-weight: 1000;
 }
@@ -676,9 +752,9 @@ input::placeholder {
 
 .account-reward__grid div {
   min-width: 0;
-  border: 2px solid rgba(23, 19, 10, 0.14);
+  border: 2px solid var(--account-field-border);
   border-radius: 8px;
-  background: #fffbe8;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.86) 0%, var(--account-field-bg) 100%);
   padding: 12px;
 }
 

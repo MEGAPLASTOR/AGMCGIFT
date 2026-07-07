@@ -1,14 +1,30 @@
-export function AccountRewardCard({ reward, account, title = "Acc nhận được" }) {
+const SUPPORTED_TIERS = new Set(["A", "B", "C", "D", "E"]);
+
+function normalizeTier(value) {
+  const tier = String(value || "").trim().toUpperCase();
+
+  return SUPPORTED_TIERS.has(tier) ? tier : "";
+}
+
+export function AccountRewardCard({
+  reward,
+  account,
+  title = "Acc nhận được",
+}) {
   const accountInfo = account || reward || {};
   const accountName =
     accountInfo.tenAcc || accountInfo.tenPhanThuong || accountInfo.platform;
   const username = accountInfo.taiKhoan || accountInfo.username;
   const password = accountInfo.matKhau || accountInfo.password;
-  const tier = accountInfo.tier;
+  const tier = normalizeTier(accountInfo.tier);
   const note = accountInfo.ghiChu || accountInfo.message;
 
   return (
-    <div className="account-reward">
+    <div
+      className={`account-reward${
+        tier ? ` account-reward--${tier.toLowerCase()}` : ""
+      }`}
+    >
       <div className="account-reward__head">
         <span className="account-reward__icon" aria-hidden="true">
           OK

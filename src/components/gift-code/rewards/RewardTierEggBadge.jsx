@@ -1,8 +1,8 @@
+import { EGG_CHOICES } from "../../../api/eggs";
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
 import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 
 const TIER_PRIORITY = ["E", "D", "C", "B", "A"];
-const PREMIUM_TIERS = new Set(["A", "B", "C"]);
 
 function normalizeTier(value) {
   const tier = String(value || "").trim().toUpperCase();
@@ -36,20 +36,30 @@ function getDisplayTier(redemptionInfo) {
     .find((tier) => tiers.includes(tier)) || "E";
 }
 
+function isDiamondEgg(redemptionInfo) {
+  if (redemptionInfo?.choice) {
+    return redemptionInfo.choice === EGG_CHOICES.delayed;
+  }
+
+  if (redemptionInfo?.rewardReadyAt || redemptionInfo?.rewardDateTime) {
+    return true;
+  }
+
+  return Number(redemptionInfo?.eggType) === 2;
+}
+
 export function RewardTierEggBadge({ redemptionInfo }) {
   const displayTier = getDisplayTier(redemptionInfo);
-  const eggImage = PREMIUM_TIERS.has(displayTier)
-    ? eggPremium15Days
-    : eggInstantGold;
+  const diamondEgg = isDiamondEgg(redemptionInfo);
 
   return (
     <span
       className={`reward-tier-egg reward-tier-egg--${displayTier.toLowerCase()}`}
-      aria-label={`Trung tier ${displayTier}`}
+      aria-label={`Trung ${diamondEgg ? "kim cuong" : "vang"} tier ${displayTier}`}
       role="img"
     >
       <span className="reward-tier-egg__shine" aria-hidden="true" />
-      <img src={eggImage} alt="" />
+      <img src={diamondEgg ? eggPremium15Days : eggInstantGold} alt="" />
       <span className="reward-tier-egg__label">Tier {displayTier}</span>
     </span>
   );
