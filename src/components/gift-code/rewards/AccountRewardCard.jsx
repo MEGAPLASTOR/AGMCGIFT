@@ -84,49 +84,49 @@ export function AccountRewardCard({
   };
 
   return (
-    <div className={`account-reward account-reward--${displayTier.toLowerCase()}`}>
-      <span className="account-reward__ornament" aria-hidden="true">
-        <span className="account-reward__aura" />
-        <span className="account-reward__wings">
-          <span className="account-reward__wing account-reward__wing--left" />
-          <span className="account-reward__wing account-reward__wing--right" />
+    <div className={`tier-reward tier-reward--${displayTier.toLowerCase()}`}>
+      <span className="tier-reward__art" aria-hidden="true">
+        <span className="tier-reward__aura" />
+        <span className="tier-reward__wings">
+          <span className="tier-reward__wing tier-reward__wing--left" />
+          <span className="tier-reward__wing tier-reward__wing--right" />
         </span>
-        <span className="account-reward__crest" />
+        <span className="tier-reward__crest" />
       </span>
-      <span className="account-reward__tier-mark" aria-hidden="true">
+      <span className="tier-reward__tier-mark" aria-hidden="true">
         {displayTier}
       </span>
 
-      <div className="account-reward__banner">{successMessage}</div>
+      <div className="tier-reward__banner">{successMessage}</div>
 
-      <div className="account-reward__head">
-        <div className="account-reward__identity">
-          <span className="account-reward__icon" aria-hidden="true">
+      <div className="tier-reward__hero">
+        <div className="tier-reward__identity">
+          <span className="tier-reward__seal" aria-hidden="true">
             {displayTier}
           </span>
-          <div className="account-reward__summary">
+          <div className="tier-reward__summary">
             <span>{title}</span>
             <strong>{accountName || "Acc Blox Fruit"}</strong>
             {platform ? (
-              <em className="account-reward__platform">{platform}</em>
+              <em className="tier-reward__platform">{platform}</em>
             ) : null}
           </div>
         </div>
       </div>
 
-      <dl className="account-reward__grid">
+      <dl className="tier-reward__grid">
         {rows.map((row) => (
           <div
             key={row.key}
-            className={`account-reward__field${
-              row.full ? " account-reward__note" : ""
+            className={`tier-reward__field${
+              row.full ? " tier-reward__field--full" : ""
             }`}
           >
-            <div className="account-reward__field-head">
+            <div className="tier-reward__field-head">
               <dt>{row.label}</dt>
               <button
                 type="button"
-                className="account-reward__copy"
+                className="tier-reward__copy"
                 onClick={() => handleCopy(row.label, row.value)}
               >
                 Copy
