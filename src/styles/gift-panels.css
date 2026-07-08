@@ -1667,6 +1667,10 @@ input::placeholder {
   pointer-events: none;
 }
 
+.tier-reward {
+  --tier-orb-size: clamp(132px, 16vw, 210px);
+}
+
 .tier-reward__aura {
   position: absolute;
   top: 40px;
@@ -1739,8 +1743,8 @@ input::placeholder {
   position: absolute;
   top: 0;
   left: 50%;
-  width: clamp(132px, 16vw, 210px);
-  height: clamp(132px, 16vw, 210px);
+  width: var(--tier-orb-size);
+  height: var(--tier-orb-size);
   border: 2px solid var(--tier-line);
   border-radius: 50%;
   background:
@@ -1780,8 +1784,8 @@ input::placeholder {
   left: 50%;
   z-index: 2;
   display: grid;
-  width: clamp(132px, 16vw, 210px);
-  height: clamp(132px, 16vw, 210px);
+  width: var(--tier-orb-size);
+  height: var(--tier-orb-size);
   place-items: center;
   color: var(--tier-title);
   font-family: Georgia, "Times New Roman", serif;
@@ -1792,7 +1796,7 @@ input::placeholder {
     0 0 18px #fff,
     0 0 40px var(--tier-glow),
     0 0 74px var(--tier-glow);
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(0.03em);
 }
 
 .tier-reward__hero {

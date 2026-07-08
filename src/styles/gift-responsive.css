@@ -162,6 +162,7 @@
   }
 
   .tier-reward {
+    --tier-orb-size: 112px;
     min-height: 620px;
     border-radius: 24px;
     padding: 14px;
@@ -199,14 +200,14 @@
   }
 
   .tier-reward__crest {
-    width: 112px;
-    height: 112px;
+    width: var(--tier-orb-size);
+    height: var(--tier-orb-size);
   }
 
   .tier-reward__tier-mark {
     top: 0;
-    width: 112px;
-    height: 112px;
+    width: var(--tier-orb-size);
+    height: var(--tier-orb-size);
     font-size: 88px;
   }
 

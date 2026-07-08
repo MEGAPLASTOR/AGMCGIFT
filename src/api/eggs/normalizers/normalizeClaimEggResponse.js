@@ -7,7 +7,13 @@ function normalizeClaimedAccount(account, fallbackMessage = "") {
     tenAcc: source.platform || "Acc Blox Fruit",
     taiKhoan: source.username || source.taiKhoan || "",
     matKhau: source.password || source.matKhau || "",
-    token: source.token || "",
+    token:
+      source.token ||
+      source.accessToken ||
+      source.access_token ||
+      source.refreshToken ||
+      source.refresh_token ||
+      "",
     platform: source.platform || "",
     tier: source.tier || "",
     ghiChu: source.message || fallbackMessage,
@@ -37,7 +43,11 @@ export function normalizeClaimEggResponse(payload) {
     .map((account) => normalizeClaimedAccount(account, root.message || ""))
     .filter(
       (account) =>
-        account.taiKhoan || account.matKhau || account.platform || account.tier
+        account.taiKhoan ||
+        account.matKhau ||
+        account.token ||
+        account.platform ||
+        account.tier
     );
   const account = accounts[0] || normalizeClaimedAccount(root, root.message || "");
   const eggRows = getEggRows(root);
@@ -49,7 +59,14 @@ export function normalizeClaimEggResponse(payload) {
     tenAcc: account.tenAcc || root.platform || "Acc Blox Fruit",
     taiKhoan: account.taiKhoan || root.username || "",
     matKhau: account.matKhau || root.password || "",
-    token: account.token || root.token || "",
+    token:
+      account.token ||
+      root.token ||
+      root.accessToken ||
+      root.access_token ||
+      root.refreshToken ||
+      root.refresh_token ||
+      "",
     platform: account.platform || root.platform || "",
     tier: account.tier || root.tier || "",
     ghiChu: root.message || account.ghiChu || "",
