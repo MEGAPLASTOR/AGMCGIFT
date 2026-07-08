@@ -20,6 +20,19 @@ import { useGiftCode } from "../../hooks/useGiftCode";
 
 const SCROLL_TOP_GAP = 120;
 
+function getTempBanDisplayMessage(message) {
+  const normalizedMessage = String(message || "").trim();
+
+  if (!normalizedMessage) {
+    return "Bạn chưa thể mở quà lúc này. Khi đếm ngược về 0, hãy kiểm tra lại để được gỡ ban.";
+  }
+
+  return normalizedMessage
+    .replace(/\s+đến ngày\s+\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2})?\.?/i, ".")
+    .replace(/\.\s*\./g, ".")
+    .trim();
+}
+
 export default function GiftCodePage() {
   const [inputValue, setInputValue] = useState("");
   const [selectedStageEgg, setSelectedStageEgg] = useState(null);
@@ -207,14 +220,13 @@ export default function GiftCodePage() {
               <div className="panel-heading">
                 <div>
                   <p className="eyebrow">{"T\u1ea1m kh\u00f3a"}</p>
-                  <h2>{"T\u00e0i kho\u1ea3n \u0111ang b\u1ecb temp ban"}</h2>
+                  <h2>{"T\u00e0i kho\u1ea3n b\u1ecb kh\u00f3a t\u1ea1m th\u1eddi"}</h2>
                 </div>
                 {currentCode ? <span className="panel-chip">{currentCode}</span> : null}
               </div>
 
               <p className="message message--warning">
-                {banInfo?.message ||
-                  "B\u1ea1n ch\u01b0a th\u1ec3 m\u1edf qu\u00e0 l\u00fac n\u00e0y. Khi \u0111\u1ebfm ng\u01b0\u1ee3c v\u1ec1 0, h\u00e3y ki\u1ec3m tra l\u1ea1i \u0111\u1ec3 \u0111\u01b0\u1ee3c g\u1ee1 ban."}
+                {getTempBanDisplayMessage(banInfo?.message)}
               </p>
 
               {banInfo?.unbanAt ? (
