@@ -36,7 +36,7 @@ export function RewardChoicePage({
     : !canClaimNow
       ? "Không có trứng thường cho mã này."
       : instantNeedsIncubation
-        ? ""
+        ? "Bạn đang bị Warning do vi phạm"
         : "Bấm mở để nhận acc theo số trứng backend mở được.";
   const delayedDescription = delayedOpened
     ? "Nhóm trứng này đã mở, bấm để xem lại acc."
