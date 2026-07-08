@@ -20,6 +20,8 @@ function normalizeSearchText(value) {
   return normalizeText(value)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/đ/g, "d")
+    .replace(/Đ/g, "D")
     .toLowerCase();
 }
 
@@ -151,8 +153,8 @@ export function extractCustomerState(
       order.unban_at,
       order.unlockAt,
       order.unlock_at,
-    order.banExpiresAt,
-    order.ban_expires_at,
+      order.banExpiresAt,
+      order.ban_expires_at,
     ]) ||
     extractUnbanAtFromMessage(message) ||
     null;
