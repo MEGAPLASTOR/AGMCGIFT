@@ -143,10 +143,10 @@ export function AdminEarlyHatchPanel({
       <div className="admin-panel__head admin-early-hatch-panel__head">
         <div>
           <span>Duyệt thủ công</span>
-          <h2>Duyệt Trứng Sớm (Manual Approval)</h2>
+          <h2>Duyệt trứng sớm</h2>
           <p>
-            Lấy danh sách trứng đang ấp đủ điều kiện từ backend và duyệt giảm
-            3 ngày cho từng quả.
+            Rút ngắn thời gian chờ cho các trứng đủ điều kiện, mỗi lần duyệt sẽ
+            giảm 3 ngày cho 1 quả trứng.
           </p>
         </div>
         <button
@@ -158,21 +158,6 @@ export function AdminEarlyHatchPanel({
           <FaRotateRight aria-hidden="true" />
           {isBusy ? "Đang tải" : "Làm mới"}
         </button>
-      </div>
-
-      <div className="admin-early-hatch-rules">
-        <strong>Quy tắc duyệt sớm:</strong>
-        <ul>
-          <li>
-            Chỉ hiển thị trứng đang ấp của đơn nhiều sản phẩm/số lượng lớn và
-            khách còn tín dụng duyệt sớm.
-          </li>
-          <li>Mỗi lần duyệt trừ 1 tín dụng và giảm thời gian ấp 3 ngày.</li>
-          <li>
-            Nếu thời gian nở mới nhỏ hơn hoặc bằng hiện tại, backend sẽ chuyển
-            trứng sang READY_TO_CLAIM.
-          </li>
-        </ul>
       </div>
 
       {error ? <p className="admin-error">{error}</p> : null}

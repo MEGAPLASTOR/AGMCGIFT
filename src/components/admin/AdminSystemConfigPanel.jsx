@@ -152,10 +152,9 @@ export function AdminSystemConfigPanel({
       <div className="admin-panel__head">
         <div>
           <span>Cấu hình khóa tài khoản</span>
-          <h2>System Configs</h2>
+          <h2>Cấu hình hệ thống</h2>
           <p>
-            Điều chỉnh luật `WARNING`, `TEMP_BANNED`, `BANNED` theo cấu hình backend
-            mới đã launch.
+            Điều chỉnh quy tắc cảnh báo, tạm khóa và khóa hẳn cho khách hàng.
           </p>
         </div>
 
@@ -222,8 +221,8 @@ export function AdminSystemConfigPanel({
             value={formValues.permanentBan}
             onChange={(event) => updateField("permanentBan", event.target.value)}
           >
-            <option value="false">false - giữ ở TEMP_BANNED</option>
-            <option value="true">true - chuyển sang BANNED</option>
+            <option value="false">false - chỉ tạm khóa</option>
+            <option value="true">true - có thể khóa hẳn</option>
           </select>
         </label>
       </div>

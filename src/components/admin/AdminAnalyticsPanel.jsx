@@ -626,7 +626,6 @@ export function AdminAnalyticsPanel({
           .includes(normalizedOrderSearch)
       )
     : latestOrders;
-
   if (!dashboard || !analytics) {
     return null;
   }

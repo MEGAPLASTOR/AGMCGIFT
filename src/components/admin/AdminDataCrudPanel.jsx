@@ -36,6 +36,7 @@ import { AdminEggTablePanel } from "./AdminEggTablePanel";
 import { AdminGiftPoolDragPanel } from "./AdminGiftPoolDragPanel";
 import { AdminModalPortal } from "./AdminModalPortal";
 import { AdminGiftPoolTablePanel } from "./AdminGiftPoolTablePanel";
+import { AdminPageGuide } from "./AdminPageGuide";
 import { AdminProductTablePanel } from "./AdminProductTablePanel";
 import {
   CUSTOMER_STATUS,
@@ -1719,7 +1720,19 @@ export function AdminDataCrudPanel({
 
       {isGiftAccountsTable ? (
         <>
-          <AccountExcelGuide onDownloadTemplate={downloadAccountTemplate} />
+          <AdminPageGuide
+            action={
+              <button
+                type="button"
+                className="admin-light-button"
+                onClick={downloadAccountTemplate}
+              >
+                <FaDownload aria-hidden="true" />
+                Tải file Excel mẫu
+              </button>
+            }
+            pageKey="accounts"
+          />
           <div className="admin-account-toolbar">
             <label className="admin-account-search">
               <span>Tìm kiếm</span>

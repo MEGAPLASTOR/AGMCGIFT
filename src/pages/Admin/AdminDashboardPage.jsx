@@ -23,6 +23,7 @@ import { AdminAnalyticsPanel } from "../../components/admin/AdminAnalyticsPanel"
 import { AdminDataCrudPanel } from "../../components/admin/AdminDataCrudPanel";
 import { AdminEarlyHatchPanel } from "../../components/admin/AdminEarlyHatchPanel";
 import { AdminLoginPanel } from "../../components/admin/AdminLoginPanel";
+import { AdminPageGuide } from "../../components/admin/AdminPageGuide";
 import { AdminPasswordPanel } from "../../components/admin/AdminPasswordPanel";
 import { AdminSystemConfigPanel } from "../../components/admin/AdminSystemConfigPanel";
 import { showAdminAlert } from "../../services/adminBrowserFeedback";
@@ -91,7 +92,7 @@ const MANAGEMENT_PAGES = [
     icon: FaLink,
     label: "Mapping trứng",
     title: "Quản lý mapping trứng",
-    description: "Liên kết sản phẩm AGMC với loại trứng và bể quà phát thưởng.",
+    description: "Nối sản phẩm với loại trứng và bể quà tương ứng.",
   },
   {
     slug: "customers",
@@ -99,15 +100,15 @@ const MANAGEMENT_PAGES = [
     icon: FaUserGroup,
     label: "Khách hàng",
     title: "Quản lý khách hàng",
-    description: "Theo dõi trạng thái, chuỗi VIP, số lần hoàn/hủy, cảnh báo và thời điểm mở khóa.",
+    description: "Theo dõi trạng thái, số lần hoàn/hủy, cảnh báo và thời điểm mở khóa.",
   },
   {
     slug: "system-configs",
     icon: FaCircleInfo,
     label: "Cấu hình",
     title: "Cấu hình hệ thống",
-    description: "Cập nhật `BAN_DAY` và `PERMANENT_BAN` theo route admin mới.",
-    badgeLabel: "CFG",
+    description: "Chỉnh số ngày tạm khóa và bật hoặc tắt khóa hẳn.",
+    badgeLabel: "LUẬT",
     isCustom: true,
   },
   {
@@ -116,15 +117,15 @@ const MANAGEMENT_PAGES = [
     icon: FaEgg,
     label: "Trứng",
     title: "Quản lý trứng",
-    description: "Kiểm tra loại trứng, trạng thái ấp, thời gian mở và tài khoản được cấp.",
+    description: "Kiểm tra loại trứng, trạng thái chờ mở và thời gian nhận thưởng.",
   },
   {
     slug: "early-hatch",
     icon: FaBolt,
     label: "Duyệt sớm",
     title: "Duyệt Trứng Sớm",
-    description: "Duyệt giảm 3 ngày ấp cho trứng đủ điều kiện.",
-    badgeLabel: "API",
+    description: "Rút ngắn 3 ngày chờ cho các trứng đủ điều kiện.",
+    badgeLabel: "SỚM",
     isCustom: true,
   },
   {
@@ -133,7 +134,7 @@ const MANAGEMENT_PAGES = [
     icon: FaCube,
     label: "Sản phẩm",
     title: "Quản lý sản phẩm",
-    description: "Xem sản phẩm đã đồng bộ từ hệ thống AGMC và đối chiếu mapping phát trứng.",
+    description: "Xem danh sách sản phẩm và phần quà đang gắn với từng sản phẩm.",
   },
   {
     slug: "orders",
@@ -141,7 +142,7 @@ const MANAGEMENT_PAGES = [
     icon: FaCartShopping,
     label: "Đơn hàng",
     title: "Quản lý đơn hàng",
-    description: "Kiểm tra đơn hàng gift code, trạng thái thanh toán, giao hàng và điều kiện nhận quà.",
+    description: "Kiểm tra tình trạng đơn và xem đơn đã đủ điều kiện nhận quà hay chưa.",
   },
 ].filter((page) => page.slug !== "egg-mappings");
 
@@ -308,32 +309,32 @@ export default function AdminDashboardPage() {
     {
       label: "Tổng đơn gift code",
       value: dashboard.summary.totalOrders,
-      note: "đơn đã tải",
+      note: "đang có trong hệ thống",
       tone: "blue",
     },
     {
       label: "Đơn Paid",
       value: dashboard.summary.paidOrders,
-      note: "được nhập mã",
+      note: "đủ điều kiện",
       tone: "green",
     },
     {
       label: "Đơn bị chặn",
       value: dashboard.summary.blockedOrders,
-      note: "Pending / Cancel",
+      note: "chờ hoặc không hợp lệ",
       tone: "red",
     },
     {
       label: "Doanh thu Paid",
       value: formatCurrency(dashboard.summary.totalRevenue),
       rawValue: dashboard.summary.totalRevenue,
-      note: "financial_status paid",
+      note: "đã thanh toán",
       tone: "gold",
     },
     {
       label: "Sản phẩm",
       value: dashboard.summary.totalProducts,
-      note: "sản phẩm đã tải",
+      note: "đang có trong danh sách",
       tone: "blue",
     },
     {
@@ -345,13 +346,13 @@ export default function AdminDashboardPage() {
     {
       label: "Trứng đang ấp",
       value: dashboard.summary.hatchingEggs,
-      note: "status incubating",
+      note: "đang chờ mở",
       tone: "purple",
     },
     {
-      label: "Acc available",
+      label: "Acc còn kho",
       value: dashboard.summary.availableAccounts,
-      note: `${dashboard.summary.totalAccounts} total`,
+      note: `${dashboard.summary.totalAccounts} toàn bộ`,
       tone: "green",
     },
   ].filter((metric) => hasMetricValue(metric.rawValue ?? metric.value));
@@ -754,17 +755,6 @@ export default function AdminDashboardPage() {
           <span>{activePageDescription}</span>
         </div>
 
-        <div className="admin-header__utility">
-          <div className="admin-header__profile">
-            <div className="admin-header__identity">
-              <strong>{admin.full_name}</strong>
-              <small>
-                @{admin.username} / {admin.role}
-              </small>
-            </div>
-          </div>
-        </div>
-
         <div className="admin-header__actions">
           <span
             className={`admin-header__status${
@@ -856,6 +846,77 @@ export default function AdminDashboardPage() {
             tableCounts={adminTables.tableCounts}
             onNavigate={handleAdminNavNavigate}
           />
+
+          <div className="admin-sidebar__footer">
+            <div className="admin-header__profile admin-sidebar__profile">
+              <div className="admin-header__identity">
+                <strong>{admin.full_name}</strong>
+                <small>
+                  @{admin.username} / {admin.role}
+                </small>
+              </div>
+            </div>
+
+            <div className="admin-header__action-buttons admin-sidebar__action-buttons">
+              <button
+                type="button"
+                className="admin-light-button"
+                aria-label={
+                  adminTables.isLoadingRawData
+                    ? "\u0110ang t\u1ea3i d\u1eef li\u1ec7u"
+                    : "T\u1ea3i l\u1ea1i d\u1eef li\u1ec7u"
+                }
+                data-label={
+                  adminTables.isLoadingRawData
+                    ? "\u0110ang t\u1ea3i d\u1eef li\u1ec7u"
+                    : "T\u1ea3i l\u1ea1i d\u1eef li\u1ec7u"
+                }
+                disabled={adminTables.isLoadingRawData}
+                onClick={handleReloadRawData}
+              >
+                <FaRotateRight aria-hidden="true" />
+                {adminTables.isLoadingRawData ? "Äang táº£i dá»¯ liá»‡u" : "Táº£i láº¡i dá»¯ liá»‡u"}
+              </button>
+              <button
+                type="button"
+                className="admin-light-button"
+                aria-label={
+                  isSyncingProducts
+                    ? "\u0110ang \u0111\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m"
+                    : "\u0110\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m"
+                }
+                data-label={
+                  isSyncingProducts
+                    ? "\u0110ang \u0111\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m"
+                    : "\u0110\u1ed3ng b\u1ed9 s\u1ea3n ph\u1ea9m"
+                }
+                disabled={isSyncingProducts || adminTables.isLoadingRawData}
+                onClick={handleSyncProducts}
+              >
+                <FaBoxesStacked aria-hidden="true" />
+                {isSyncingProducts ? "Äang Ä‘á»“ng bá»™ sáº£n pháº©m" : "Äá»“ng bá»™ sáº£n pháº©m"}
+              </button>
+              <button
+                type="button"
+                className="admin-light-button"
+                aria-label={"\u0110\u1ed5i m\u1eadt kh\u1ea9u"}
+                data-label={"\u0110\u1ed5i m\u1eadt kh\u1ea9u"}
+                onClick={() => setPasswordModalOpen(true)}
+              >
+                <FaKey aria-hidden="true" />
+                Äá»•i máº­t kháº©u
+              </button>
+              <button
+                type="button"
+                aria-label={"\u0110\u0103ng xu\u1ea5t"}
+                data-label={"\u0110\u0103ng xu\u1ea5t"}
+                onClick={logout}
+              >
+                <FaRightFromBracket aria-hidden="true" />
+                ÄÄƒng xuáº¥t
+              </button>
+            </div>
+          </div>
         </aside>
 
         {!isNavCollapsed ? (
@@ -868,6 +929,10 @@ export default function AdminDashboardPage() {
         ) : null}
 
         <div className="admin-shell__content">
+          {isOverviewPage || activeManagementPage.slug !== "accounts" ? (
+            <AdminPageGuide pageKey={isOverviewPage ? "overview" : activeManagementPage.slug} />
+          ) : null}
+
           {isOverviewPage ? (
             <AdminAnalyticsPanel
               dashboard={dashboard}

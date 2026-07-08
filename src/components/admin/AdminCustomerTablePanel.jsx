@@ -384,7 +384,7 @@ export function AdminCustomerTablePanel({
         <div>
           <h2>Kiểm soát khách hàng gian lận</h2>
           <p>
-            Cập nhật cảnh báo, khóa tạm hoặc ban vĩnh viễn theo dữ liệu trả về từ API.
+            Cập nhật cảnh báo, tạm khóa hoặc khóa hẳn dựa trên tình trạng hiện tại của khách hàng.
           </p>
         </div>
         <div className="admin-fraud-stats" aria-label="Thống kê khách hàng">
@@ -657,8 +657,7 @@ export function AdminCustomerTablePanel({
             </div>
 
             <p className="admin-customer-form__note">
-              `returnCount` và `warningCount` là dữ liệu tích lũy từ backend, chỉ xem
-              và không chỉnh tay ở đây.
+              Tổng hoàn/hủy và tổng cảnh báo chỉ để theo dõi, không sửa trực tiếp ở đây.
             </p>
 
             <div className="admin-customer-modal__actions">
