@@ -81,7 +81,7 @@ export function RewardChoicePage({
           <span className="reward-egg-card__content">
             <span>
               <strong>
-                {instantNeedsIncubation ? "Trứng vàng đang cooldown" : "Trứng thường"}
+                {instantNeedsIncubation ? "Trứng vàng" : "Trứng thường"}
               </strong>
               <span>{instantDescription}</span>
             </span>
