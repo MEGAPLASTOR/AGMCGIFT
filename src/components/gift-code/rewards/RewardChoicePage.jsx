@@ -27,7 +27,7 @@ export function RewardChoicePage({
   const instantActionLabel = instantOpened
     ? "Xem acc"
     : instantNeedsIncubation
-      ? "Đang chờ mở"
+      ? "Warning"
       : isClaiming
         ? "Đang mở..."
         : "Mở trứng";
