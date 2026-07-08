@@ -69,10 +69,10 @@ export function InstantRewardPage({
         ))}
       </div>
 
-      <p className="panel-note">
+      {/* <p className="panel-note">
         Thời gian đổi:{" "}
         {new Date(redemptionInfo.redeemedAt).toLocaleString("vi-VN")}
-      </p>
+      </p> */}
 
       <button type="button" onClick={onReset}>
         {backLabel}
