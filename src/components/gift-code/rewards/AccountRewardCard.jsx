@@ -71,7 +71,6 @@ export function AccountRewardCard({
   const displayTier = tier || "E";
   const platform = String(accountInfo.platform || "").trim();
   const note = accountInfo.ghiChu || accountInfo.message;
-  const successMessage = note || "Chúc mừng! Bạn đã mở trứng thành công.";
   const rows = buildRows(note, username, password, token);
 
   const handleCopy = async (label, value) => {
@@ -102,8 +101,6 @@ export function AccountRewardCard({
         {displayTier}
       </span>
 
-      <div className="tier-reward__banner">{successMessage}</div>
-
       <div className="tier-reward__hero">
         <div className="tier-reward__identity">
           <span className="tier-reward__seal" aria-hidden="true">
@@ -123,6 +120,7 @@ export function AccountRewardCard({
         {rows.map((row) => (
           <div
             key={row.key}
+            data-field={row.key}
             className={`tier-reward__field${
               row.full ? " tier-reward__field--full" : ""
             }`}

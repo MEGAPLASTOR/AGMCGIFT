@@ -1558,7 +1558,7 @@ input::placeholder {
 
 .tier-reward-list {
   display: grid;
-  gap: 28px;
+  gap: 20px;
 }
 
 .tier-reward {
@@ -1578,9 +1578,9 @@ input::placeholder {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 680px;
+  min-height: 560px;
   border: 2px solid var(--tier-line);
-  border-radius: 34px;
+  border-radius: 28px;
   background:
     radial-gradient(circle at 50% 21%, var(--tier-glow) 0 12%, transparent 33%),
     radial-gradient(circle at 12% 84%, rgba(255, 255, 255, 0.14), transparent 25%),
@@ -1591,13 +1591,13 @@ input::placeholder {
     inset 0 0 70px rgba(255, 255, 255, 0.05),
     0 28px 80px -44px var(--tier-glow);
   color: var(--tier-ink);
-  padding: clamp(18px, 2.8vw, 36px);
+  padding: clamp(16px, 2.2vw, 28px);
 }
 
 .tier-reward::before {
   content: "";
   position: absolute;
-  inset: 46px 38px 58px;
+  inset: 38px 26px 48px;
   z-index: 0;
   border: 1px solid var(--tier-line-soft);
   border-radius: 18px;
@@ -1614,11 +1614,11 @@ input::placeholder {
   content: attr(data-tier);
   position: absolute;
   left: 50%;
-  bottom: 19px;
+  bottom: 14px;
   z-index: 3;
   display: grid;
-  width: 78px;
-  height: 78px;
+  width: 64px;
+  height: 64px;
   place-items: center;
   border: 2px solid var(--tier-line);
   border-radius: 50%;
@@ -1628,55 +1628,34 @@ input::placeholder {
     var(--tier-chip);
   color: var(--tier-title);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 42px;
+  font-size: 34px;
   font-weight: 900;
   line-height: 1;
   text-shadow: 0 0 18px var(--tier-glow);
   transform: translateX(-50%);
   box-shadow:
-    0 0 0 8px rgba(255, 255, 255, 0.08),
+    0 0 0 6px rgba(255, 255, 255, 0.08),
     0 0 34px -7px var(--tier-glow);
-}
-
-.tier-reward__banner {
-  position: relative;
-  z-index: 4;
-  width: min(82%, 1120px);
-  margin: 0 auto;
-  border: 2px solid var(--tier-line);
-  border-radius: 18px;
-  background:
-    radial-gradient(circle at 84% 22%, rgba(255, 255, 255, 0.5), transparent 24%),
-    linear-gradient(135deg, rgba(255, 254, 242, 0.96), rgba(252, 231, 179, 0.92));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.82),
-    0 0 28px -8px var(--tier-glow),
-    0 18px 34px -28px #000;
-  color: var(--tier-ink);
-  font-size: clamp(18px, 2vw, 31px);
-  font-weight: 1000;
-  line-height: 1.25;
-  padding: 24px clamp(22px, 4vw, 64px);
 }
 
 .tier-reward__art {
   position: absolute;
-  inset: 108px 0 auto;
+  inset: 84px 0 auto;
   z-index: 1;
-  height: 310px;
+  height: 248px;
   pointer-events: none;
 }
 
 .tier-reward {
-  --tier-orb-size: clamp(132px, 16vw, 210px);
+  --tier-orb-size: clamp(116px, 13vw, 176px);
 }
 
 .tier-reward__aura {
   position: absolute;
-  top: 40px;
+  top: 24px;
   left: 50%;
-  width: min(112%, 1220px);
-  height: 260px;
+  width: min(110%, 980px);
+  height: 210px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.5) 0 4%, transparent 15%),
@@ -1694,7 +1673,7 @@ input::placeholder {
   position: absolute;
   top: 0;
   width: 52%;
-  height: 236px;
+  height: 182px;
   filter: drop-shadow(0 22px 22px var(--tier-glow));
   opacity: 0.98;
 }
@@ -1767,15 +1746,15 @@ input::placeholder {
 }
 
 .tier-reward__crest::before {
-  top: -18px;
-  width: 42px;
-  height: 42px;
+  top: -14px;
+  width: 34px;
+  height: 34px;
 }
 
 .tier-reward__crest::after {
-  bottom: -22px;
-  width: 48px;
-  height: 48px;
+  bottom: -18px;
+  width: 40px;
+  height: 40px;
 }
 
 .tier-reward__tier-mark {
@@ -1789,14 +1768,14 @@ input::placeholder {
   place-items: center;
   color: var(--tier-title);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(82px, 11vw, 148px);
+  font-size: clamp(66px, 9vw, 118px);
   font-weight: 900;
   line-height: 1;
   text-shadow:
     0 0 18px #fff,
     0 0 40px var(--tier-glow),
     0 0 74px var(--tier-glow);
-  transform: translateX(-50%) translateY(0.03em);
+  transform: translateX(-50%) translateY(0.68em);
 }
 
 .tier-reward__hero {
@@ -1804,32 +1783,32 @@ input::placeholder {
   z-index: 4;
   display: flex;
   align-items: center;
-  min-height: 210px;
-  margin-top: 98px;
-  padding: 34px clamp(18px, 6vw, 88px) 10px;
+  min-height: 150px;
+  margin-top: 76px;
+  padding: 20px clamp(12px, 4vw, 54px) 8px;
 }
 
 .tier-reward__identity {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
   min-width: 0;
 }
 
 .tier-reward__seal {
   display: grid;
   flex: 0 0 auto;
-  width: 90px;
-  height: 90px;
+  width: 66px;
+  height: 66px;
   place-items: center;
   border: 2px solid var(--tier-line);
-  border-radius: 24px;
+  border-radius: 18px;
   background:
     radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.78), transparent 20%),
     var(--tier-chip);
   color: var(--tier-title);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 54px;
+  font-size: 38px;
   font-weight: 900;
   text-shadow: 0 0 18px var(--tier-glow);
   box-shadow: 0 0 34px -10px var(--tier-glow);
@@ -1837,24 +1816,24 @@ input::placeholder {
 
 .tier-reward__summary {
   display: grid;
-  gap: 9px;
+  gap: 6px;
   min-width: 0;
 }
 
 .tier-reward__summary > span {
   color: rgba(255, 255, 255, 0.9);
-  font-size: clamp(14px, 1.4vw, 20px);
+  font-size: clamp(12px, 1vw, 16px);
   font-weight: 1000;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .tier-reward__summary strong {
   overflow-wrap: anywhere;
   color: var(--tier-title);
-  font-size: clamp(32px, 4vw, 52px);
+  font-size: clamp(24px, 2.8vw, 40px);
   font-weight: 1000;
-  text-shadow: 0 14px 32px rgba(0, 0, 0, 0.48);
+  text-shadow: 0 10px 24px rgba(0, 0, 0, 0.48);
 }
 
 .tier-reward__platform {
@@ -1864,11 +1843,11 @@ input::placeholder {
   border-radius: 999px;
   background: var(--tier-chip);
   color: #fff9e8;
-  font-size: clamp(13px, 1.2vw, 18px);
+  font-size: clamp(11px, 0.9vw, 14px);
   font-style: normal;
   font-weight: 1000;
   letter-spacing: 0.06em;
-  padding: 8px 20px;
+  padding: 6px 16px;
   text-transform: uppercase;
 }
 
@@ -1877,43 +1856,43 @@ input::placeholder {
   z-index: 4;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: 14px;
   margin: 0;
-  padding: 0 clamp(10px, 4vw, 72px) 70px;
+  padding: 0 clamp(8px, 3vw, 42px) 50px;
 }
 
 .tier-reward__field {
   display: grid;
   align-content: start;
-  gap: 16px;
-  min-height: 142px;
+  gap: 12px;
+  min-height: 104px;
   border: 2px solid var(--tier-line);
-  border-radius: 22px;
+  border-radius: 18px;
   background:
     radial-gradient(circle at 82% 25%, rgba(255, 255, 255, 0.62), transparent 24%),
     linear-gradient(135deg, var(--tier-panel), var(--tier-panel-soft));
   box-shadow:
     inset 0 0 0 1px rgba(255, 255, 255, 0.58),
     0 16px 34px -24px var(--tier-glow);
-  padding: 24px 28px;
+  padding: 18px 20px;
 }
 
 .tier-reward__field--full {
   grid-column: 1 / -1;
-  min-height: 166px;
+  min-height: 116px;
 }
 
 .tier-reward__field-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .tier-reward dt {
   margin: 0;
   color: var(--tier-ink);
-  font-size: clamp(13px, 1.2vw, 18px);
+  font-size: clamp(11px, 0.95vw, 15px);
   font-weight: 1000;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1923,25 +1902,36 @@ input::placeholder {
   overflow-wrap: anywhere;
   margin: 0;
   color: #2f2414;
-  font-size: clamp(20px, 2.2vw, 30px);
+  font-size: clamp(17px, 1.7vw, 24px);
   font-weight: 1000;
-  line-height: 1.25;
+  line-height: 1.3;
+}
+
+.tier-reward__field[data-field="token"] dd {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: clamp(14px, 1.2vw, 18px);
+  line-height: 1.45;
+}
+
+.tier-reward__field[data-field="note"] dd {
+  font-size: clamp(16px, 1.45vw, 22px);
+  line-height: 1.35;
 }
 
 .tier-reward__copy {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 42px;
+  min-height: 34px;
   border: 1px solid var(--tier-line);
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(247, 220, 160, 0.88));
   color: var(--tier-ink);
   cursor: pointer;
-  font-size: clamp(12px, 1vw, 16px);
+  font-size: clamp(11px, 0.9vw, 14px);
   font-weight: 1000;
   letter-spacing: 0.04em;
-  padding: 0 22px;
+  padding: 0 18px;
   text-transform: uppercase;
 }
 

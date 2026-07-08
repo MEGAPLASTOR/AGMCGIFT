@@ -12,6 +12,7 @@ import {
 import { ADMIN_ENDPOINTS } from "../api/endpoints/adminEndpoints";
 import { requestJson } from "../api/http/requestJson";
 import { GIFT_CODE_STATUS } from "../constants/giftCodeStatus";
+import { normalizeAdminGiftAccount } from "../services/adminGiftPoolService";
 import { getAdminAuthorizationHeader } from "../services/adminAuthService";
 import {
   addDays,
@@ -100,6 +101,151 @@ function getValidDate(value) {
 
 function normalizeLookupText(value) {
   return String(value ?? "").trim().toUpperCase();
+}
+
+function getAdminGiftAccountRows(payload) {
+  const candidates = [
+    payload?.data?.giftAccounts,
+    payload?.giftAccounts,
+    payload?.data,
+    payload?.data?.items,
+    payload?.data?.content,
+    payload?.data?.records,
+    payload?.items,
+    payload?.content,
+    payload?.records,
+    payload,
+  ];
+
+  return candidates.find((candidate) => Array.isArray(candidate)) || [];
+}
+
+function hasTokenValue(value) {
+  return Boolean(String(value?.token || "").trim());
+}
+
+function mergeAccountDetails(account, fallbackAccount) {
+  const primary = account || {};
+  const fallback = fallbackAccount || {};
+  const username =
+    primary.taiKhoan ||
+    primary.username ||
+    fallback.taiKhoan ||
+    fallback.username ||
+    "";
+  const password =
+    primary.matKhau ||
+    primary.password ||
+    fallback.matKhau ||
+    fallback.password ||
+    "";
+  const token = primary.token || fallback.token || "";
+  const platform = primary.platform || fallback.platform || "";
+  const tier = primary.tier || fallback.tier || "";
+  const note = primary.ghiChu || primary.message || fallback.ghiChu || fallback.message || "";
+
+  if (!username && !password && !token && !platform && !tier && !note) {
+    return null;
+  }
+
+  return {
+    ...fallback,
+    ...primary,
+    tenAcc:
+      primary.tenAcc ||
+      primary.tenPhanThuong ||
+      fallback.tenAcc ||
+      fallback.tenPhanThuong ||
+      fallback.platform ||
+      "Acc Blox Fruit",
+    taiKhoan: username,
+    username,
+    matKhau: password,
+    password,
+    token,
+    platform,
+    tier,
+    ghiChu: note,
+  };
+}
+
+function findMatchingAdminGiftAccount(account, adminAccounts) {
+  const username = normalizeLookupText(account?.taiKhoan || account?.username);
+  const password = normalizeLookupText(account?.matKhau || account?.password);
+  const platform = normalizeLookupText(account?.platform);
+
+  if (!username) {
+    return null;
+  }
+
+  return (
+    adminAccounts.find((item) => {
+      const itemUsername = normalizeLookupText(item.username);
+      const itemPassword = normalizeLookupText(item.password);
+      const itemPlatform = normalizeLookupText(item.platform);
+
+      return (
+        itemUsername === username &&
+        (!password || itemPassword === password) &&
+        (!platform || itemPlatform === platform)
+      );
+    }) ||
+    adminAccounts.find(
+      (item) => normalizeLookupText(item.username) === username
+    ) ||
+    null
+  );
+}
+
+async function enrichAccountsWithAdminTokens(accounts) {
+  const normalizedAccounts = (Array.isArray(accounts) ? accounts : []).filter(Boolean);
+
+  if (!normalizedAccounts.length || normalizedAccounts.every(hasTokenValue)) {
+    return normalizedAccounts;
+  }
+
+  const authHeader = readAdminAuthHeader();
+
+  if (!authHeader) {
+    return normalizedAccounts;
+  }
+
+  try {
+    const payload = await requestJson(ADMIN_ENDPOINTS.giftAccounts, {
+      headers: {
+        Authorization: authHeader,
+      },
+    });
+    const adminAccounts = getAdminGiftAccountRows(payload).map(normalizeAdminGiftAccount);
+
+    return normalizedAccounts.map((account) =>
+      mergeAccountDetails(account, findMatchingAdminGiftAccount(account, adminAccounts))
+    );
+  } catch {
+    return normalizedAccounts;
+  }
+}
+
+async function enrichRewardWithAdminTokens(reward) {
+  if (!reward) {
+    return reward;
+  }
+
+  const baseAccounts = Array.isArray(reward.accounts)
+    ? reward.accounts
+    : reward.account || reward.reward
+      ? [reward.account || reward.reward]
+      : [];
+  const accounts = await enrichAccountsWithAdminTokens(baseAccounts);
+  const primaryAccount = accounts[0] || reward.account || reward.reward || null;
+
+  return {
+    ...reward,
+    token: reward.token || primaryAccount?.token || "",
+    reward: mergeAccountDetails(reward.reward || reward.account, primaryAccount),
+    account: mergeAccountDetails(reward.account || reward.reward, primaryAccount),
+    accounts,
+  };
 }
 
 function readStoredAdminSession() {
@@ -562,7 +708,10 @@ export function useGiftCode(catalogData) {
             : null;
 
       if (existingRedemption) {
-        setRedemptionInfo(existingRedemption);
+        const enrichedRedemption = await enrichRewardWithAdminTokens(existingRedemption);
+
+        saveStoredRedemption(enrichedRedemption);
+        setRedemptionInfo(enrichedRedemption);
         setErrorMsg("");
         setStatus(
           choice === LUA_CHON_NHAN_NGAY
@@ -594,7 +743,9 @@ export function useGiftCode(catalogData) {
           selectedEntry.order.id,
           selectedEgg.eggType
         );
-        const reward = normalizeClaimEggResponse(claimPayload);
+        const reward = await enrichRewardWithAdminTokens(
+          normalizeClaimEggResponse(claimPayload)
+        );
         const newRedemption = createClaimedRedemption(
           selectedEntry,
           selectedEgg,
@@ -635,7 +786,9 @@ export function useGiftCode(catalogData) {
         redemptionInfo.orderId,
         redemptionInfo.eggType
       );
-      const reward = normalizeClaimEggResponse(claimPayload);
+      const reward = await enrichRewardWithAdminTokens(
+        normalizeClaimEggResponse(claimPayload)
+      );
 
       setRedemptionInfo((current) => {
         const nextRedemption = {
