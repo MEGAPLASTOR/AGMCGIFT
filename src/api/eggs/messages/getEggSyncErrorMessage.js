@@ -2,6 +2,7 @@ import { getDeliveryStatusKind } from "../utils/getDeliveryStatusKind";
 import { normalizeApiText } from "../utils/normalizeApiText";
 import {
   CUSTOMER_STATUS,
+  extractCustomerBanInfo,
   extractCustomerState,
 } from "../../../utils/customerStatus";
 
@@ -54,11 +55,13 @@ export function getEggSyncErrorMessage(error) {
     );
   }
 
+  const banInfo = extractCustomerBanInfo(error.payload);
   const customerState = extractCustomerState(error.payload, "");
   const rawCustomerStatus = customerState.rawStatus;
   const customerStatus = customerState.status;
   const customerStatusText = normalizeApiText(rawCustomerStatus);
-  const messageText = normalizeApiText(error.payload?.message || error.message);
+  const backendMessage = error.payload?.message || error.message || "";
+  const messageText = normalizeApiText(backendMessage);
   const orderStatus = normalizeApiText(
     [
       error.payload?.orderStatus,
@@ -82,25 +85,35 @@ export function getEggSyncErrorMessage(error) {
     error.payload?.order?.fulfillment_status;
   const deliveryStatusError =
     rawDeliveryStatus === undefined ? "" : getDeliveryStatusError(rawDeliveryStatus);
-  const unbanAt = customerState.unbanAt;
+  const unbanAt = banInfo?.unbanAt || customerState.unbanAt;
 
   if (
+    banInfo?.type === CUSTOMER_STATUS.TEMP_BANNED ||
     customerStatus === CUSTOMER_STATUS.TEMP_BANNED ||
     customerStatusText.includes("temp_banned")
   ) {
+    if (banInfo?.message) {
+      return banInfo.message;
+    }
+
     const formattedUnbanAt = formatDateTime(unbanAt);
 
     return formattedUnbanAt
-      ? `Tài khoản đang bị tạm khóa đến ${formattedUnbanAt}. Vui lòng quay lại sau mốc này.`
-      : "Tài khoản đang bị tạm khóa. Vui lòng quay lại sau khi hết thời gian khóa.";
+      ? `Tài khoản đang bị khóa tạm thời đến ${formattedUnbanAt}. Vui lòng quay lại sau mốc này.`
+      : "Tài khoản đang bị khóa tạm thời. Vui lòng quay lại sau khi hết thời gian khóa.";
   }
 
   if (
+    banInfo?.type === CUSTOMER_STATUS.BANNED ||
     customerStatus === CUSTOMER_STATUS.BANNED ||
     customerStatusText.includes("banned") ||
     (customerStatusText.includes("ban") && !customerStatusText.includes("temp"))
   ) {
-    return "Tài khoản đã bị khóa vĩnh viễn do vi phạm chính sách.";
+    return (
+      banInfo?.message ||
+      backendMessage ||
+      "Tài khoản đã bị khóa vĩnh viễn do vi phạm chính sách."
+    );
   }
 
   if (deliveryStatusError) {

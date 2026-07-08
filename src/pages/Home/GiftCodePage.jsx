@@ -213,9 +213,8 @@ export default function GiftCodePage() {
               </div>
 
               <p className="message message--warning">
-                {
-                  "B\u1ea1n ch\u01b0a th\u1ec3 m\u1edf qu\u00e0 l\u00fac n\u00e0y. Khi \u0111\u1ebfm ng\u01b0\u1ee3c v\u1ec1 0, h\u00e3y ki\u1ec3m tra l\u1ea1i \u0111\u1ec3 \u0111\u01b0\u1ee3c g\u1ee1 ban."
-                }
+                {banInfo?.message ||
+                  "B\u1ea1n ch\u01b0a th\u1ec3 m\u1edf qu\u00e0 l\u00fac n\u00e0y. Khi \u0111\u1ebfm ng\u01b0\u1ee3c v\u1ec1 0, h\u00e3y ki\u1ec3m tra l\u1ea1i \u0111\u1ec3 \u0111\u01b0\u1ee3c g\u1ee1 ban."}
               </p>
 
               {banInfo?.unbanAt ? (
@@ -259,9 +258,8 @@ export default function GiftCodePage() {
               </div>
 
               <p className="message message--error">
-                {
-                  "T\u00e0i kho\u1ea3n n\u00e0y b\u1ecb kh\u00f3a v\u0129nh vi\u1ec5n, kh\u00f4ng th\u1ec3 t\u1ef1 m\u1edf l\u1ea1i tr\u00ean trang client."
-                }
+                {banInfo?.message ||
+                  "T\u00e0i kho\u1ea3n n\u00e0y b\u1ecb kh\u00f3a v\u0129nh vi\u1ec5n, kh\u00f4ng th\u1ec3 t\u1ef1 m\u1edf l\u1ea1i tr\u00ean trang client."}
               </p>
               <p className="panel-note">
                 {
