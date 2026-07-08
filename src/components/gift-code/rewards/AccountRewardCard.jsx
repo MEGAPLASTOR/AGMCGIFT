@@ -66,8 +66,10 @@ export function AccountRewardCard({
   const username = accountInfo.taiKhoan || accountInfo.username;
   const password = accountInfo.matKhau || accountInfo.password;
   const tier = normalizeTier(accountInfo.tier);
+  const displayTier = tier || "E";
   const platform = String(accountInfo.platform || "").trim();
   const note = accountInfo.ghiChu || accountInfo.message;
+  const successMessage = note || "Chúc mừng! Bạn đã mở trứng thành công.";
   const rows = buildRows(note, username, password);
 
   const handleCopy = async (label, value) => {
@@ -82,11 +84,7 @@ export function AccountRewardCard({
   };
 
   return (
-    <div
-      className={`account-reward${
-        tier ? ` account-reward--${tier.toLowerCase()}` : ""
-      }`}
-    >
+    <div className={`account-reward account-reward--${displayTier.toLowerCase()}`}>
       <span className="account-reward__ornament" aria-hidden="true">
         <span className="account-reward__aura" />
         <span className="account-reward__wings">
@@ -95,11 +93,16 @@ export function AccountRewardCard({
         </span>
         <span className="account-reward__crest" />
       </span>
+      <span className="account-reward__tier-mark" aria-hidden="true">
+        {displayTier}
+      </span>
+
+      <div className="account-reward__banner">{successMessage}</div>
 
       <div className="account-reward__head">
         <div className="account-reward__identity">
           <span className="account-reward__icon" aria-hidden="true">
-            OK
+            {displayTier}
           </span>
           <div className="account-reward__summary">
             <span>{title}</span>
