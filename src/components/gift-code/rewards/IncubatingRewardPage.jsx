@@ -86,7 +86,7 @@ export function IncubatingRewardPage({
                 Có {redemptionInfo.stuckCount} trứng chưa mở được do thiếu tài khoản trong pool hoặc chưa có pool liên kết.
               </p>
             ) : null}
-            <div className="account-reward-list">
+            <div className="tier-reward-list">
               {accounts.map((account, index) => (
                 <AccountRewardCard
                   key={`${account.taiKhoan || account.username || "reward"}-${index}`}

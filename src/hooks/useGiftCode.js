@@ -9,7 +9,10 @@ import {
   normalizeSyncEggResponse,
   syncEggsByOrderCode,
 } from "../api/eggs";
+import { ADMIN_ENDPOINTS } from "../api/endpoints/adminEndpoints";
+import { requestJson } from "../api/http/requestJson";
 import { GIFT_CODE_STATUS } from "../constants/giftCodeStatus";
+import { getAdminAuthorizationHeader } from "../services/adminAuthService";
 import {
   addDays,
   getDelayedRewardInfo,
@@ -25,6 +28,7 @@ import {
 const LUA_CHON_NHAN_NGAY = EGG_CHOICES.instant;
 const LUA_CHON_CHO_NHAN_THUONG_XIN = EGG_CHOICES.delayed;
 const CLAIMED_REWARDS_STORAGE_KEY = "agmcGiftClaimedRewards";
+const ADMIN_SESSION_STORAGE_KEY = "agmc_admin_session";
 
 function hasRewardPayload(value) {
   return Boolean(
@@ -92,6 +96,69 @@ function getValidDate(value) {
   const date = new Date(value);
 
   return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function normalizeLookupText(value) {
+  return String(value ?? "").trim().toUpperCase();
+}
+
+function readStoredAdminSession() {
+  if (typeof window === "undefined") return null;
+
+  try {
+    return JSON.parse(window.sessionStorage.getItem(ADMIN_SESSION_STORAGE_KEY) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function readAdminAuthHeader() {
+  const session = readStoredAdminSession();
+  return getAdminAuthorizationHeader(session).Authorization || "";
+}
+
+function getAdminCustomerRows(payload) {
+  const candidates = [
+    payload?.data?.customers,
+    payload?.customers,
+    payload?.data,
+    payload?.data?.items,
+    payload?.data?.content,
+    payload?.data?.records,
+    payload?.items,
+    payload?.content,
+    payload?.records,
+    payload,
+  ];
+
+  return candidates.find((candidate) => Array.isArray(candidate)) || [];
+}
+
+async function fetchAdminCustomerBanInfo(customerCode) {
+  const normalizedCustomerCode = normalizeLookupText(customerCode);
+  const authHeader = readAdminAuthHeader();
+
+  if (!normalizedCustomerCode || !authHeader) {
+    return null;
+  }
+
+  try {
+    const payload = await requestJson(ADMIN_ENDPOINTS.customers, {
+      headers: {
+        Authorization: authHeader,
+      },
+    });
+    const matchedCustomer = getAdminCustomerRows(payload).find(
+      (customer) =>
+        normalizeLookupText(
+          customer?.customerCode || customer?.customer_code || customer?.code
+        ) === normalizedCustomerCode
+    );
+
+    return extractCustomerBanInfo(matchedCustomer);
+  } catch {
+    return null;
+  }
 }
 
 function getEggReadyInfo(egg, fallbackDays) {
@@ -389,13 +456,33 @@ export function useGiftCode(catalogData) {
         const unbanAt = matchedEntry.order.unbanAt;
 
         if (isTempBannedCustomerStatus(customerStatus)) {
+          setSelectedEntry(matchedEntry);
           setBanInfo({ type: CUSTOMER_STATUS.TEMP_BANNED, unbanAt });
           setStatus(GIFT_CODE_STATUS.tempBanned);
           return;
         }
 
         if (isPermanentlyBannedCustomerStatus(customerStatus)) {
+          setSelectedEntry(matchedEntry);
           setBanInfo({ type: CUSTOMER_STATUS.BANNED, unbanAt: null });
+          setStatus(GIFT_CODE_STATUS.banned);
+          return;
+        }
+
+        const adminBanInfo = await fetchAdminCustomerBanInfo(
+          matchedEntry.order.customerCode
+        );
+
+        if (adminBanInfo?.type === CUSTOMER_STATUS.TEMP_BANNED) {
+          setSelectedEntry(matchedEntry);
+          setBanInfo(adminBanInfo);
+          setStatus(GIFT_CODE_STATUS.tempBanned);
+          return;
+        }
+
+        if (adminBanInfo?.type === CUSTOMER_STATUS.BANNED) {
+          setSelectedEntry(matchedEntry);
+          setBanInfo(adminBanInfo);
           setStatus(GIFT_CODE_STATUS.banned);
           return;
         }

@@ -84,7 +84,10 @@ export function AccountRewardCard({
   };
 
   return (
-    <div className={`tier-reward tier-reward--${displayTier.toLowerCase()}`}>
+    <div
+      className={`tier-reward tier-reward--${displayTier.toLowerCase()}`}
+      data-tier={displayTier}
+    >
       <span className="tier-reward__art" aria-hidden="true">
         <span className="tier-reward__aura" />
         <span className="tier-reward__wings">

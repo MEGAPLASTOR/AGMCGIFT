@@ -157,76 +157,88 @@
 
   .code-form,
   .reward-egg-grid,
-  .account-reward__grid {
+  .tier-reward__grid {
     grid-template-columns: 1fr;
   }
 
-  .account-reward {
-    min-height: 500px;
+  .tier-reward {
+    min-height: 620px;
     border-radius: 24px;
-    padding: 18px 14px 14px;
+    padding: 14px;
   }
 
-  .account-reward__banner {
+  .tier-reward::before {
+    inset: 36px 14px 54px;
+  }
+
+  .tier-reward::after {
+    width: 58px;
+    height: 58px;
+    font-size: 32px;
+  }
+
+  .tier-reward__banner {
+    width: 100%;
     border-radius: 14px;
     font-size: 18px;
     padding: 16px 14px;
   }
 
-  .account-reward__tier-mark {
-    top: 124px;
+  .tier-reward__art {
+    top: 92px;
+    height: 220px;
+  }
+
+  .tier-reward__aura {
+    width: min(116%, 520px);
+    height: 170px;
+  }
+
+  .tier-reward__wings {
+    top: 54px;
+    width: min(170%, 720px);
+    height: 160px;
+  }
+
+  .tier-reward__wing {
+    height: 148px;
+  }
+
+  .tier-reward__crest {
     width: 112px;
     height: 112px;
-    font-size: 82px;
   }
 
-  .account-reward__ornament {
-    top: 88px;
-    height: 182px;
+  .tier-reward__tier-mark {
+    top: 177px;
+    font-size: 88px;
   }
 
-  .account-reward__aura {
-    width: min(112%, 440px);
-    height: 132px;
+  .tier-reward__hero {
+    min-height: 210px;
+    margin-top: 84px;
+    padding: 28px 10px 8px;
   }
 
-  .account-reward__wings {
-    top: 14px;
-    width: min(138%, 660px);
-    height: 150px;
-  }
-
-  .account-reward__wing {
-    top: 10px;
-    height: 128px;
-  }
-
-  .account-reward__crest {
-    top: 44px;
-    width: 72px;
-    height: 76px;
-  }
-
-  .account-reward::after {
-    top: 18px;
-    width: 44px;
-    height: 44px;
-  }
-
-  .account-reward__head,
-  .account-reward__identity {
+  .tier-reward__identity {
     align-items: flex-start;
   }
 
-  .account-reward__head {
-    margin-top: 98px;
-  }
-
-  .account-reward__icon {
+  .tier-reward__seal {
     width: 58px;
     height: 58px;
     border-radius: 14px;
     font-size: 30px;
+  }
+
+  .tier-reward__grid {
+    gap: 12px;
+    padding: 0 0 60px;
+  }
+
+  .tier-reward__field {
+    min-height: 118px;
+    padding: 16px;
   }
 
   .reward-egg-card {

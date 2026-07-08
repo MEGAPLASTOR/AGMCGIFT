@@ -59,7 +59,7 @@ export function InstantRewardPage({
         </p>
       ) : null}
 
-      <div className="account-reward-list">
+      <div className="tier-reward-list">
         {accounts.map((account, index) => (
           <AccountRewardCard
             key={`${account.taiKhoan || account.username || "reward"}-${index}`}

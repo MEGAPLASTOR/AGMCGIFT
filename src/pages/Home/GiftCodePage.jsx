@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { AdminModalPortal } from "../../components/admin/AdminModalPortal";
 import { GiftCodeEntryPanel } from "../../components/gift-code/forms/GiftCodeEntryPanel";
 import { GiftPageDecorations } from "../../components/gift-code/layout/GiftPageDecorations";
 import { GiftTopbar } from "../../components/gift-code/layout/GiftTopbar";
@@ -22,6 +23,7 @@ const SCROLL_TOP_GAP = 120;
 export default function GiftCodePage() {
   const [inputValue, setInputValue] = useState("");
   const [selectedStageEgg, setSelectedStageEgg] = useState(null);
+  const [isConfirmModalOpen, setConfirmModalOpen] = useState(false);
   const codeEntryRef = useRef(null);
   const actionSectionRef = useRef(null);
 
@@ -47,17 +49,30 @@ export default function GiftCodePage() {
 
   const handleCheck = async (event) => {
     event?.preventDefault();
+
+    if (!inputValue.trim()) {
+      await checkCode(inputValue);
+      return;
+    }
+
+    setConfirmModalOpen(true);
+  };
+
+  const handleConfirmCheck = async () => {
+    setConfirmModalOpen(false);
     await checkCode(inputValue);
   };
 
   const handleReset = () => {
     setInputValue("");
     setSelectedStageEgg(null);
+    setConfirmModalOpen(false);
     reset();
   };
 
   const handleBackToCodeEntry = () => {
     setSelectedStageEgg(null);
+    setConfirmModalOpen(false);
     reset();
   };
 
@@ -87,6 +102,41 @@ export default function GiftCodePage() {
 
       <section className="incubator-shell" aria-label="AGMC Gift Hatchery">
         <GiftTopbar />
+
+        {isConfirmModalOpen ? (
+          <AdminModalPortal onClick={() => setConfirmModalOpen(false)}>
+            <section
+              className="gift-panel gift-confirm-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="gift-confirm-check-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="gift-confirm-modal__head">
+                <div>
+                  <span>Xác nhận trước khi kiểm tra</span>
+                  <h2 id="gift-confirm-check-title">Xác nhận không báo công an</h2>
+                </div>
+              </div>
+              <p className="panel-note">
+                Sau khi xác nhận, hệ thống mới kiểm tra mã đơn và cho bạn tiếp tục
+                nhận trứng.
+              </p>
+              <div className="gift-confirm-modal__actions">
+                <button type="button" onClick={handleConfirmCheck}>
+                  Xác nhận
+                </button>
+                <button
+                  type="button"
+                  className="secondary-button"
+                  onClick={() => setConfirmModalOpen(false)}
+                >
+                  Hủy
+                </button>
+              </div>
+            </section>
+          </AdminModalPortal>
+        ) : null}
 
         {(status === GIFT_CODE_STATUS.idle ||
           status === GIFT_CODE_STATUS.invalid) && (
