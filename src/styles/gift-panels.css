@@ -1683,12 +1683,7 @@ input::placeholder {
 }
 
 .tier-reward__wings {
-  position: absolute;
-  top: 58px;
-  left: 50%;
-  width: min(148%, 1480px);
-  height: 250px;
-  transform: translateX(-50%);
+  display: none;
 }
 
 .tier-reward__wing {
@@ -1781,12 +1776,16 @@ input::placeholder {
 
 .tier-reward__tier-mark {
   position: absolute;
-  top: 198px;
+  top: 0;
   left: 50%;
   z-index: 2;
+  display: grid;
+  width: clamp(132px, 16vw, 210px);
+  height: clamp(132px, 16vw, 210px);
+  place-items: center;
   color: var(--tier-title);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(98px, 14vw, 178px);
+  font-size: clamp(82px, 11vw, 148px);
   font-weight: 900;
   line-height: 1;
   text-shadow:

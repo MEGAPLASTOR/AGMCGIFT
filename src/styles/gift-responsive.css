@@ -195,13 +195,7 @@
   }
 
   .tier-reward__wings {
-    top: 54px;
-    width: min(170%, 720px);
-    height: 160px;
-  }
-
-  .tier-reward__wing {
-    height: 148px;
+    display: none;
   }
 
   .tier-reward__crest {
@@ -210,7 +204,9 @@
   }
 
   .tier-reward__tier-mark {
-    top: 177px;
+    top: 0;
+    width: 112px;
+    height: 112px;
     font-size: 88px;
   }
 

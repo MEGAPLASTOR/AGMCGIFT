@@ -47,11 +47,12 @@ async function copyText(value) {
   }
 }
 
-function buildRows(note, username, password) {
+function buildRows(note, username, password, token) {
   return [
     { key: "username", label: "Tài khoản", value: username },
     { key: "password", label: "Mật khẩu", value: password },
-    { key: "note", label: "Ghi chú", value: note, full: true },
+    { key: "token", label: "Token", value: token, full: true },
+    { key: "note", label: "Ghi chú", value: note, full: true, copyable: false },
   ].filter((row) => row.value);
 }
 
@@ -65,12 +66,13 @@ export function AccountRewardCard({
     accountInfo.tenAcc || accountInfo.tenPhanThuong || accountInfo.platform;
   const username = accountInfo.taiKhoan || accountInfo.username;
   const password = accountInfo.matKhau || accountInfo.password;
+  const token = accountInfo.token;
   const tier = normalizeTier(accountInfo.tier);
   const displayTier = tier || "E";
   const platform = String(accountInfo.platform || "").trim();
   const note = accountInfo.ghiChu || accountInfo.message;
   const successMessage = note || "Chúc mừng! Bạn đã mở trứng thành công.";
-  const rows = buildRows(note, username, password);
+  const rows = buildRows(note, username, password, token);
 
   const handleCopy = async (label, value) => {
     const copied = await copyText(value);
@@ -127,13 +129,15 @@ export function AccountRewardCard({
           >
             <div className="tier-reward__field-head">
               <dt>{row.label}</dt>
-              <button
-                type="button"
-                className="tier-reward__copy"
-                onClick={() => handleCopy(row.label, row.value)}
-              >
-                Copy
-              </button>
+              {row.copyable === false ? null : (
+                <button
+                  type="button"
+                  className="tier-reward__copy"
+                  onClick={() => handleCopy(row.label, row.value)}
+                >
+                  Copy
+                </button>
+              )}
             </div>
             <dd>{row.value}</dd>
           </div>
