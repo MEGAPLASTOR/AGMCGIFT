@@ -162,10 +162,26 @@
   }
 
   .account-reward {
+    min-height: 500px;
+    border-radius: 24px;
     padding: 18px 14px 14px;
   }
 
+  .account-reward__banner {
+    border-radius: 14px;
+    font-size: 18px;
+    padding: 16px 14px;
+  }
+
+  .account-reward__tier-mark {
+    top: 124px;
+    width: 112px;
+    height: 112px;
+    font-size: 82px;
+  }
+
   .account-reward__ornament {
+    top: 88px;
     height: 182px;
   }
 
@@ -186,7 +202,7 @@
   }
 
   .account-reward__crest {
-    top: 8px;
+    top: 44px;
     width: 72px;
     height: 76px;
   }
@@ -200,6 +216,17 @@
   .account-reward__head,
   .account-reward__identity {
     align-items: flex-start;
+  }
+
+  .account-reward__head {
+    margin-top: 98px;
+  }
+
+  .account-reward__icon {
+    width: 58px;
+    height: 58px;
+    border-radius: 14px;
+    font-size: 30px;
   }
 
   .reward-egg-card {

@@ -1,5 +1,5 @@
 import { normalizeEgg } from "./normalizeEgg";
-import { normalizeCustomerStatus } from "../../../utils/customerStatus";
+import { extractCustomerState } from "../../../utils/customerStatus";
 
 function getPayloadRoot(payload) {
   return payload?.data || payload?.result || payload || {};
@@ -53,6 +53,7 @@ export function normalizeSyncEggResponse(payload, orderCode) {
   const root = getPayloadRoot(payload);
   const order = root.order || root.orderInfo || {};
   const customer = root.customer || order.customer || {};
+  const customerState = extractCustomerState(root);
   const firstOrderItem =
     order.orderItems?.[0] || order.items?.[0] || root.orderItems?.[0] || {};
   const product = root.product || firstOrderItem.product || {};
@@ -100,9 +101,7 @@ export function normalizeSyncEggResponse(payload, orderCode) {
         order.customerCode ||
         order.customer_code ||
         "",
-      customerStatus: normalizeCustomerStatus(
-        root.customerStatus || customer.status || ""
-      ),
+      customerStatus: customerState.status,
       successCount: Number(
         root.successCount ??
           root.success_count ??
@@ -131,12 +130,7 @@ export function normalizeSyncEggResponse(payload, orderCode) {
           customer.warning_count ??
           0
       ),
-      unbanAt:
-        root.unbanAt ||
-        root.unban_at ||
-        customer.unbanAt ||
-        customer.unban_at ||
-        null,
+      unbanAt: customerState.unbanAt,
       deliveryStatus:
         root.deliveryStatus ||
         root.delivery_status ||

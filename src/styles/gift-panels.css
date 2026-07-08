@@ -1182,3 +1182,314 @@ input::placeholder {
 .account-reward__note {
   grid-column: 1 / -1;
 }
+
+/* ponytail: one reward frame, tier colors do the variants. */
+.account-reward {
+  --account-canvas-top: #08111a;
+  --account-canvas-bottom: #171006;
+  --account-banner-bg: linear-gradient(135deg, rgba(255, 252, 236, 0.96), rgba(255, 239, 180, 0.9));
+  --account-banner-text: #674812;
+  --account-field-ink: #4b3513;
+  --account-hero-title: #fff8e7;
+  min-height: 560px;
+  border-width: 2px;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 50% 18%, var(--account-glow-aura) 0 18%, transparent 42%),
+    radial-gradient(circle at 0 82%, rgba(255, 255, 255, 0.16) 0 11%, transparent 34%),
+    radial-gradient(circle at 100% 84%, rgba(255, 255, 255, 0.14) 0 10%, transparent 34%),
+    linear-gradient(145deg, var(--account-canvas-top), var(--account-canvas-bottom));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    0 34px 70px -36px var(--account-shadow);
+  margin: 34px 0;
+  padding: 30px clamp(18px, 3vw, 34px) 28px;
+}
+
+.account-reward::before {
+  inset: 18px;
+  border: 1px solid var(--account-frame-soft);
+  border-radius: 26px;
+  box-shadow:
+    inset 0 0 42px rgba(255, 255, 255, 0.06),
+    0 0 34px -18px var(--account-shadow);
+}
+
+.account-reward::after {
+  top: auto;
+  right: auto;
+  bottom: -34px;
+  left: 50%;
+  width: 74px;
+  height: 74px;
+  opacity: 0.96;
+  transform: translateX(-50%);
+}
+
+.account-reward__banner {
+  position: relative;
+  z-index: 2;
+  border: 2px solid var(--account-frame-soft);
+  border-radius: 18px;
+  background: var(--account-banner-bg);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 18px 38px -24px var(--account-shadow);
+  color: var(--account-banner-text);
+  font-size: clamp(18px, 2.2vw, 30px);
+  font-weight: 1000;
+  line-height: 1.25;
+  padding: 24px clamp(18px, 4vw, 54px);
+}
+
+.account-reward__tier-mark {
+  position: absolute;
+  top: 145px;
+  left: 50%;
+  z-index: 1;
+  display: grid;
+  width: clamp(120px, 18vw, 210px);
+  height: clamp(120px, 18vw, 210px);
+  place-items: center;
+  border: 2px solid var(--account-frame-soft);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.14), transparent 62%),
+    radial-gradient(circle, rgba(12, 12, 18, 0.5), rgba(0, 0, 0, 0.1));
+  color: var(--account-jewel-top);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(82px, 14vw, 170px);
+  font-weight: 900;
+  line-height: 1;
+  text-shadow:
+    0 0 18px var(--account-shadow),
+    0 0 42px var(--account-shadow);
+  transform: translateX(-50%);
+}
+
+.account-reward__ornament {
+  top: 96px;
+  height: 278px;
+}
+
+.account-reward__aura {
+  top: 24px;
+  width: min(118%, 1040px);
+  height: 238px;
+  opacity: 0.95;
+}
+
+.account-reward__wings {
+  top: 30px;
+  width: min(152%, 1220px);
+  height: 248px;
+}
+
+.account-reward__wing {
+  top: 8px;
+  height: 228px;
+}
+
+.account-reward__wing--left {
+  left: -15%;
+}
+
+.account-reward__wing--right {
+  right: -15%;
+}
+
+.account-reward__crest {
+  top: 58px;
+  width: 112px;
+  height: 126px;
+}
+
+.account-reward__head {
+  margin: 124px 0 28px;
+  min-height: 114px;
+}
+
+.account-reward__identity {
+  align-items: center;
+  gap: 18px;
+}
+
+.account-reward__icon {
+  width: 74px;
+  height: 74px;
+  border-radius: 18px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 40px;
+}
+
+.account-reward__summary > span {
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+}
+
+.account-reward__summary strong {
+  color: var(--account-hero-title);
+  font-size: clamp(28px, 4vw, 44px);
+  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.34);
+}
+
+.account-reward__platform {
+  border-color: var(--account-frame-soft);
+  background: var(--account-chip-bg);
+  color: var(--account-chip-text);
+  font-size: 15px;
+  padding: 8px 18px;
+}
+
+.account-reward__grid {
+  gap: 18px;
+}
+
+.account-reward__field {
+  min-height: 132px;
+  border-color: var(--account-frame-soft);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 85% 24%, rgba(255, 255, 255, 0.5) 0 8%, transparent 28%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.94), var(--account-field-bg));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.48),
+    0 16px 30px -26px var(--account-shadow);
+  padding: 20px 22px;
+}
+
+.account-reward__field dt {
+  color: var(--account-banner-text);
+  font-size: 15px;
+}
+
+.account-reward dd {
+  color: var(--account-field-ink);
+  font-size: clamp(20px, 2.2vw, 28px);
+}
+
+.account-reward__copy {
+  min-height: 42px;
+  border-color: var(--account-frame-soft);
+  background: var(--account-banner-bg);
+  color: var(--account-banner-text);
+  font-size: 15px;
+  padding: 0 20px;
+}
+
+.account-reward--s {
+  --account-frame: #f6d98b;
+  --account-frame-soft: rgba(255, 229, 156, 0.72);
+  --account-shadow: rgba(255, 213, 92, 0.58);
+  --account-canvas-top: #071018;
+  --account-canvas-bottom: #201505;
+  --account-field-bg: rgba(255, 248, 226, 0.94);
+  --account-icon-bg: linear-gradient(135deg, #fff9df, #f6c453);
+  --account-icon-text: #6b4308;
+  --account-jewel-top: #fff7c6;
+  --account-jewel-bottom: #f6b93b;
+  --account-jewel-frame: rgba(255, 231, 166, 0.92);
+  --account-glow-aura: rgba(255, 208, 83, 0.34);
+  --account-chip-bg: linear-gradient(135deg, rgba(118, 75, 12, 0.92), rgba(244, 185, 62, 0.92));
+  --account-wing-light: #fffdf0;
+  --account-wing-mid: #fff0b3;
+  --account-wing-deep: #dca63b;
+  --account-wing-edge: rgba(255, 220, 136, 0.78);
+  --account-wing-opacity: 1;
+}
+
+.account-reward--a {
+  --account-frame: #ff8a62;
+  --account-frame-soft: rgba(255, 138, 98, 0.58);
+  --account-shadow: rgba(255, 67, 54, 0.52);
+  --account-canvas-top: #17090a;
+  --account-canvas-bottom: #2a0906;
+  --account-field-bg: rgba(255, 237, 229, 0.94);
+  --account-icon-bg: linear-gradient(135deg, #ffdfc7, #ef3b2d);
+  --account-icon-text: #7a130c;
+  --account-banner-text: #7a2a10;
+  --account-field-ink: #5d1c0d;
+  --account-hero-title: #fff0e6;
+  --account-jewel-top: #ffd0ad;
+  --account-jewel-bottom: #ef3b2d;
+  --account-jewel-frame: rgba(255, 147, 99, 0.88);
+  --account-glow-aura: rgba(239, 68, 68, 0.3);
+  --account-wing-light: #fff2e8;
+  --account-wing-mid: #ff8a62;
+  --account-wing-deep: #c3221a;
+}
+
+.account-reward--b {
+  --account-frame: #f7bd4d;
+  --account-frame-soft: rgba(247, 189, 77, 0.56);
+  --account-shadow: rgba(245, 158, 11, 0.46);
+  --account-canvas-top: #120d04;
+  --account-canvas-bottom: #251602;
+  --account-field-bg: rgba(255, 246, 216, 0.94);
+  --account-icon-bg: linear-gradient(135deg, #fff2b8, #d97706);
+  --account-icon-text: #6a3905;
+  --account-banner-text: #6a4308;
+  --account-jewel-top: #ffe89a;
+  --account-jewel-bottom: #d97706;
+  --account-wing-light: #fff7dc;
+  --account-wing-mid: #f6c453;
+  --account-wing-deep: #b96306;
+}
+
+.account-reward--c {
+  --account-frame: #d9a7ff;
+  --account-frame-soft: rgba(216, 180, 254, 0.58);
+  --account-shadow: rgba(168, 85, 247, 0.5);
+  --account-canvas-top: #12071c;
+  --account-canvas-bottom: #230633;
+  --account-field-bg: rgba(250, 241, 255, 0.94);
+  --account-icon-bg: linear-gradient(135deg, #f2d9ff, #9d4edd);
+  --account-icon-text: #51106f;
+  --account-banner-text: #5a2478;
+  --account-field-ink: #44125d;
+  --account-hero-title: #faefff;
+  --account-jewel-top: #efd4ff;
+  --account-jewel-bottom: #9333ea;
+  --account-wing-light: #fff2ff;
+  --account-wing-mid: #d9a7ff;
+  --account-wing-deep: #7e22ce;
+}
+
+.account-reward--d {
+  --account-frame: #93c5fd;
+  --account-frame-soft: rgba(147, 197, 253, 0.54);
+  --account-shadow: rgba(59, 130, 246, 0.48);
+  --account-canvas-top: #061225;
+  --account-canvas-bottom: #061b3d;
+  --account-field-bg: rgba(237, 246, 255, 0.94);
+  --account-icon-bg: linear-gradient(135deg, #dbeafe, #2563eb);
+  --account-icon-text: #102e76;
+  --account-banner-text: #1d3f79;
+  --account-field-ink: #10285d;
+  --account-hero-title: #eef6ff;
+  --account-jewel-top: #dbeafe;
+  --account-jewel-bottom: #2563eb;
+  --account-wing-light: #eff8ff;
+  --account-wing-mid: #93c5fd;
+  --account-wing-deep: #1d4ed8;
+}
+
+.account-reward--e {
+  --account-frame: #a3e66f;
+  --account-frame-soft: rgba(163, 230, 111, 0.48);
+  --account-shadow: rgba(34, 197, 94, 0.36);
+  --account-canvas-top: #08140b;
+  --account-canvas-bottom: #0f2612;
+  --account-field-bg: rgba(239, 255, 235, 0.94);
+  --account-icon-bg: linear-gradient(135deg, #efffd8, #22c55e);
+  --account-icon-text: #10461e;
+  --account-banner-text: #285510;
+  --account-field-ink: #183f13;
+  --account-hero-title: #efffe9;
+  --account-jewel-top: #e6ffd4;
+  --account-jewel-bottom: #16a34a;
+  --account-wing-light: #f2ffe7;
+  --account-wing-mid: #a3e66f;
+  --account-wing-deep: #16803d;
+}

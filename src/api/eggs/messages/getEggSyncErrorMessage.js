@@ -2,7 +2,7 @@ import { getDeliveryStatusKind } from "../utils/getDeliveryStatusKind";
 import { normalizeApiText } from "../utils/normalizeApiText";
 import {
   CUSTOMER_STATUS,
-  normalizeCustomerStatus,
+  extractCustomerState,
 } from "../../../utils/customerStatus";
 
 function formatDateTime(value) {
@@ -54,9 +54,9 @@ export function getEggSyncErrorMessage(error) {
     );
   }
 
-  const rawCustomerStatus =
-    error.payload?.customerStatus || error.payload?.customer?.status || "";
-  const customerStatus = normalizeCustomerStatus(rawCustomerStatus, "");
+  const customerState = extractCustomerState(error.payload, "");
+  const rawCustomerStatus = customerState.rawStatus;
+  const customerStatus = customerState.status;
   const customerStatusText = normalizeApiText(rawCustomerStatus);
   const messageText = normalizeApiText(error.payload?.message || error.message);
   const orderStatus = normalizeApiText(
@@ -66,22 +66,23 @@ export function getEggSyncErrorMessage(error) {
       error.payload?.deliveryStatus,
       error.payload?.fulfillmentStatus,
       error.payload?.financialStatus,
+      error.payload?.order?.orderStatus,
+      error.payload?.order?.status,
+      error.payload?.order?.deliveryStatus,
+      error.payload?.order?.fulfillmentStatus,
+      error.payload?.order?.financialStatus,
     ].join(" ")
   );
   const rawDeliveryStatus =
-    error.payload?.deliveryStatus ?? error.payload?.delivery_status;
+    error.payload?.deliveryStatus ??
+    error.payload?.delivery_status ??
+    error.payload?.order?.deliveryStatus ??
+    error.payload?.order?.delivery_status ??
+    error.payload?.order?.fulfillmentStatus ??
+    error.payload?.order?.fulfillment_status;
   const deliveryStatusError =
     rawDeliveryStatus === undefined ? "" : getDeliveryStatusError(rawDeliveryStatus);
-  const unbanAt =
-    error.payload?.unbanAt ||
-    error.payload?.unban_at ||
-    error.payload?.customer?.unbanAt ||
-    error.payload?.customer?.unban_at ||
-    null;
-
-  if (deliveryStatusError) {
-    return deliveryStatusError;
-  }
+  const unbanAt = customerState.unbanAt;
 
   if (
     customerStatus === CUSTOMER_STATUS.TEMP_BANNED ||
@@ -100,6 +101,10 @@ export function getEggSyncErrorMessage(error) {
     (customerStatusText.includes("ban") && !customerStatusText.includes("temp"))
   ) {
     return "Tài khoản đã bị khóa vĩnh viễn do vi phạm chính sách.";
+  }
+
+  if (deliveryStatusError) {
+    return deliveryStatusError;
   }
 
   if (

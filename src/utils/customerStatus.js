@@ -16,6 +16,14 @@ function normalizeText(value) {
   return String(value ?? "").trim();
 }
 
+function getFirstFilledValue(values) {
+  return (
+    values.find(
+      (value) => value !== undefined && value !== null && normalizeText(value)
+    ) ?? null
+  );
+}
+
 export function normalizeCustomerStatus(value, fallback = CUSTOMER_STATUS.NORMAL) {
   const normalizedValue = normalizeText(value).toUpperCase().replace(/\s+/g, "_");
 
@@ -36,16 +44,96 @@ export function normalizeCustomerStatus(value, fallback = CUSTOMER_STATUS.NORMAL
   if (
     normalizedValue === CUSTOMER_STATUS.TEMP_BANNED ||
     normalizedValue === "TEMP-BANNED" ||
-    normalizedValue === "TEMPBAN"
+    normalizedValue === "TEMPBAN" ||
+    normalizedValue === "TEMP_BAN" ||
+    normalizedValue === "TEMPBANNED"
   ) {
     return CUSTOMER_STATUS.TEMP_BANNED;
   }
 
-  if (normalizedValue === CUSTOMER_STATUS.BANNED) {
+  if (
+    normalizedValue === CUSTOMER_STATUS.BANNED ||
+    normalizedValue === "PERMANENT_BAN" ||
+    normalizedValue === "PERMANENT_BANNED" ||
+    normalizedValue === "PERM_BAN" ||
+    normalizedValue === "PERM_BANNED" ||
+    normalizedValue === "BAN_VV" ||
+    normalizedValue === "BANVV"
+  ) {
     return CUSTOMER_STATUS.BANNED;
   }
 
   return fallback;
+}
+
+export function extractCustomerState(
+  payload,
+  fallback = CUSTOMER_STATUS.NORMAL
+) {
+  const root = payload?.data || payload?.result || payload || {};
+  const order = root.order || root.orderInfo || {};
+  const customer = root.customer || order.customer || {};
+  const rawStatus = getFirstFilledValue([
+    root.customerStatus,
+    root.customer_status,
+    root.statusCustomer,
+    root.status_customer,
+    customer.customerStatus,
+    customer.customer_status,
+    customer.status,
+    order.customerStatus,
+    order.customer_status,
+    order.statusCustomer,
+    order.status_customer,
+    order.customer?.status,
+  ]);
+  const unbanAt =
+    getFirstFilledValue([
+      root.unbanAt,
+      root.unban_at,
+      root.unlockAt,
+      root.unlock_at,
+      root.banExpiresAt,
+      root.ban_expires_at,
+      customer.unbanAt,
+      customer.unban_at,
+      customer.unlockAt,
+      customer.unlock_at,
+      customer.banExpiresAt,
+      customer.ban_expires_at,
+      order.unbanAt,
+      order.unban_at,
+      order.unlockAt,
+      order.unlock_at,
+      order.banExpiresAt,
+      order.ban_expires_at,
+    ]) || null;
+
+  return {
+    status: normalizeCustomerStatus(rawStatus, fallback),
+    rawStatus: rawStatus || "",
+    unbanAt,
+  };
+}
+
+export function extractCustomerBanInfo(payload) {
+  const { status, unbanAt } = extractCustomerState(payload, "");
+
+  if (status === CUSTOMER_STATUS.TEMP_BANNED) {
+    return {
+      type: CUSTOMER_STATUS.TEMP_BANNED,
+      unbanAt,
+    };
+  }
+
+  if (status === CUSTOMER_STATUS.BANNED) {
+    return {
+      type: CUSTOMER_STATUS.BANNED,
+      unbanAt: null,
+    };
+  }
+
+  return null;
 }
 
 export function getCustomerStatusLabel(status) {

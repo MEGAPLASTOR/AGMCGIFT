@@ -17,6 +17,7 @@ import {
 } from "../utils/rewardDate";
 import {
   CUSTOMER_STATUS,
+  extractCustomerBanInfo,
   isTempBannedCustomerStatus,
   isPermanentlyBannedCustomerStatus,
 } from "../utils/customerStatus";
@@ -418,6 +419,20 @@ export function useGiftCode(catalogData) {
         setSelectedEntry(matchedEntry);
         setStatus(GIFT_CODE_STATUS.choosing);
       } catch (error) {
+        const banState = extractCustomerBanInfo(error?.payload);
+
+        if (banState?.type === CUSTOMER_STATUS.TEMP_BANNED) {
+          setBanInfo(banState);
+          setStatus(GIFT_CODE_STATUS.tempBanned);
+          return;
+        }
+
+        if (banState?.type === CUSTOMER_STATUS.BANNED) {
+          setBanInfo(banState);
+          setStatus(GIFT_CODE_STATUS.banned);
+          return;
+        }
+
         setErrorMsg(getEggSyncErrorMessage(error));
         setStatus(GIFT_CODE_STATUS.invalid);
       } finally {
