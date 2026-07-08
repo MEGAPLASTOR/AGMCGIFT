@@ -16,12 +16,49 @@ function normalizeText(value) {
   return String(value ?? "").trim();
 }
 
+function normalizeSearchText(value) {
+  return normalizeText(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 function getFirstFilledValue(values) {
   return (
     values.find(
       (value) => value !== undefined && value !== null && normalizeText(value)
     ) ?? null
   );
+}
+
+function detectCustomerStatusFromMessage(message) {
+  const normalizedMessage = normalizeSearchText(message);
+
+  if (
+    normalizedMessage.includes("khoa tam thoi") ||
+    normalizedMessage.includes("tam khoa") ||
+    normalizedMessage.includes("temp ban")
+  ) {
+    return CUSTOMER_STATUS.TEMP_BANNED;
+  }
+
+  if (
+    normalizedMessage.includes("khoa vinh vien") ||
+    normalizedMessage.includes("ban vinh vien") ||
+    normalizedMessage.includes("permanent ban")
+  ) {
+    return CUSTOMER_STATUS.BANNED;
+  }
+
+  return "";
+}
+
+function extractUnbanAtFromMessage(message) {
+  const matchedValue = normalizeText(message).match(
+    /\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2})?/
+  );
+
+  return matchedValue?.[0] || null;
 }
 
 export function normalizeCustomerStatus(value, fallback = CUSTOMER_STATUS.NORMAL) {
@@ -73,6 +110,15 @@ export function extractCustomerState(
   const root = payload?.data || payload?.result || payload || {};
   const order = root.order || root.orderInfo || {};
   const customer = root.customer || order.customer || {};
+  const message =
+    getFirstFilledValue([
+      root.message,
+      root.errorMessage,
+      root.error_message,
+      payload?.message,
+      payload?.errorMessage,
+      payload?.error_message,
+    ]) || "";
   const rawStatus = getFirstFilledValue([
     root.customerStatus,
     root.customer_status,
@@ -105,24 +151,31 @@ export function extractCustomerState(
       order.unban_at,
       order.unlockAt,
       order.unlock_at,
-      order.banExpiresAt,
-      order.ban_expires_at,
-    ]) || null;
+    order.banExpiresAt,
+    order.ban_expires_at,
+    ]) ||
+    extractUnbanAtFromMessage(message) ||
+    null;
+  const detectedStatus =
+    normalizeCustomerStatus(rawStatus, "") ||
+    detectCustomerStatusFromMessage(message);
 
   return {
-    status: normalizeCustomerStatus(rawStatus, fallback),
+    status: detectedStatus || fallback,
     rawStatus: rawStatus || "",
     unbanAt,
+    message,
   };
 }
 
 export function extractCustomerBanInfo(payload) {
-  const { status, unbanAt } = extractCustomerState(payload, "");
+  const { status, unbanAt, message } = extractCustomerState(payload, "");
 
   if (status === CUSTOMER_STATUS.TEMP_BANNED) {
     return {
       type: CUSTOMER_STATUS.TEMP_BANNED,
       unbanAt,
+      message,
     };
   }
 
@@ -130,6 +183,7 @@ export function extractCustomerBanInfo(payload) {
     return {
       type: CUSTOMER_STATUS.BANNED,
       unbanAt: null,
+      message,
     };
   }
 
