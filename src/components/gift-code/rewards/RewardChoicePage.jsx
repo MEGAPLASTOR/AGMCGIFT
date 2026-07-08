@@ -36,7 +36,7 @@ export function RewardChoicePage({
     : !canClaimNow
       ? "Không có trứng thường cho mã này."
       : instantNeedsIncubation
-        ? "Nhóm trứng này cần chờ đủ cooldown trước khi mở."
+        ? ""
         : "Bấm mở để nhận acc theo số trứng backend mở được.";
   const delayedDescription = delayedOpened
     ? "Nhóm trứng này đã mở, bấm để xem lại acc."
