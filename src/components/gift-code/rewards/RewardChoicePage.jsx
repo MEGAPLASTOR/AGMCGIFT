@@ -1,9 +1,16 @@
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
+import { getRewardInfoFromTargetDate } from "../../../utils/rewardDate";
 
 function isReadyToOpen(egg) {
   if (!egg?.hatchAt) return true;
 
   return new Date(egg.hatchAt).getTime() <= Date.now();
+}
+
+function getReadyDateTime(egg) {
+  return egg?.hatchAt
+    ? getRewardInfoFromTargetDate(egg.hatchAt).rewardDateTime
+    : "";
 }
 
 export function RewardChoicePage({
@@ -24,10 +31,12 @@ export function RewardChoicePage({
   const delayedOpened = Boolean(delayedEgg?.isClaimed);
   const delayedReady = isReadyToOpen(delayedEgg);
   const instantNeedsIncubation = Boolean(instantEgg?.requiresIncubation);
+  const instantReadyAt = getReadyDateTime(instantEgg);
+  const delayedReadyAt = getReadyDateTime(delayedEgg);
   const instantActionLabel = instantOpened
     ? "Xem acc"
     : instantNeedsIncubation
-      ? `Ấp ${daysToWait} ngày`
+      ? "Đang chờ mở"
       : isClaiming
         ? "Đang mở..."
         : "Mở trứng";
@@ -36,7 +45,9 @@ export function RewardChoicePage({
     : !canClaimNow
       ? "Không có trứng thường cho mã này."
       : instantNeedsIncubation
-        ? "Nhóm trứng này cần chờ đủ cooldown trước khi mở."
+        ? instantReadyAt
+          ? `Nhóm trứng này cần chờ đủ cooldown trước khi mở. Mở lại lúc ${instantReadyAt}.`
+          : "Nhóm trứng này cần chờ đủ cooldown trước khi mở."
         : "Bấm mở để nhận acc theo số trứng backend mở được.";
   const delayedDescription = delayedOpened
     ? "Nhóm trứng này đã mở, bấm để xem lại acc."
@@ -44,7 +55,9 @@ export function RewardChoicePage({
       ? "Không có trứng ấp 15 ngày cho mã này."
       : delayedReady
         ? "Hết cooldown, bấm mở để nhận acc theo số trứng backend mở được."
-        : "Đang ấp, chưa lộ trứng vàng hay kim cương.";
+        : delayedReadyAt
+          ? `Đang ấp, chưa lộ trứng vàng hay kim cương. Mở lúc ${delayedReadyAt}.`
+          : "Đang ấp, chưa lộ trứng vàng hay kim cương.";
   const delayedActionLabel = delayedOpened
     ? "Xem acc"
     : delayedReady
@@ -81,7 +94,7 @@ export function RewardChoicePage({
           <span className="reward-egg-card__content">
             <span>
               <strong>
-                {instantNeedsIncubation ? "Trứng vàng đang ấp" : "Trứng thường"}
+                {instantNeedsIncubation ? "Trứng vàng đang cooldown" : "Trứng thường"}
               </strong>
               <span>{instantDescription}</span>
             </span>

@@ -1,4 +1,5 @@
 import { useCallback, useState } from "react";
+import { EGG_CHOICES } from "../../../api/eggs";
 import { AccountRewardCard } from "./AccountRewardCard";
 import { CountdownTimer } from "./CountdownTimer";
 import { RewardTierEggBadge } from "./RewardTierEggBadge";
@@ -29,7 +30,11 @@ export function IncubatingRewardPage({
   const accounts = getRewardAccounts(redemptionInfo);
   const isReady = redemptionInfo.isReady || isCountdownComplete;
   const hasReward = accounts.length > 0;
-  const eggName = "Trứng bí ẩn";
+  const isGoldEgg =
+    redemptionInfo?.choice === EGG_CHOICES.instant ||
+    Number(redemptionInfo?.eggType) === 1;
+  const eggName = isGoldEgg ? "Trứng vàng" : "Trứng bí ẩn";
+  const cooldownDays = Number(redemptionInfo?.cooldownDays || (isGoldEgg ? 3 : 15));
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
   }, []);
@@ -38,7 +43,13 @@ export function IncubatingRewardPage({
     <section className="gift-panel gift-panel--result gift-panel--incubating">
       <div className="incubating-page__hero">
         <div>
-          <p className="eyebrow">{hasReward ? `${eggName} đã mở` : `${eggName} 15 ngày`}</p>
+          <p className="eyebrow">
+            {hasReward
+              ? `${eggName} đã mở`
+              : isGoldEgg
+                ? `${eggName} đang cooldown`
+                : `${eggName} ${cooldownDays} ngày`}
+          </p>
           <h2>
             {hasReward
               ? "Nhận acc thành công"
@@ -47,7 +58,7 @@ export function IncubatingRewardPage({
                 : "Đợi đủ cooldown để mở"}
           </h2>
         </div>
-        {hasReward ? (
+        {hasReward || isGoldEgg ? (
           <RewardTierEggBadge redemptionInfo={redemptionInfo} />
         ) : (
           <span className="mystery-egg mystery-egg--small" aria-hidden="true">
@@ -117,7 +128,7 @@ export function IncubatingRewardPage({
             onComplete={handleCountdownComplete}
           />
           <p className="message message--warning">
-            Trứng đang được che lại. Khi đếm ngược về 0, bạn mới mở được phần thưởng.
+            {eggName} đang cooldown. Đến đúng ngày giờ mở ở trên, bạn có thể bấm mở để nhận phần thưởng.
           </p>
         </>
       )}

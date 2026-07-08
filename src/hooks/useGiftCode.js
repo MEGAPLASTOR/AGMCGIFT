@@ -24,12 +24,14 @@ import {
   extractCustomerBanInfo,
   isTempBannedCustomerStatus,
   isPermanentlyBannedCustomerStatus,
+  isWarningCustomerStatus,
 } from "../utils/customerStatus";
 
 const LUA_CHON_NHAN_NGAY = EGG_CHOICES.instant;
 const LUA_CHON_CHO_NHAN_THUONG_XIN = EGG_CHOICES.delayed;
 const CLAIMED_REWARDS_STORAGE_KEY = "agmcGiftClaimedRewards";
 const ADMIN_SESSION_STORAGE_KEY = "agmc_admin_session";
+const WARNING_GOLD_EGG_WAIT_DAYS = 3;
 
 function hasRewardPayload(value) {
   return Boolean(
@@ -464,7 +466,18 @@ function createBaseRedemption(selectedEntry, egg) {
   };
 }
 
-function createClaimedRedemption(selectedEntry, egg, choice, reward, delayDays) {
+function getEggCooldownDays(entry, egg, defaultDelayDays) {
+  if (
+    Number(egg?.eggType) === 1 &&
+    isWarningCustomerStatus(entry?.order?.customerStatus)
+  ) {
+    return WARNING_GOLD_EGG_WAIT_DAYS;
+  }
+
+  return defaultDelayDays;
+}
+
+function createClaimedRedemption(selectedEntry, egg, choice, reward, cooldownDays) {
   const primaryReward =
     reward?.reward || reward?.account || reward?.accounts?.[0] || null;
   const accounts = Array.isArray(reward?.accounts)
@@ -487,8 +500,11 @@ function createClaimedRedemption(selectedEntry, egg, choice, reward, delayDays) 
     responseEggs: reward?.eggs || [],
     claimedAt: new Date().toISOString(),
     isReady: true,
-    ...(choice === LUA_CHON_CHO_NHAN_THUONG_XIN
-      ? getEggReadyInfo(egg, delayDays)
+    ...(egg?.requiresIncubation
+      ? {
+          cooldownDays,
+          ...getEggReadyInfo(egg, cooldownDays),
+        }
       : {}),
   };
 }
@@ -549,6 +565,36 @@ function withFallbackHatchAt(entry, delayDays) {
   return withEggGroups(entry, eggs);
 }
 
+function withWarningGoldEggCooldown(entry) {
+  if (!isWarningCustomerStatus(entry?.order?.customerStatus)) {
+    return entry;
+  }
+
+  const firstGoldEgg = entry.eggs.find((egg) => Number(egg.eggType) === 1);
+  const warningReadyAt =
+    entry.order.unbanAt ||
+    addDays(
+      entry.order.deliveredAt ||
+        firstGoldEgg?.createdAt ||
+        new Date().toISOString(),
+      WARNING_GOLD_EGG_WAIT_DAYS
+    ).toISOString();
+
+  const eggs = entry.eggs.map((egg) => {
+    if (Number(egg.eggType) !== 1 || egg.hatchAt || egg.isClaimed) {
+      return egg;
+    }
+
+    return {
+      ...egg,
+      hatchAt: warningReadyAt,
+      requiresIncubation: true,
+    };
+  });
+
+  return withEggGroups(entry, eggs);
+}
+
 export function useGiftCode(catalogData) {
   const [status, setStatus] = useState(GIFT_CODE_STATUS.idle);
   const [selectedEntry, setSelectedEntry] = useState(null);
@@ -593,9 +639,11 @@ export function useGiftCode(catalogData) {
 
       try {
         const payload = await syncEggsByOrderCode(trimmedCode);
-        const matchedEntry = withFallbackHatchAt(
-          normalizeSyncEggResponse(payload, trimmedCode),
-          soNgayCho
+        const matchedEntry = withWarningGoldEggCooldown(
+          withFallbackHatchAt(
+            normalizeSyncEggResponse(payload, trimmedCode),
+            soNgayCho
+          )
         );
 
         const customerStatus = matchedEntry.order.customerStatus;
@@ -689,6 +737,11 @@ export function useGiftCode(catalogData) {
       }
 
       const baseRedemption = createBaseRedemption(selectedEntry, selectedEgg);
+      const cooldownDays = getEggCooldownDays(
+        selectedEntry,
+        selectedEgg,
+        soNgayCho
+      );
       const savedRedemption = getStoredRedemption(
         selectedEntry.order.id,
         selectedEgg.eggType,
@@ -703,7 +756,7 @@ export function useGiftCode(catalogData) {
                 selectedEgg,
                 choice,
                 selectedEgg,
-                soNgayCho
+                cooldownDays
               )
             : null;
 
@@ -722,13 +775,14 @@ export function useGiftCode(catalogData) {
       }
 
       if (
-        choice === LUA_CHON_CHO_NHAN_THUONG_XIN &&
+        selectedEgg.requiresIncubation &&
         (!selectedEgg.hatchAt || !isEggReady(selectedEgg))
       ) {
         setRedemptionInfo({
           ...baseRedemption,
           choice,
-          ...getEggReadyInfo(selectedEgg, soNgayCho),
+          cooldownDays,
+          ...getEggReadyInfo(selectedEgg, cooldownDays),
         });
         setErrorMsg("");
         setStatus(GIFT_CODE_STATUS.claimedLater);
@@ -751,7 +805,7 @@ export function useGiftCode(catalogData) {
           selectedEgg,
           choice,
           reward,
-          soNgayCho
+          cooldownDays
         );
 
         saveStoredRedemption(newRedemption);
