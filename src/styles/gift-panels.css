@@ -544,6 +544,26 @@ input::placeholder {
   margin: 16px 0;
 }
 
+.gift-panel--ban {
+  background:
+    linear-gradient(180deg, rgba(255, 250, 235, 0.98), rgba(255, 229, 220, 0.96));
+}
+
+.ban-contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.ban-contact-links .secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  text-decoration: none;
+}
+
 .gift-panel--incubating {
   position: relative;
   overflow: hidden;

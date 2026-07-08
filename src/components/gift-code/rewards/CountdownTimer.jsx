@@ -19,7 +19,12 @@ function pad(value) {
   return String(value).padStart(2, "0");
 }
 
-export function CountdownTimer({ targetDate, onComplete }) {
+export function CountdownTimer({
+  targetDate,
+  onComplete,
+  readyMessage = "Tr\u1ee9ng \u0111\u00e3 s\u1eb5n s\u00e0ng m\u1edf",
+  ariaLabel = "Th\u1eddi gian \u0111\u1ebfm ng\u01b0\u1ee3c",
+}) {
   const targetTime = useMemo(() => new Date(targetDate).getTime(), [targetDate]);
   const [remainingMs, setRemainingMs] = useState(() => targetTime - Date.now());
   const time = splitTime(remainingMs);
@@ -40,28 +45,28 @@ export function CountdownTimer({ targetDate, onComplete }) {
     return (
       <div className="countdown countdown--ready">
         <strong>00:00:00</strong>
-        <span>Trứng đã sẵn sàng mở</span>
+        <span>{readyMessage}</span>
       </div>
     );
   }
 
   return (
-    <div className="countdown" aria-label="Thời gian đếm ngược mở trứng">
+    <div className="countdown" aria-label={ariaLabel}>
       <div>
         <strong>{time.days}</strong>
-        <span>Ngày</span>
+        <span>{"Ng\u00e0y"}</span>
       </div>
       <div>
         <strong>{pad(time.hours)}</strong>
-        <span>Giờ</span>
+        <span>{"Gi\u1edd"}</span>
       </div>
       <div>
         <strong>{pad(time.minutes)}</strong>
-        <span>Phút</span>
+        <span>{"Ph\u00fat"}</span>
       </div>
       <div>
         <strong>{pad(time.seconds)}</strong>
-        <span>Giây</span>
+        <span>{"Gi\u00e2y"}</span>
       </div>
     </div>
   );
