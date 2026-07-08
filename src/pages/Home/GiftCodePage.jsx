@@ -20,19 +20,6 @@ import { useGiftCode } from "../../hooks/useGiftCode";
 
 const SCROLL_TOP_GAP = 120;
 
-function getTempBanDisplayMessage(message) {
-  const normalizedMessage = String(message || "").trim();
-
-  if (!normalizedMessage) {
-    return "Bạn chưa thể mở quà lúc này. Khi đếm ngược về 0, hãy kiểm tra lại để được gỡ ban.";
-  }
-
-  return normalizedMessage
-    .replace(/\s+đến ngày\s+\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2})?\.?/i, ".")
-    .replace(/\.\s*\./g, ".")
-    .trim();
-}
-
 export default function GiftCodePage() {
   const [inputValue, setInputValue] = useState("");
   const [selectedStageEgg, setSelectedStageEgg] = useState(null);
@@ -225,10 +212,6 @@ export default function GiftCodePage() {
                 {currentCode ? <span className="panel-chip">{currentCode}</span> : null}
               </div>
 
-              <p className="message message--warning">
-                {getTempBanDisplayMessage(banInfo?.message)}
-              </p>
-
               {banInfo?.unbanAt ? (
                 <CountdownTimer
                   targetDate={banInfo.unbanAt}
@@ -269,14 +252,8 @@ export default function GiftCodePage() {
                 {currentCode ? <span className="panel-chip">{currentCode}</span> : null}
               </div>
 
-              <p className="message message--error">
-                {banInfo?.message ||
-                  "T\u00e0i kho\u1ea3n n\u00e0y b\u1ecb kh\u00f3a v\u0129nh vi\u1ec5n, kh\u00f4ng th\u1ec3 t\u1ef1 m\u1edf l\u1ea1i tr\u00ean trang client."}
-              </p>
               <p className="panel-note">
-                {
-                  "Ch\u1ec9 c\u00f3 th\u1ec3 nh\u1eafn Facebook ho\u1eb7c Zalo c\u1ee7a ch\u1ee7 shop \u0111\u1ec3 xin \u00e2n x\u00e1."
-                }
+                {"Vui l\u00f2ng li\u00ean h\u1ec7 h\u1ed7 tr\u1ee3 Facebook ho\u1eb7c Zalo \u0111\u1ec3 \u0111\u01b0\u1ee3c \u00e2n x\u00e1."}
               </p>
 
               <div className="ban-contact-links">

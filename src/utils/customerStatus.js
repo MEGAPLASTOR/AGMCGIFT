@@ -47,7 +47,9 @@ function detectCustomerStatusFromMessage(message) {
   if (
     normalizedMessage.includes("khoa vinh vien") ||
     normalizedMessage.includes("ban vinh vien") ||
-    normalizedMessage.includes("permanent ban")
+    normalizedMessage.includes("permanent ban") ||
+    normalizedMessage.includes("vi pham chinh sach") ||
+    normalizedMessage.includes("khoa do vi pham chinh sach")
   ) {
     return CUSTOMER_STATUS.BANNED;
   }
@@ -63,7 +65,10 @@ function extractUnbanAtFromMessage(message) {
   return matchedValue?.[0] || null;
 }
 
-export function normalizeCustomerStatus(value, fallback = CUSTOMER_STATUS.NORMAL) {
+export function normalizeCustomerStatus(
+  value,
+  fallback = CUSTOMER_STATUS.NORMAL
+) {
   const normalizedValue = normalizeText(value).toUpperCase().replace(/\s+/g, "_");
 
   if (
