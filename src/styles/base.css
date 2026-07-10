@@ -1,9 +1,13 @@
 :root {
+  --font-body:
+    "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-display:
+    "Be Vietnam Pro", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
   color: #17130a;
   background: #ffd52e;
-  font-family:
-    'Outfit', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: var(--font-body);
   font-synthesis: none;
   text-rendering: geometricPrecision;
 }
@@ -26,7 +30,7 @@ input,
 .account-reward-card strong,
 .status-rail__item strong,
 .topbar-pill strong {
-  font-family: 'Pixelify Sans', 'Outfit', sans-serif;
+  font-family: var(--font-display);
 }
 
 * {
