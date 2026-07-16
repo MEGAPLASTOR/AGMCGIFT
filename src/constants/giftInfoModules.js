@@ -95,9 +95,9 @@ export const GIFT_INFO_MODULES = [
     id: "guide",
     title: "Hướng Dẫn",
     eyebrow: "Hướng Dẫn Kích Hoạt",
-    heading: "Các bước nhập mã đơn hàng và nhận thông tin bàn giao nhân vật",
+    heading: "Các bước nhập mã đơn hàng và nhận quà tặng",
     description:
-      "Quý khách vui lòng thực hiện theo các bước sau để hệ thống tự động xác thực đơn hàng và kích hoạt gói quà tương ứng.",
+      "Quý khách vui lòng thực hiện theo các bước sau để hệ thống tự động xác thực đơn hàng và hỗ trợ nhận quà tặng tương ứng.",
     cards: [
       {
         label: "Các bước kích hoạt",
