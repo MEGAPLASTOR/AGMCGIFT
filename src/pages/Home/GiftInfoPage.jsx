@@ -52,9 +52,11 @@ export default function GiftInfoPage() {
 
         <section
           className={
-            activeModule.cards.length > 1
-              ? "gift-info-content"
-              : "gift-info-content gift-info-content--single"
+            activeModule.id === "guide"
+              ? "gift-info-content gift-info-content--guide"
+              : activeModule.cards.length > 1
+                ? "gift-info-content"
+                : "gift-info-content gift-info-content--single"
           }
         >
           {activeModule.cards.map((card) => (

@@ -97,6 +97,11 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
+.gift-info-content--guide {
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 0.88fr);
+  align-items: start;
+}
+
 .gift-info-card {
   display: grid;
   gap: 12px;
@@ -181,6 +186,17 @@
   font-size: 14px;
   font-weight: 750;
   line-height: 1.58;
+}
+
+.gift-info-content--guide .gift-info-card li {
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.gift-info-content--guide .gift-info-card p {
+  font-size: 13px;
+  line-height: 1.46;
 }
 
 .gift-info-card--accent {
