@@ -1,4 +1,5 @@
 import { Link, Navigate, useParams } from "react-router-dom";
+import guideEggChoiceExample from "../../assets/images/guide-egg-choice-example.png";
 import guideOrderCodeExample from "../../assets/images/guide-order-code-example.png";
 import { GiftPageDecorations } from "../../components/gift-code/layout/GiftPageDecorations";
 import { GiftTopbar } from "../../components/gift-code/layout/GiftTopbar";
@@ -60,56 +61,104 @@ export default function GiftInfoPage() {
           }
         >
           {activeModule.cards.map((card) => (
-            <div
-              key={card.label}
-              className={
-                card.accent ? "gift-info-card gift-info-card--accent" : "gift-info-card"
-              }
-            >
-              <span>{card.label}</span>
+            activeModule.id === "guide" && card.label === "Lưu ý" ? (
+              <div key={card.label} className="gift-info-guide-side">
+                <div className="gift-info-card gift-info-card--accent">
+                  <span>{card.label}</span>
 
-              {activeModule.id === "guide" && card.label === "Các bước kích hoạt" ? (
-                <figure className="gift-info-card__media">
-                  <img
-                    src={guideOrderCodeExample}
-                    alt="Ví dụ vị trí mã đơn hàng trong ứng dụng mua sắm"
-                  />
-                </figure>
-              ) : null}
-
-              {card.paragraphs?.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
-              ))}
-
-              {card.items?.length ? (
-                <ul>
-                  {card.items.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              ) : null}
-
-              {card.sections?.map((section, index) => (
-                <section
-                  key={`${card.label}-${section.heading ?? index}`}
-                  className="gift-info-card__section"
-                >
-                  {section.heading ? <h3>{section.heading}</h3> : null}
-
-                  {section.paragraphs?.map((paragraph) => (
+                  {card.paragraphs?.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
                   ))}
 
-                  {section.items?.length ? (
+                  {card.items?.length ? (
                     <ul>
-                      {section.items.map((item) => (
+                      {card.items.map((item) => (
                         <li key={item}>{item}</li>
                       ))}
                     </ul>
                   ) : null}
-                </section>
-              ))}
-            </div>
+
+                  {card.sections?.map((section, index) => (
+                    <section
+                      key={`${card.label}-${section.heading ?? index}`}
+                      className="gift-info-card__section"
+                    >
+                      {section.heading ? <h3>{section.heading}</h3> : null}
+
+                      {section.paragraphs?.map((paragraph) => (
+                        <p key={paragraph}>{paragraph}</p>
+                      ))}
+
+                      {section.items?.length ? (
+                        <ul>
+                          {section.items.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </section>
+                  ))}
+                </div>
+
+                <figure className="gift-info-guide-side__media">
+                  <img
+                    src={guideEggChoiceExample}
+                    alt="Ví dụ màn hình chọn trứng muốn mở"
+                  />
+                </figure>
+              </div>
+            ) : (
+              <div
+                key={card.label}
+                className={
+                  card.accent ? "gift-info-card gift-info-card--accent" : "gift-info-card"
+                }
+              >
+                <span>{card.label}</span>
+
+                {activeModule.id === "guide" && card.label === "Các bước kích hoạt" ? (
+                  <figure className="gift-info-card__media">
+                    <img
+                      src={guideOrderCodeExample}
+                      alt="Ví dụ vị trí mã đơn hàng trong ứng dụng mua sắm"
+                    />
+                  </figure>
+                ) : null}
+
+                {card.paragraphs?.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+
+                {card.items?.length ? (
+                  <ul>
+                    {card.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                ) : null}
+
+                {card.sections?.map((section, index) => (
+                  <section
+                    key={`${card.label}-${section.heading ?? index}`}
+                    className="gift-info-card__section"
+                  >
+                    {section.heading ? <h3>{section.heading}</h3> : null}
+
+                    {section.paragraphs?.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+
+                    {section.items?.length ? (
+                      <ul>
+                        {section.items.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </section>
+                ))}
+              </div>
+            )
           ))}
         </section>
 
