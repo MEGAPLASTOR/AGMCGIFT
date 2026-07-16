@@ -39,6 +39,11 @@
   max-width: 340px;
 }
 
+.stage-copy h1 {
+  margin-bottom: 16px;
+  line-height: 1.04;
+}
+
 .stage-hanging-eggs {
   position: relative;
   z-index: 1;

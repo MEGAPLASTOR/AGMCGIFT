@@ -13,10 +13,9 @@ export function GiftTopbar() {
         <img className="brand-mark" src={anhGaLogo} alt="Anh Gà MC" />
         <span>
           <strong>AGMC Gift</strong>
-          <small>Ổ trứng acc may mắn</small>
+          <small>Hệ thống tri ân khách hàng</small>
         </span>
       </Link>
-      <div className="topbar-pill">Gift code may mắn</div>
     </header>
   );
 }

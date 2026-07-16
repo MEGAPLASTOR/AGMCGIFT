@@ -28,7 +28,7 @@ export function getDeliveryStatusError(deliveryStatus) {
   }
 
   if (deliveryKind === "returned") {
-    return "Đơn hàng đã bị hoàn bạn không được phép nhận trứng :<";
+    return "Đơn hàng đã bị hoàn nên không đủ điều kiện nhận quà tri ân.";
   }
 
   if (deliveryKind === "delivering") {
@@ -130,7 +130,7 @@ export function getEggSyncErrorMessage(error) {
     messageText.includes("returned") ||
     messageText.includes("refund")
   ) {
-    return "Đơn hàng đang hoàn/trả nên trứng liên quan đã bị hủy.";
+    return "Đơn hàng đang hoàn/trả nên gói quà liên quan đã bị hủy.";
   }
 
   if (error.status === 400) {

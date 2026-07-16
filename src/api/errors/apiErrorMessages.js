@@ -78,11 +78,11 @@ export function getDefaultApiErrorMessage(status, endpoint) {
   }
 
   if (endpoint === EGG_ENDPOINTS.sync && status === 400) {
-    return "Mã đơn không hợp lệ, khách hàng bị khóa, hoặc đơn hàng chưa đủ điều kiện nhận trứng.";
+    return "Mã đơn không hợp lệ, khách hàng bị khóa, hoặc đơn hàng chưa đủ điều kiện nhận quà.";
   }
 
   if (endpoint === EGG_ENDPOINTS.claim && status === 400) {
-    return "Trứng chưa hết 15 ngày, đơn chưa an toàn, hết quà, hoặc trứng đã mở.";
+    return "Gói quà chưa đủ thời gian chuẩn bị, đơn chưa an toàn, hết quà, hoặc đã được nhận.";
   }
 
   return "Hệ thống dữ liệu trả về lỗi.";

@@ -24,7 +24,7 @@ export function IncubatingRewardPage({
   claimError,
   onClaimReady,
   onReset,
-  backLabel = "Quay lại xem trứng",
+  backLabel = "Quay lại xem lựa chọn",
 }) {
   const [isCountdownComplete, setIsCountdownComplete] = useState(false);
   const accounts = getRewardAccounts(redemptionInfo);
@@ -33,7 +33,7 @@ export function IncubatingRewardPage({
   const isGoldEgg =
     redemptionInfo?.choice === EGG_CHOICES.instant ||
     Number(redemptionInfo?.eggType) === 1;
-  const eggName = isGoldEgg ? "Trứng vàng" : "Trứng bí ẩn";
+  const packageName = isGoldEgg ? "Gói nhận ngay" : "Gói chuẩn bị";
   const cooldownDays = Number(redemptionInfo?.cooldownDays || (isGoldEgg ? 3 : 15));
   const handleCountdownComplete = useCallback(() => {
     setIsCountdownComplete(true);
@@ -45,17 +45,17 @@ export function IncubatingRewardPage({
         <div>
           <p className="eyebrow">
             {hasReward
-              ? `${eggName} đã mở`
+              ? `${packageName} đã sẵn sàng`
               : isGoldEgg
-                ? `${eggName} đang cooldown`
-                : `${eggName} ${cooldownDays} ngày`}
+                ? `${packageName} đang chờ xử lý`
+                : `${packageName} ${cooldownDays} ngày`}
           </p>
           <h2>
             {hasReward
-              ? "Nhận acc thành công"
+              ? "Thông tin quà tri ân"
               : isReady
-                ? "Mở để nhận acc"
-                : "Đợi đủ cooldown để mở"}
+                ? "Nhận thông tin quà"
+                : "Vui lòng chờ hệ thống chuẩn bị"}
           </h2>
         </div>
         {hasReward || isGoldEgg ? (
@@ -70,16 +70,16 @@ export function IncubatingRewardPage({
       <div className="result-summary">
         <span>Code: {redemptionInfo.code}</span>
         <span>Sản phẩm: {redemptionInfo.productName}</span>
-        <span>Ngày giờ mở: {redemptionInfo.rewardDateTime}</span>
-        {accounts.length > 1 ? <span>Số acc: {accounts.length}</span> : null}
+        <span>Ngày giờ nhận: {redemptionInfo.rewardDateTime}</span>
+        {accounts.length > 1 ? <span>Số tài khoản: {accounts.length}</span> : null}
         {getPositiveNumber(redemptionInfo.totalCount) ? (
-          <span>Tổng trứng: {redemptionInfo.totalCount}</span>
+          <span>Tổng lượt: {redemptionInfo.totalCount}</span>
         ) : null}
         {getPositiveNumber(redemptionInfo.claimedCount) ? (
-          <span>Đã mở: {redemptionInfo.claimedCount}</span>
+          <span>Đã bàn giao: {redemptionInfo.claimedCount}</span>
         ) : null}
         {getPositiveNumber(redemptionInfo.hatchingCount) ? (
-          <span>Đang ấp: {redemptionInfo.hatchingCount}</span>
+          <span>Đang chuẩn bị: {redemptionInfo.hatchingCount}</span>
         ) : null}
         {getPositiveNumber(redemptionInfo.stuckCount) ? (
           <span>Bị kẹt: {redemptionInfo.stuckCount}</span>
@@ -90,11 +90,12 @@ export function IncubatingRewardPage({
         hasReward ? (
           <>
             <p className="message message--success">
-              {redemptionInfo.message || `${eggName} đã nở. Đây là phần thưởng của bạn.`}
+              {redemptionInfo.message ||
+                `${packageName} đã hoàn tất. Đây là thông tin quà tri ân của bạn.`}
             </p>
             {getPositiveNumber(redemptionInfo.stuckCount) ? (
               <p className="message message--warning">
-                Có {redemptionInfo.stuckCount} trứng chưa mở được do thiếu tài khoản trong pool hoặc chưa có pool liên kết.
+                Có {redemptionInfo.stuckCount} lượt chưa bàn giao được do thiếu tài khoản trong pool hoặc chưa có pool liên kết.
               </p>
             ) : null}
             <div className="tier-reward-list">
@@ -104,8 +105,8 @@ export function IncubatingRewardPage({
                   account={account}
                   title={
                     accounts.length > 1
-                      ? `Acc nhận được #${index + 1}`
-                      : "Acc nhận được"
+                      ? `Tài khoản bàn giao #${index + 1}`
+                      : "Tài khoản bàn giao"
                   }
                 />
               ))}
@@ -114,10 +115,10 @@ export function IncubatingRewardPage({
         ) : (
           <>
             <p className="message message--success">
-              {eggName} đã hết cooldown. Bấm mở để nhận acc.
+              {packageName} đã sẵn sàng. Bấm nhận để xem thông tin quà.
             </p>
             <button type="button" onClick={onClaimReady} disabled={isClaiming}>
-              {isClaiming ? "Đang mở trứng..." : "Mở trứng bí ẩn"}
+              {isClaiming ? "Đang xử lý..." : "Nhận quà đã chuẩn bị"}
             </button>
           </>
         )
@@ -128,7 +129,7 @@ export function IncubatingRewardPage({
             onComplete={handleCountdownComplete}
           />
           <p className="message message--warning">
-            {eggName} đang cooldown. Đến đúng ngày giờ mở ở trên, bạn có thể bấm mở để nhận phần thưởng.
+            Hệ thống đang chuẩn bị quà. Đến đúng thời gian ở trên, bạn có thể quay lại để nhận thông tin bàn giao.
           </p>
         </>
       )}

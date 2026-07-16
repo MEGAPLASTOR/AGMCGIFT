@@ -18,7 +18,7 @@ function getPositiveNumber(value) {
 export function InstantRewardPage({
   redemptionInfo,
   onReset,
-  backLabel = "Quay lại xem trứng",
+  backLabel = "Quay lại xem lựa chọn",
 }) {
   const accounts = getRewardAccounts(redemptionInfo);
 
@@ -26,8 +26,8 @@ export function InstantRewardPage({
     <section className="gift-panel gift-panel--result">
       <div className="incubating-page__hero">
         <div>
-          <p className="eyebrow">Trứng đã nở</p>
-          <h2>Nhận acc thành công</h2>
+          <p className="eyebrow">Bàn giao thành công</p>
+          <h2>Thông tin quà tri ân</h2>
         </div>
         <RewardTierEggBadge redemptionInfo={redemptionInfo} />
       </div>
@@ -35,15 +35,15 @@ export function InstantRewardPage({
       <div className="result-summary">
         <span>Code: {redemptionInfo.code}</span>
         <span>Sản phẩm: {redemptionInfo.productName}</span>
-        {accounts.length > 1 ? <span>Số acc: {accounts.length}</span> : null}
+        {accounts.length > 1 ? <span>Số tài khoản: {accounts.length}</span> : null}
         {getPositiveNumber(redemptionInfo.totalCount) ? (
-          <span>Tổng trứng: {redemptionInfo.totalCount}</span>
+          <span>Tổng lượt: {redemptionInfo.totalCount}</span>
         ) : null}
         {getPositiveNumber(redemptionInfo.claimedCount) ? (
-          <span>Đã mở: {redemptionInfo.claimedCount}</span>
+          <span>Đã bàn giao: {redemptionInfo.claimedCount}</span>
         ) : null}
         {getPositiveNumber(redemptionInfo.hatchingCount) ? (
-          <span>Đang ấp: {redemptionInfo.hatchingCount}</span>
+          <span>Đang chuẩn bị: {redemptionInfo.hatchingCount}</span>
         ) : null}
         {getPositiveNumber(redemptionInfo.stuckCount) ? (
           <span>Bị kẹt: {redemptionInfo.stuckCount}</span>
@@ -55,7 +55,7 @@ export function InstantRewardPage({
       ) : null}
       {getPositiveNumber(redemptionInfo.stuckCount) ? (
         <p className="message message--warning">
-          Có {redemptionInfo.stuckCount} trứng chưa mở được do thiếu tài khoản trong pool hoặc chưa có pool liên kết.
+          Có {redemptionInfo.stuckCount} lượt chưa bàn giao được do thiếu tài khoản trong pool hoặc chưa có pool liên kết.
         </p>
       ) : null}
 
@@ -64,7 +64,11 @@ export function InstantRewardPage({
           <AccountRewardCard
             key={`${account.taiKhoan || account.username || "reward"}-${index}`}
             account={account}
-            title={accounts.length > 1 ? `Acc nhận được #${index + 1}` : "Acc nhận được"}
+            title={
+              accounts.length > 1
+                ? `Tài khoản bàn giao #${index + 1}`
+                : "Tài khoản bàn giao"
+            }
           />
         ))}
       </div>

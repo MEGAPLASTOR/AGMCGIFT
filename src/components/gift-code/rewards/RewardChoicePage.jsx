@@ -25,40 +25,40 @@ export function RewardChoicePage({
   const delayedReady = isReadyToOpen(delayedEgg);
   const instantNeedsIncubation = Boolean(instantEgg?.requiresIncubation);
   const instantActionLabel = instantOpened
-    ? "Xem acc"
+    ? "Xem thông tin"
     : instantNeedsIncubation
-      ? "Warning"
+      ? "Cảnh báo"
       : isClaiming
-        ? "Đang mở..."
-        : "Mở trứng";
+        ? "Đang xử lý..."
+        : "Nhận ngay";
   const instantDescription = instantOpened
-    ? "Nhóm trứng này đã mở, bấm để xem lại acc."
+    ? "Gói quà này đã được bàn giao, bấm để xem lại thông tin."
     : !canClaimNow
-      ? "Không có trứng thường cho mã này."
+      ? "Không có gói nhận ngay cho mã này."
       : instantNeedsIncubation
-        ? "Bạn đang bị Warning do vi phạm"
-        : "Bấm mở để nhận acc theo số trứng backend mở được.";
+        ? "Tài khoản hiện đang bị cảnh báo do vi phạm."
+        : "Bấm để nhận thông tin quà theo số lượng hệ thống đủ điều kiện bàn giao.";
   const delayedDescription = delayedOpened
-    ? "Nhóm trứng này đã mở, bấm để xem lại acc."
+    ? "Gói quà này đã được bàn giao, bấm để xem lại thông tin."
     : !canClaimLater
-      ? "Không có trứng ấp 15 ngày cho mã này."
+      ? "Không có gói chuẩn bị cho mã này."
       : delayedReady
-        ? "Hết cooldown, bấm mở để nhận acc theo số trứng backend mở được."
-        : "Đang ấp, chưa lộ trứng vàng hay kim cương.";
+        ? "Hệ thống đã chuẩn bị xong, bấm để nhận thông tin quà."
+        : "Hệ thống đang chuẩn bị quà và sẽ bàn giao khi đủ thời gian.";
   const delayedActionLabel = delayedOpened
-    ? "Xem acc"
+    ? "Xem thông tin"
     : delayedReady
       ? isClaiming
-        ? "Đang mở..."
-        : "Mở trứng"
-      : `Ấp ${daysToWait} ngày`;
+        ? "Đang xử lý..."
+        : "Nhận quà"
+      : `Chờ ${daysToWait} ngày`;
 
   return (
     <section className="gift-panel reward-choice-page">
       <div className="panel-heading">
         <div>
           <p className="eyebrow eyebrow--success">Mã đơn hợp lệ</p>
-          <h2>Chọn trứng muốn mở</h2>
+          <h2>Chọn gói quà muốn nhận</h2>
         </div>
         <span className="panel-chip">{code}</span>
       </div>
@@ -80,9 +80,7 @@ export function RewardChoicePage({
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>
-                {instantNeedsIncubation ? "Trứng vàng" : "Trứng thường"}
-              </strong>
+              <strong>{instantNeedsIncubation ? "Gói ưu tiên" : "Gói nhận ngay"}</strong>
               <span>{instantDescription}</span>
             </span>
             <em>{instantActionLabel}</em>
@@ -107,9 +105,7 @@ export function RewardChoicePage({
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>
-                {delayedOpened ? "Trứng đã mở" : "Trứng bí ẩn 15 ngày"}
-              </strong>
+              <strong>{delayedOpened ? "Gói đã sẵn sàng" : `Gói chuẩn bị ${daysToWait} ngày`}</strong>
               <span>{delayedDescription}</span>
             </span>
             <em>{delayedActionLabel}</em>

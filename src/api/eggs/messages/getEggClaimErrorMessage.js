@@ -2,7 +2,7 @@ import { normalizeApiText } from "../utils/normalizeApiText";
 
 export function getEggClaimErrorMessage(error) {
   if (error.status === 0) {
-    return "Hệ thống mở trứng đang tạm ngắt kết nối. Vui lòng thử lại sau.";
+    return "Hệ thống bàn giao quà đang tạm ngắt kết nối. Vui lòng thử lại sau.";
   }
 
   if (error.status === 429) {
@@ -10,7 +10,7 @@ export function getEggClaimErrorMessage(error) {
   }
 
   if (error.status === 404) {
-    return "Không tìm thấy API mở trứng. Vui lòng kiểm tra cấu hình proxy /api hoặc deploy lại frontend.";
+    return "Không tìm thấy API bàn giao quà. Vui lòng kiểm tra cấu hình proxy /api hoặc deploy lại frontend.";
   }
 
   const messageText = normalizeApiText(error.payload?.message || error.message);
@@ -22,7 +22,7 @@ export function getEggClaimErrorMessage(error) {
     messageText.includes("returned") ||
     messageText.includes("refund")
   ) {
-    return "Đơn hàng đã hoàn/trả, trứng bị hủy và không thể mở.";
+    return "Đơn hàng đã hoàn/trả nên gói quà không thể kích hoạt.";
   }
 
   if (
@@ -32,7 +32,7 @@ export function getEggClaimErrorMessage(error) {
     messageText.includes("da giao") ||
     messageText.includes("delivered")
   ) {
-    return "Trứng chỉ được mở khi đã hết 15 ngày và đơn đã giao an toàn.";
+    return "Gói quà chỉ được nhận sau khi đủ 15 ngày và đơn đã giao an toàn.";
   }
 
   if (
@@ -41,7 +41,7 @@ export function getEggClaimErrorMessage(error) {
     messageText.includes("chua san sang") ||
     messageText.includes("not ready")
   ) {
-    return "Trứng chưa hết thời gian ấp 15 ngày.";
+    return "Gói quà chưa hết thời gian chuẩn bị 15 ngày.";
   }
 
   if (error.payload?.message) {
@@ -49,8 +49,8 @@ export function getEggClaimErrorMessage(error) {
   }
 
   if (error.status === 400) {
-    return "Trứng chưa sẵn sàng, hết quà, hoặc trứng đã được mở.";
+    return "Gói quà chưa sẵn sàng, đã hết lượt, hoặc đã được nhận.";
   }
 
-  return error.message || "Không kết nối được API mở trứng.";
+  return error.message || "Không kết nối được API bàn giao quà.";
 }

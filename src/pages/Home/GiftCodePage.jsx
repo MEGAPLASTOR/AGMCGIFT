@@ -111,8 +111,8 @@ export default function GiftCodePage() {
     scrollToSection(codeEntryRef.current, SCROLL_TOP_GAP);
   };
   const resultBackLabel = allAvailableChoicesOpened
-    ? "Quay lại xem trứng"
-    : "Quay lại mở trứng tiếp";
+    ? "Quay lại xem lựa chọn"
+    : "Quay lại tiếp tục nhận quà";
 
   useEffect(() => {
     if (
@@ -130,7 +130,7 @@ export default function GiftCodePage() {
     <main className="gift-page">
       <GiftPageDecorations />
 
-      <section className="incubator-shell" aria-label="AGMC Gift Hatchery">
+      <section className="incubator-shell" aria-label="AGMC Gift">
         <GiftTopbar />
 
         {isConfirmModalOpen ? (

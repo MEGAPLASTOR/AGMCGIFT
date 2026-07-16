@@ -163,7 +163,7 @@ export default function GiftInfoPage() {
         </section>
 
         <div className="gift-info-actions">
-          <Link to={giftCodeRoute.path}>Quay lại mở trứng</Link>
+          <Link to={giftCodeRoute.path}>Quay lại trang tri ân</Link>
         </div>
       </section>
 
