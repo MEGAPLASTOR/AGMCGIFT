@@ -97,19 +97,6 @@
   border-radius: 14px;
 }
 
-.stage-hanging-egg--selected::after {
-  position: absolute;
-  right: 12%;
-  bottom: 8%;
-  left: 12%;
-  z-index: 1;
-  height: 18px;
-  border: 3px solid rgba(23, 19, 10, 0.86);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.72);
-  content: "";
-}
-
 .stage-hanging-egg--gold {
   animation: stage-egg-shake-gold 2.35s ease-in-out infinite;
 }

@@ -93,7 +93,13 @@
   gap: 14px;
 }
 
+.gift-info-content--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .gift-info-card {
+  display: grid;
+  gap: 12px;
   min-width: 0;
   border: 2px solid #17130a;
   border-radius: 8px;
@@ -103,11 +109,28 @@
 
 .gift-info-card span {
   display: block;
-  margin-bottom: 12px;
   color: #b01818;
   font-size: 12px;
   font-weight: 1000;
   text-transform: uppercase;
+}
+
+.gift-info-card__section {
+  display: grid;
+  gap: 10px;
+}
+
+.gift-info-card__section + .gift-info-card__section {
+  border-top: 1px solid rgba(23, 19, 10, 0.14);
+  padding-top: 12px;
+}
+
+.gift-info-card h3 {
+  margin: 0;
+  color: #17130a;
+  font-size: 16px;
+  font-weight: 1000;
+  line-height: 1.4;
 }
 
 .gift-info-card ul {

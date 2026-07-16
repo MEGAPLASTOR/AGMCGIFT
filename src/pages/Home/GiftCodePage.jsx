@@ -19,6 +19,36 @@ import { scrollToSection } from "../../helpers/scrollToSection";
 import { useGiftCode } from "../../hooks/useGiftCode";
 
 const SCROLL_TOP_GAP = 120;
+const GIFT_CONFIRM_AGREEMENT_SECTIONS = [
+  {
+    title: "1. Xác nhận tham gia tự nguyện",
+    paragraphs: [
+      "Tôi xác nhận đã mua thành công sản phẩm mô hình đồ chơi vật lý của AGMC thông qua sàn thương mại điện tử.",
+      "Tôi tự nguyện tham gia chương trình tri ân AGMC Gift và đồng ý nhận phần quà trải nghiệm là nhân vật game do AGMC chuẩn bị sẵn theo nội dung chương trình.",
+    ],
+  },
+  {
+    title: "2. Cam kết sử dụng đúng mục đích",
+    paragraphs: [
+      "Tôi cam kết không lợi dụng chương trình để trục lợi thông qua việc hoàn hàng, hoàn tiền hoặc sử dụng các hình thức gian lận khác sau khi đã kích hoạt và nhận quà.",
+      "Nếu phát hiện hành vi gian lận, AGMC có quyền từ chối phục vụ, thu hồi quyền sử dụng chương trình và tạm ngừng quyền truy cập AGMC Gift theo quy định.",
+    ],
+  },
+  {
+    title: "3. Xác nhận về giá trị quà tặng",
+    paragraphs: [
+      "Tôi hiểu rằng nhân vật game được bàn giao là quà tặng chăm sóc khách hàng đi kèm chương trình tri ân, không phải sản phẩm được bán, không có giá trị quy đổi thành tiền và không cấu thành giá trị của đơn hàng vật lý.",
+      "Do được chuẩn bị theo từng thời điểm, cấp độ hoặc trang bị giữa các nhân vật có thể khác nhau và điều này không được xem là lỗi hoặc căn cứ khiếu nại.",
+    ],
+  },
+  {
+    title: "4. Trách nhiệm bảo mật",
+    paragraphs: [
+      "Sau khi nhận bàn giao, tôi sẽ chủ động đổi mật khẩu, liên kết email hoặc số điện thoại và tự chịu trách nhiệm quản lý tài khoản của mình.",
+      "AGMC sẽ xóa dữ liệu hỗ trợ tạm thời sau 10 phút kể từ thời điểm bàn giao.",
+    ],
+  },
+];
 
 export default function GiftCodePage() {
   const [inputValue, setInputValue] = useState("");
@@ -114,17 +144,36 @@ export default function GiftCodePage() {
             >
               <div className="gift-confirm-modal__head">
                 <div>
-                  <span>Xác nhận trước khi kiểm tra</span>
-                  <h2 id="gift-confirm-check-title">Xác nhận không báo công an</h2>
+                  <span>Bản cam kết trước khi nhận quà</span>
+                  <h2 id="gift-confirm-check-title">
+                    Bản cam kết và thỏa thuận tham gia chương trình tri ân AGMC Gift
+                  </h2>
                 </div>
               </div>
-              <p className="panel-note">
-                Sau khi xác nhận, hệ thống mới kiểm tra mã đơn và cho bạn tiếp tục
-                nhận trứng.
-              </p>
+              <p className="panel-note">Vui lòng đọc kỹ trước khi xác nhận.</p>
+              <div className="gift-confirm-agreement">
+                <p>
+                  Bằng việc nhấn nút <strong>&quot;Đồng ý&quot;</strong>, tôi xác
+                  nhận và đồng ý với các nội dung sau:
+                </p>
+
+                {GIFT_CONFIRM_AGREEMENT_SECTIONS.map((section) => (
+                  <section key={section.title} className="gift-confirm-agreement__section">
+                    <h3>{section.title}</h3>
+                    {section.paragraphs.map((paragraph) => (
+                      <p key={paragraph}>{paragraph}</p>
+                    ))}
+                  </section>
+                ))}
+
+                <p className="gift-confirm-agreement__question">
+                  Bạn có đồng ý với các điều khoản của chương trình AGMC Gift để
+                  nhận bàn giao phần quà tri ân hay không?
+                </p>
+              </div>
               <div className="gift-confirm-modal__actions">
                 <button type="button" onClick={handleConfirmCheck}>
-                  Xác nhận
+                  Đồng ý
                 </button>
                 <button
                   type="button"

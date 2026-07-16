@@ -49,24 +49,56 @@ export default function GiftInfoPage() {
           </nav>
         </section>
 
-        <section className="gift-info-content">
-          <div className="gift-info-card">
-            <span>Nội dung chính</span>
-            <ul>
-              {activeModule.points.map((point) => (
-                <li key={point}>{point}</li>
-              ))}
-            </ul>
-          </div>
+        <section
+          className={
+            activeModule.cards.length > 1
+              ? "gift-info-content"
+              : "gift-info-content gift-info-content--single"
+          }
+        >
+          {activeModule.cards.map((card) => (
+            <div
+              key={card.label}
+              className={
+                card.accent ? "gift-info-card gift-info-card--accent" : "gift-info-card"
+              }
+            >
+              <span>{card.label}</span>
 
-          <div className="gift-info-card gift-info-card--accent">
-            <span>Lưu ý</span>
-            <p>
-              Mã đơn hàng cần được nhập đúng như thông tin mua hàng. Với trứng ấp,
-              khách nên quay lại đúng thời điểm hiển thị trên bộ đếm ngược để mở
-              phần thưởng.
-            </p>
-          </div>
+              {card.paragraphs?.map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+
+              {card.items?.length ? (
+                <ul>
+                  {card.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              ) : null}
+
+              {card.sections?.map((section, index) => (
+                <section
+                  key={`${card.label}-${section.heading ?? index}`}
+                  className="gift-info-card__section"
+                >
+                  {section.heading ? <h3>{section.heading}</h3> : null}
+
+                  {section.paragraphs?.map((paragraph) => (
+                    <p key={paragraph}>{paragraph}</p>
+                  ))}
+
+                  {section.items?.length ? (
+                    <ul>
+                      {section.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </section>
+              ))}
+            </div>
+          ))}
         </section>
 
         <div className="gift-info-actions">
