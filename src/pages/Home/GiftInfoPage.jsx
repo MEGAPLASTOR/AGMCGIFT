@@ -1,4 +1,5 @@
 import { Link, Navigate, useParams } from "react-router-dom";
+import guideOrderCodeExample from "../../assets/images/guide-order-code-example.png";
 import { GiftPageDecorations } from "../../components/gift-code/layout/GiftPageDecorations";
 import { GiftTopbar } from "../../components/gift-code/layout/GiftTopbar";
 import { SupportContactRail } from "../../components/gift-code/layout/SupportContactRail";
@@ -64,6 +65,15 @@ export default function GiftInfoPage() {
               }
             >
               <span>{card.label}</span>
+
+              {activeModule.id === "guide" && card.label === "Các bước kích hoạt" ? (
+                <figure className="gift-info-card__media">
+                  <img
+                    src={guideOrderCodeExample}
+                    alt="Ví dụ vị trí mã đơn hàng trong ứng dụng mua sắm"
+                  />
+                </figure>
+              ) : null}
 
               {card.paragraphs?.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
