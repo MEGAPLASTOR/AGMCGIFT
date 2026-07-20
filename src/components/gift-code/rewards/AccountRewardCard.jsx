@@ -1,6 +1,22 @@
 import { toast } from "react-hot-toast";
+import {
+  FaBolt,
+  FaCrown,
+  FaFireFlameCurved,
+  FaLeaf,
+  FaMoon,
+  FaShieldHalved,
+} from "react-icons/fa6";
 
 const SUPPORTED_TIERS = ["E", "D", "C", "B", "A", "S"];
+const TIER_ICONS = {
+  S: FaCrown,
+  A: FaFireFlameCurved,
+  B: FaShieldHalved,
+  C: FaMoon,
+  D: FaBolt,
+  E: FaLeaf,
+};
 
 function normalizeTier(value) {
   const tier = String(value || "").trim().toUpperCase();
@@ -69,6 +85,7 @@ export function AccountRewardCard({
   const token = accountInfo.token;
   const tier = normalizeTier(accountInfo.tier);
   const displayTier = tier || "E";
+  const TierIcon = TIER_ICONS[displayTier];
   const platform = String(accountInfo.platform || "").trim();
   const note = accountInfo.ghiChu || accountInfo.message;
   const rows = buildRows(note, username, password, token);
@@ -92,7 +109,9 @@ export function AccountRewardCard({
           <span className="tier-reward__wing tier-reward__wing--left" />
           <span className="tier-reward__wing tier-reward__wing--right" />
         </span>
-        <span className="tier-reward__crest" />
+        <span className="tier-reward__crest">
+          <TierIcon />
+        </span>
       </span>
       <div className="tier-reward__hero">
         <div className="tier-reward__identity">

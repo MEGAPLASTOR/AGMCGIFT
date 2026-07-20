@@ -1729,37 +1729,18 @@ input::placeholder {
   left: 50%;
   width: var(--tier-orb-size);
   height: var(--tier-orb-size);
-  border: 2px solid var(--tier-line);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.18), transparent 56%),
-    radial-gradient(circle, rgba(0, 0, 0, 0.42), rgba(0, 0, 0, 0.1));
-  box-shadow:
-    inset 0 0 24px rgba(255, 255, 255, 0.06),
-    0 0 46px -8px var(--tier-glow);
+  display: grid;
+  place-items: center;
+  color: var(--tier-title);
   transform: translateX(-50%);
 }
 
-.tier-reward__crest::before,
-.tier-reward__crest::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  border: 2px solid var(--tier-line);
-  background: linear-gradient(180deg, #fff, var(--tier-wing-mid));
-  transform: translateX(-50%) rotate(45deg);
-}
-
-.tier-reward__crest::before {
-  top: -14px;
-  width: 34px;
-  height: 34px;
-}
-
-.tier-reward__crest::after {
-  bottom: -18px;
-  width: 40px;
-  height: 40px;
+.tier-reward__crest svg {
+  width: 72%;
+  height: 72%;
+  filter:
+    drop-shadow(0 0 10px #fff)
+    drop-shadow(0 0 28px var(--tier-glow));
 }
 
 .tier-reward__hero {
