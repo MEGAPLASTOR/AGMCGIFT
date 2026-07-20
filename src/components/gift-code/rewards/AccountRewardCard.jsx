@@ -1,22 +1,9 @@
 import { toast } from "react-hot-toast";
-import {
-  FaBolt,
-  FaCrown,
-  FaFireFlameCurved,
-  FaLeaf,
-  FaMoon,
-  FaShieldHalved,
-} from "react-icons/fa6";
+import { FaCheck } from "react-icons/fa6";
 
 const SUPPORTED_TIERS = ["E", "D", "C", "B", "A", "S"];
-const TIER_ICONS = {
-  S: FaCrown,
-  A: FaFireFlameCurved,
-  B: FaShieldHalved,
-  C: FaMoon,
-  D: FaBolt,
-  E: FaLeaf,
-};
+const PUBLISHER_NOTE =
+  "(Nhà phát hành tại VN đang ẩn nhân vật vì một số lý do.) Vui lòng dùng PC thay vì Mobile.";
 
 function normalizeTier(value) {
   const tier = String(value || "").trim().toUpperCase();
@@ -65,8 +52,8 @@ async function copyText(value) {
 
 function buildRows(note, username, password, token) {
   return [
-    { key: "username", label: "Tài khoản", value: username },
-    { key: "password", label: "Mật khẩu", value: password },
+    { key: "username", label: "ID", value: username },
+    { key: "password", label: "Mã", value: password },
     { key: "token", label: "Token", value: token, full: true },
     { key: "note", label: "Ghi chú", value: note, full: true, copyable: false },
   ].filter((row) => row.value);
@@ -78,16 +65,15 @@ export function AccountRewardCard({
   title = "Nhân vật bàn giao",
 }) {
   const accountInfo = account || reward || {};
-  const accountName =
-    accountInfo.tenAcc || accountInfo.tenPhanThuong || accountInfo.platform;
   const username = accountInfo.taiKhoan || accountInfo.username;
   const password = accountInfo.matKhau || accountInfo.password;
   const token = accountInfo.token;
   const tier = normalizeTier(accountInfo.tier);
   const displayTier = tier || "E";
-  const TierIcon = TIER_ICONS[displayTier];
   const platform = String(accountInfo.platform || "").trim();
-  const note = accountInfo.ghiChu || accountInfo.message;
+  const note = [accountInfo.ghiChu || accountInfo.message, PUBLISHER_NOTE]
+    .filter(Boolean)
+    .join(" ");
   const rows = buildRows(note, username, password, token);
 
   const handleCopy = async (label, value) => {
@@ -110,14 +96,14 @@ export function AccountRewardCard({
           <span className="tier-reward__wing tier-reward__wing--right" />
         </span>
         <span className="tier-reward__crest">
-          <TierIcon />
+          <FaCheck />
         </span>
       </span>
       <div className="tier-reward__hero">
         <div className="tier-reward__identity">
           <div className="tier-reward__summary">
             <span>{title}</span>
-            <strong>{accountName || "Acc Blox Fruit"}</strong>
+            <strong>Chúc Mừng</strong>
             {platform ? (
               <em className="tier-reward__platform">{platform}</em>
             ) : null}
