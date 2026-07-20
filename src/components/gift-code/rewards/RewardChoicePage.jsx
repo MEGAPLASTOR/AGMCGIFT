@@ -1,4 +1,5 @@
 import eggInstantGold from "../../../assets/images/egg-instant-gold.png";
+import eggPremium15Days from "../../../assets/images/egg-premium-15-days.png";
 
 function isReadyToOpen(egg) {
   if (!egg?.hatchAt) return true;
@@ -99,9 +100,7 @@ export function RewardChoicePage({
             </span>
           )}
           <span className="reward-egg-card__image">
-            <span className="mystery-egg" aria-hidden="true">
-              ?
-            </span>
+            <img src={eggPremium15Days} alt="" />
           </span>
           <span className="reward-egg-card__content">
             <span>
