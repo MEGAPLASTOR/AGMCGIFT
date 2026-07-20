@@ -425,8 +425,8 @@ function downloadAccountTemplate() {
   }
 
   const rows = [
-    ["Username", "Password", "Platform", "Tier", "Status", "Token"],
-    ["ACC001", "password01", "ROBLOX", "A", "available", "token-or-email"],
+    ["Username", "Password", "Platform", "Tier", "Token"],
+    ["ACC001", "password01", "ROBLOX", "A", "token-or-email"],
   ];
   const csvText = rows
     .map((row) =>
