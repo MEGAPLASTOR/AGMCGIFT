@@ -104,7 +104,7 @@ export function RewardChoicePage({
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>{delayedOpened ? "Gói đã sẵn sàng" : `Gói chuẩn bị ${daysToWait} ngày`}</strong>
+              <strong>{delayedOpened ? "Gói đã sẵn sàng" : `Đang ấp, xin vui lòng chờ ${daysToWait} ngày để nhận quà`}</strong>
               <span>{delayedDescription}</span>
             </span>
             <em>{delayedActionLabel}</em>
