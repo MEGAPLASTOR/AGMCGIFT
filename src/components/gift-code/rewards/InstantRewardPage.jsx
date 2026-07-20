@@ -66,8 +66,8 @@ export function InstantRewardPage({
             account={account}
             title={
               accounts.length > 1
-                ? `Tài khoản bàn giao #${index + 1}`
-                : "Tài khoản bàn giao"
+                ? `Nhân vật bàn giao #${index + 1}`
+                : "Nhân vật bàn giao"
             }
           />
         ))}

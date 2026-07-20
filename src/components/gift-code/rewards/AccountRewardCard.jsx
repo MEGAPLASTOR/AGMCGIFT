@@ -59,7 +59,7 @@ function buildRows(note, username, password, token) {
 export function AccountRewardCard({
   reward,
   account,
-  title = "Acc nhận được",
+  title = "Nhân vật bàn giao",
 }) {
   const accountInfo = account || reward || {};
   const accountName =
@@ -85,10 +85,7 @@ export function AccountRewardCard({
   };
 
   return (
-    <div
-      className={`tier-reward tier-reward--${displayTier.toLowerCase()}`}
-      data-tier={displayTier}
-    >
+    <div className={`tier-reward tier-reward--${displayTier.toLowerCase()}`}>
       <span className="tier-reward__art" aria-hidden="true">
         <span className="tier-reward__aura" />
         <span className="tier-reward__wings">
@@ -97,15 +94,8 @@ export function AccountRewardCard({
         </span>
         <span className="tier-reward__crest" />
       </span>
-      <span className="tier-reward__tier-mark" aria-hidden="true">
-        {displayTier}
-      </span>
-
       <div className="tier-reward__hero">
         <div className="tier-reward__identity">
-          <span className="tier-reward__seal" aria-hidden="true">
-            {displayTier}
-          </span>
           <div className="tier-reward__summary">
             <span>{title}</span>
             <strong>{accountName || "Acc Blox Fruit"}</strong>
