@@ -25,6 +25,7 @@ import {
   searchTableRows,
 } from "../../services/adminCrudService";
 import { parseAccountImportFile } from "../../services/accountImportService";
+import accountTemplateUrl from "../../assets/gift-account-template.xlsx?url";
 import {
   confirmAdminAction,
   showAdminAlert,
@@ -424,25 +425,11 @@ function downloadAccountTemplate() {
     return;
   }
 
-  const rows = [
-    ["Username", "Password", "Platform", "Tier", "Token"],
-    ["ACC001", "password01", "ROBLOX", "A", "token-or-email"],
-  ];
-  const csvText = rows
-    .map((row) =>
-      row
-        .map((cell) => `"${String(cell).replace(/"/g, '""')}"`)
-        .join(",")
-    )
-    .join("\n");
-  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
 
-  link.href = url;
-  link.download = "gift-account-template.csv";
+  link.href = accountTemplateUrl;
+  link.download = "gift-account-template.xlsx";
   link.click();
-  URL.revokeObjectURL(url);
 }
 
 function AccountExcelGuide({ onDownloadTemplate }) {
