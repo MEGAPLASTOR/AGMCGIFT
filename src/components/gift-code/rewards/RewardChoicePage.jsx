@@ -38,7 +38,7 @@ export function RewardChoicePage({
       ? "Không có gói nhận ngay cho mã này."
       : instantNeedsIncubation
         ? "Tài khoản hiện đang bị cảnh báo do vi phạm."
-        : "Bấm để nhận thông tin quà theo số lượng hệ thống đủ điều kiện bàn giao.";
+        : "Bấm để nhận ngay quà tri ân.";
   const delayedDescription = delayedOpened
     ? "Gói quà này đã được bàn giao, bấm để xem lại thông tin."
     : !canClaimLater
