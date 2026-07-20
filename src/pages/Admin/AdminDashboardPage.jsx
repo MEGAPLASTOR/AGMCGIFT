@@ -50,8 +50,8 @@ import {
   deleteAdminGiftAccounts,
   deleteAdminGiftAccount,
   updateAdminGiftAccount,
-  uploadAdminGiftAccounts,
 } from "../../services/adminGiftAccountService";
+import { parseAccountImportFile } from "../../services/accountImportService";
 import {
   addAdminGiftPoolAccounts,
   createAdminGiftPool,
@@ -550,11 +550,14 @@ export default function AdminDashboardPage() {
 
   const handleUploadGiftAccounts = async (file) => {
     try {
-      const payload = await uploadAdminGiftAccounts(file, admin.authHeader);
+      const { accounts } = await parseAccountImportFile(file);
+      await Promise.all(
+        accounts.map((account) => createAdminGiftAccount(account, admin.authHeader))
+      );
       const rawTables = await loadRawTables(admin.authHeader);
       handleAuthError(rawTables);
 
-      return payload;
+      return { accountsImported: accounts.length };
     } catch (uploadError) {
       handleAuthError(uploadError);
       throw uploadError;
