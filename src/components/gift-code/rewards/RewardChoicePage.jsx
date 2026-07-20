@@ -45,7 +45,7 @@ export function RewardChoicePage({
       ? "Không có gói chuẩn bị cho mã này."
       : delayedReady
         ? "Hệ thống đã chuẩn bị xong, bấm để nhận thông tin quà."
-        : "Hệ thống đang chuẩn bị quà và sẽ bàn giao khi đủ thời gian.";
+        : `Đang ấp, xin vui lòng chờ ${daysToWait} ngày để nhận quà.`;
   const delayedActionLabel = delayedOpened
     ? "Xem thông tin"
     : delayedReady
@@ -104,7 +104,7 @@ export function RewardChoicePage({
           </span>
           <span className="reward-egg-card__content">
             <span>
-              <strong>{delayedOpened ? "Gói đã sẵn sàng" : `Đang ấp, xin vui lòng chờ ${daysToWait} ngày để nhận quà`}</strong>
+              <strong>{delayedOpened ? "Gói đã sẵn sàng" : `Gói chuẩn bị ${daysToWait} ngày`}</strong>
               <span>{delayedDescription}</span>
             </span>
             <em>{delayedActionLabel}</em>
