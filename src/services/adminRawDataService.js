@@ -289,6 +289,8 @@ function normalizeProducts(products) {
     fullName: product.fullName,
     basePrice: product.basePrice || 0,
     imageUrl: product.imageUrl || "",
+    eggType1Qty: Number(product.eggType1Qty ?? product.egg_type_1_qty ?? 0),
+    eggType2Qty: Number(product.eggType2Qty ?? product.egg_type_2_qty ?? 0),
     lastSyncedAt: normalizeDate(product.lastSyncedAt),
   }));
 }

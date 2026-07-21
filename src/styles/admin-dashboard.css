@@ -4081,6 +4081,27 @@
   font-weight: 800;
 }
 
+.admin-product-egg-quantity {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  gap: 4px;
+  margin-bottom: 7px;
+  border: 1px solid rgba(58, 205, 92, 0.35);
+  border-radius: 999px;
+  background: rgba(58, 205, 92, 0.12);
+  color: #67dc82;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 7px;
+}
+
+.admin-product-egg-quantity.is-egg-2 {
+  border-color: rgba(255, 166, 38, 0.38);
+  background: rgba(255, 166, 38, 0.12);
+  color: #ffad38;
+}
+
 .admin-product-mapping-list {
   display: flex;
   flex-wrap: wrap;

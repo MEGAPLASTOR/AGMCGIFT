@@ -64,7 +64,10 @@ import {
   linkAdminProductEggMapping,
   updateAdminProductEggMappingRates,
 } from "../../services/adminProductEggMappingService";
-import { syncAllAdminProducts } from "../../services/adminProductService";
+import {
+  syncAllAdminProducts,
+  updateAdminProductEggQuantities,
+} from "../../services/adminProductService";
 
 const ADMIN_BASE_PATH = "/agmcmyadmin";
 const ADMIN_OVERVIEW_REFRESH_INTERVAL_MS = 10000;
@@ -671,6 +674,21 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleUpdateProductEggQuantities = async (productId, quantities) => {
+    try {
+      await updateAdminProductEggQuantities(productId, quantities, admin.authHeader);
+      const rawTables = await loadRawTables(admin.authHeader);
+      handleAuthError(rawTables);
+
+      return (rawTables.products || []).find(
+        (product) => String(product.kvProductId || product.id) === String(productId)
+      );
+    } catch (updateError) {
+      handleAuthError(updateError);
+      throw updateError;
+    }
+  };
+
   const handleUpdateEggHatchTime = async (eggId, hatchAt) => {
     try {
       const fallbackEgg = await updateAdminEggHatchTime(
@@ -977,6 +995,7 @@ export default function AdminDashboardPage() {
               onSaveProductEggMapping={handleSaveProductEggMapping}
               onDeleteProductEggMapping={handleDeleteProductEggMapping}
               onUpdateProductEggMappingRates={handleUpdateProductEggMappingRates}
+              onUpdateProductEggQuantities={handleUpdateProductEggQuantities}
               onUpdateEggHatchTime={handleUpdateEggHatchTime}
               onImportGiftAccounts={adminTables.importGiftAccounts}
               onUploadGiftAccounts={handleUploadGiftAccounts}

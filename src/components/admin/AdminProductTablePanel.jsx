@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   FaCloudArrowDown,
+  FaEgg,
   FaLink,
   FaMagnifyingGlass,
   FaPercent,
@@ -177,6 +178,7 @@ export function AdminProductTablePanel({
   onDeleteRecord,
   onSyncProducts,
   onUpdateProductEggMappingRates,
+  onUpdateProductEggQuantities,
   tables,
 }) {
   const [keyword, setKeyword] = useState("");
@@ -185,6 +187,11 @@ export function AdminProductTablePanel({
   const [selectedMappingType, setSelectedMappingType] = useState(1);
   const [rateProductId, setRateProductId] = useState("");
   const [draftRates, setDraftRates] = useState({});
+  const [quantityProductId, setQuantityProductId] = useState("");
+  const [draftQuantities, setDraftQuantities] = useState({
+    eggType1Qty: 0,
+    eggType2Qty: 0,
+  });
   const [isSaving, setIsSaving] = useState(false);
 
   const products = tables.products || EMPTY_ROWS;
@@ -251,6 +258,9 @@ export function AdminProductTablePanel({
     ? mappingsByProductId.get(selectedProductId) || EMPTY_ROWS
     : EMPTY_ROWS;
   const rateProduct = rateProductId ? productById.get(rateProductId) || null : null;
+  const quantityProduct = quantityProductId
+    ? productById.get(quantityProductId) || null
+    : null;
   const rateProductMappings = rateProductId
     ? mappingsByProductId.get(rateProductId) || EMPTY_ROWS
     : EMPTY_ROWS;
@@ -463,6 +473,37 @@ export function AdminProductTablePanel({
     }
   };
 
+  const openQuantityModal = (product) => {
+    setQuantityProductId(getProductId(product));
+    setDraftQuantities({
+      eggType1Qty: Number(product.eggType1Qty || 0),
+      eggType2Qty: Number(product.eggType2Qty || 0),
+    });
+  };
+
+  const closeQuantityModal = () => setQuantityProductId("");
+
+  const saveQuantities = async () => {
+    if (!quantityProduct || isSaving) return;
+
+    setIsSaving(true);
+
+    try {
+      const savedProduct = await onUpdateProductEggQuantities?.(
+        getProductId(quantityProduct),
+        draftQuantities
+      );
+
+      if (savedProduct) onSaveRecord?.("products", savedProduct);
+      showAdminAlert("Đã cập nhật số lượng trứng.");
+      closeQuantityModal();
+    } catch (error) {
+      showAdminAlert(error.message || "Không thể cập nhật số lượng trứng.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <section className="admin-panel admin-product-manager-panel">
       <div className="admin-product-toolbar">
@@ -543,6 +584,9 @@ export function AdminProductTablePanel({
                     </td>
                     <td>{formatCurrency(product.basePrice)}</td>
                     <td>
+                      <span className="admin-product-egg-quantity is-egg-1">
+                        <FaEgg aria-hidden="true" /> Phát: {Number(product.eggType1Qty || 0)} quả
+                      </span>
                       {type1Mappings.length ? (
                         <div className="admin-product-mapping-list">
                           {type1Mappings.map((mapping) => (
@@ -567,6 +611,9 @@ export function AdminProductTablePanel({
                       )}
                     </td>
                     <td>
+                      <span className="admin-product-egg-quantity is-egg-2">
+                        <FaEgg aria-hidden="true" /> Phát: {Number(product.eggType2Qty || 0)} quả
+                      </span>
                       {type2Mappings.length ? (
                         <div className="admin-product-mapping-list">
                           {type2Mappings.map((mapping) => (
@@ -608,6 +655,14 @@ export function AdminProductTablePanel({
                         >
                           <FaPercent aria-hidden="true" />
                           Tỉ lệ
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-mini-button admin-product-quantity-button"
+                          onClick={() => openQuantityModal(product)}
+                        >
+                          <FaEgg aria-hidden="true" />
+                          Số trứng
                         </button>
                       </div>
                     </td>
@@ -799,6 +854,76 @@ export function AdminProductTablePanel({
                 </button>
                 <button type="button" disabled={isSaving} onClick={saveRates}>
                   {isSaving ? "Đang lưu..." : "Lưu tỉ lệ"}
+                </button>
+              </div>
+            </div>
+          </section>
+        </AdminModalPortal>
+      ) : null}
+
+      {quantityProduct ? (
+        <AdminModalPortal>
+          <section
+            className="admin-panel admin-modal admin-product-mapping-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="admin-product-quantity-title"
+          >
+            <div className="admin-product-mapping-editor">
+              <div className="admin-record-editor__head">
+                <div>
+                  <strong id="admin-product-quantity-title">Cài Đặt Số Lượng Trứng</strong>
+                  <span>{getProductName(quantityProduct)}</span>
+                </div>
+                <button
+                  type="button"
+                  className="admin-modal-close"
+                  aria-label="Đóng cài đặt số lượng trứng"
+                  onClick={closeQuantityModal}
+                >
+                  <FaXmark aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="admin-product-mapping-form">
+                <label>
+                  Trứng thường (Loại 1)
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={draftQuantities.eggType1Qty}
+                    onChange={(event) =>
+                      setDraftQuantities((current) => ({
+                        ...current,
+                        eggType1Qty: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  Trứng ấp (Loại 2)
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={draftQuantities.eggType2Qty}
+                    onChange={(event) =>
+                      setDraftQuantities((current) => ({
+                        ...current,
+                        eggType2Qty: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+              </div>
+
+              <div className="admin-crud-actions admin-product-mapping-actions">
+                <button type="button" className="admin-light-button" onClick={closeQuantityModal}>
+                  Hủy
+                </button>
+                <button type="button" disabled={isSaving} onClick={saveQuantities}>
+                  {isSaving ? "Đang lưu..." : "Lưu số lượng"}
                 </button>
               </div>
             </div>
