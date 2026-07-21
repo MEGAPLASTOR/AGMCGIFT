@@ -82,6 +82,7 @@ const ACCOUNT_TABLE_COLUMNS = [
   "tier",
   "status",
   "token",
+  "created_at",
   "assigned_at",
 ];
 
@@ -165,8 +166,8 @@ function getAccountTierValue(account) {
   return normalizeBoardValue(account?.tier).toUpperCase();
 }
 
-function getAssignedAtTimestamp(account) {
-  const raw = account?.assigned_at;
+function getCreatedAtTimestamp(account) {
+  const raw = account?.created_at;
 
   if (!raw) {
     return 0;
@@ -181,6 +182,14 @@ function sortGiftAccountRows(rows, lastChangedAccountId) {
   const lastChangedId = normalizeBoardValue(lastChangedAccountId);
 
   return [...rows].sort((first, second) => {
+    // Sort theo ngày thêm gần hiện tại nhất (mới nhất lên đầu)
+    const createdDiff =
+      getCreatedAtTimestamp(second) - getCreatedAtTimestamp(first);
+
+    if (createdDiff !== 0) {
+      return createdDiff;
+    }
+
     const firstId = getRecordId(first, "giftAccounts");
     const secondId = getRecordId(second, "giftAccounts");
 
@@ -190,14 +199,6 @@ function sortGiftAccountRows(rows, lastChangedAccountId) {
 
     if (recentDiff) {
       return recentDiff;
-    }
-
-    // Sort theo ngày gán gần nhất (mới nhất lên đầu)
-    const assignedDiff =
-      getAssignedAtTimestamp(second) - getAssignedAtTimestamp(first);
-
-    if (assignedDiff !== 0) {
-      return assignedDiff;
     }
 
     // Tiebreaker: status rank → tier → username
@@ -497,6 +498,7 @@ function AdminGiftAccountTable({
             <th>Tier</th>
             <th>Trạng Thái</th>
             <th>Token</th>
+            <th>Ngày Thêm</th>
             <th>Ngày Gán</th>
             <th>Hành Động</th>
           </tr>
@@ -559,6 +561,7 @@ function AdminGiftAccountTable({
                       {formatAccountTableValue(row.token)}
                     </code>
                   </td>
+                  <td>{formatAccountDate(row.created_at)}</td>
                   <td>{formatAccountDate(row.assigned_at)}</td>
                   <td>
                     <div className="admin-account-table__actions">
